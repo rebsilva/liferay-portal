@@ -34,7 +34,7 @@ import { ISymbols } from '../NumericInputMask/NumericInputMask';
 import withConfirmationField from '../util/withConfirmationField.es';
 
 const adaptiveMask = (rawValue: string, inputMaskFormat: string) => {
-	console.log("hello");
+	console.log("não");
 	const generateMask = (mask: string): string => {
 		if (!mask.includes('0')) {
 			return mask;
