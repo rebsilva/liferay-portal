@@ -12,28 +12,29 @@
  * details.
  */
 
-import {ClayInput} from '@clayui/form';
+import { ClayInput } from '@clayui/form';
 
 // @ts-ignore
 
-import {useFormState} from 'data-engine-js-components-web';
-import React, {ChangeEventHandler, FocusEventHandler, useMemo} from 'react';
+import { useFormState } from 'data-engine-js-components-web';
+import React, { ChangeEventHandler, FocusEventHandler, useMemo } from 'react';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
 
 // @ts-ignore
 
-import {conformToMask} from 'vanilla-text-mask';
+import { conformToMask } from 'vanilla-text-mask';
 
 // @ts-ignore
 
-import {FieldBase} from '../FieldBase/ReactFieldBase.es';
-import {ISymbols} from '../NumericInputMask/NumericInputMask';
+import { FieldBase } from '../FieldBase/ReactFieldBase.es';
+import { ISymbols } from '../NumericInputMask/NumericInputMask';
 
 // @ts-ignore
 
 import withConfirmationField from '../util/withConfirmationField.es';
 
 const adaptiveMask = (rawValue: string, inputMaskFormat: string) => {
+	console.log("olá!");
 	const generateMask = (mask: string): string => {
 		if (!mask.includes('0')) {
 			return mask;
@@ -113,7 +114,7 @@ const getMaskedValue = ({
 
 		if (typeof value === 'string') {
 			if (!value) {
-				return {masked: '', raw: ''};
+				return { masked: '', raw: '' };
 			}
 			value = value.replace(symbols.decimalSymbol, '.');
 			if (dataType == 'integer' && value.includes('.')) {
@@ -123,14 +124,14 @@ const getMaskedValue = ({
 		value = value.replace('.', symbols.decimalSymbol);
 	}
 
-	const {conformedValue: masked} = conformToMask(value, mask, {
+	const { conformedValue: masked } = conformToMask(value, mask, {
 		guide: false,
 		keepCharPositions: false,
 		placeholderChar: '\u2000',
 	});
 	const regex = new RegExp(`[^${symbols.decimalSymbol}|\\d]`, 'g');
 
-	return {masked, raw: inputMask ? masked.replace(regex, '') : masked};
+	return { masked, raw: inputMask ? masked.replace(regex, '') : masked };
 };
 
 const Numeric: React.FC<IProps> = ({
@@ -149,20 +150,20 @@ const Numeric: React.FC<IProps> = ({
 	placeholder,
 	predefinedValue,
 	readOnly,
-	symbols: symbolsProp = {decimalSymbol: '.'},
+	symbols: symbolsProp = { decimalSymbol: '.' },
 	value,
 	...otherProps
 }) => {
-	const {editingLanguageId} = useFormState();
+	const { editingLanguageId } = useFormState();
 	const symbols = useMemo<ISymbols>(() => {
 		return inputMask
 			? {
-					decimalSymbol: symbolsProp.decimalSymbol,
-					thousandsSeparator:
-						symbolsProp.thousandsSeparator == 'none'
-							? null
-							: symbolsProp.thousandsSeparator,
-			  }
+				decimalSymbol: symbolsProp.decimalSymbol,
+				thousandsSeparator:
+					symbolsProp.thousandsSeparator == 'none'
+						? null
+						: symbolsProp.thousandsSeparator,
+			}
 			: symbolsProp;
 	}, [inputMask, symbolsProp]);
 
@@ -198,7 +199,7 @@ const Numeric: React.FC<IProps> = ({
 	]);
 
 	const handleChange: ChangeEventHandler<HTMLInputElement> = ({
-		target: {value},
+		target: { value },
 	}) => {
 		const rawValue = value.replace(/\D/g, '');
 		if (
@@ -225,7 +226,7 @@ const Numeric: React.FC<IProps> = ({
 			value,
 		});
 		if (newValue.masked !== inputValue.masked) {
-			onChange({target: {value: newValue.raw}});
+			onChange({ target: { value: newValue.raw } });
 		}
 	};
 
@@ -281,7 +282,7 @@ const Numeric: React.FC<IProps> = ({
 	);
 };
 
-export {Numeric};
+export { Numeric };
 export default withConfirmationField(Numeric);
 
 interface IMaskedNumber {
@@ -308,10 +309,10 @@ interface IProps {
 	id: string;
 	inputMask?: boolean;
 	inputMaskFormat?: string;
-	localizedValue?: {[key: string]: string};
+	localizedValue?: { [key: string]: string };
 	name: string;
 	onBlur: FocusEventHandler<HTMLInputElement>;
-	onChange: (event: {target: {value: string}}) => void;
+	onChange: (event: { target: { value: string } }) => void;
 	onFocus: FocusEventHandler<HTMLInputElement>;
 	placeholder?: string;
 	predefinedValue?: string;
