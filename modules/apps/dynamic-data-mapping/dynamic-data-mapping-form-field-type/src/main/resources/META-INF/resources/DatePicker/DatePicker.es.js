@@ -26,75 +26,24 @@ const LETTER_DIGIT_REGEX = /[A-Z0-9]/gi;
 const NOT_LETTER_REGEX = /[^a-z]/gi;
 const YEARS_INDEX = 6;
 
-const getDateMask = (dateDelimiter, dateFormat) => {
-	const lastSymbol = dateFormat.slice(-1).match(NOT_LETTER_REGEX);
-
-	dateFormat = lastSymbol ? dateFormat.slice(0, -1) : dateFormat;
-
-	return dateFormat
-		.split(dateDelimiter)
-		.map((item) => {
-			let currentFormat;
-
-			if (item === 'YYYY') {
-				currentFormat = 'yyyy';
-			}
-			else if (item === 'DD') {
-				currentFormat = 'dd';
-			}
-			else {
-				currentFormat = 'MM';
-			}
-
-			return currentFormat;
-		})
-		.join(dateDelimiter);
-};
-
-const getDelimiter = (dateFormat) => {
-	let dateDelimiter = '/';
-
-	if (dateFormat.indexOf('.') !== -1) {
-		dateDelimiter = '.';
-	}
-
-	if (dateFormat.indexOf('-') !== -1) {
-		dateDelimiter = '-';
-	}
-
-	return dateDelimiter;
-};
-
-const getLocaleDateFormat = (locale, format = 'L') => {
+const getLocaleDateFormat = (locale) => {
 	moment.locale(locale);
 
-	return moment.localeData().longDateFormat(format);
-};
-
-const getMaskByDateFormat = (format) => {
-	const mask = [];
-
-	for (let i = 0; i < format.length; i++) {
-		if (LETTER_REGEX.test(format[i])) {
-			mask.push(DIGIT_REGEX);
-		}
-		else {
-			mask.push(`${format[i]}`);
-		}
-	}
-
-	return mask;
+	return moment.localeData().longDateFormat('L');
 };
 
 const getDateFormat = (locale) => {
 	const dateFormat = getLocaleDateFormat(locale);
-	const inputMask = getMaskByDateFormat(dateFormat);
-	const dateDelimiter = getDelimiter(inputMask);
+	const lastSymbol = dateFormat.slice(-1).match(NOT_LETTER_REGEX);
+	const dateMask = (lastSymbol ? dateFormat.slice(0, -1) : dateFormat)
+		.replace('YYYY', 'yyyy')
+		.replace('DD', 'dd');
 
-	return {
-		dateMask: getDateMask(dateDelimiter, dateFormat),
-		inputMask,
-	};
+	const inputMask = [...dateFormat].map((char) =>
+		LETTER_REGEX.test(char) ? DIGIT_REGEX : char
+	);
+
+	return {dateMask, inputMask};
 };
 
 const getInitialMonth = (value) => {
@@ -105,27 +54,25 @@ const getInitialMonth = (value) => {
 	return moment().toDate();
 };
 
-const getInitialValue = (
-	defaultLanguageId,
-	date,
-	locale,
-	formatInEditingLocale
-) => {
-	if (typeof date === 'string' && date.indexOf('_') === -1 && date !== '') {
-		if (formatInEditingLocale) {
-			return moment(date, [
-				getLocaleDateFormat(locale),
-				'YYYY-MM-DD',
-			]).format(getLocaleDateFormat(locale));
-		}
+const getInitialValue = (defaultLanguageId, value, locale, localizedValue) => {
+	if (typeof value === 'string' && value !== '' && !value.includes('_')) {
+		const formatInEditingLocale =
+			localizedValue &&
+			localizedValue[locale] !== undefined &&
+			localizedValue[locale] !== null;
 
-		return moment(date, [
-			getLocaleDateFormat(defaultLanguageId),
-			'YYYY-MM-DD',
-		]).format(getLocaleDateFormat(defaultLanguageId));
+		const currentLocale = formatInEditingLocale
+			? locale
+			: defaultLanguageId;
+
+		const localizedDateFormat = getLocaleDateFormat(currentLocale);
+
+		return moment(value, [localizedDateFormat, 'YYYY-MM-DD']).format(
+			localizedDateFormat
+		);
 	}
 
-	return date;
+	return value;
 };
 
 const getValueForHidden = (value, locale, isDatetime) => {
@@ -171,7 +118,6 @@ const WeekdayShort = [
 const DatePicker = ({
 	defaultLanguageId,
 	disabled,
-	formatInEditingLocale,
 	locale,
 	localizable,
 	localizedValue: localizedValueInitial = {},
@@ -179,7 +125,6 @@ const DatePicker = ({
 	onBlur,
 	onChange,
 	onFocus,
-	spritemap,
 	time,
 	use12Hours,
 	value: initialValue,
@@ -197,9 +142,9 @@ const DatePicker = ({
 				defaultLanguageId,
 				initialValue,
 				locale,
-				formatInEditingLocale
+				localizedValue
 			),
-		[defaultLanguageId, formatInEditingLocale, initialValue, locale]
+		[defaultLanguageId, initialValue, locale, localizedValue]
 	);
 
 	const [value, setValue] = useState(initialValueMemoized);
@@ -293,7 +238,6 @@ const DatePicker = ({
 	return (
 		<>
 			<input
-				aria-hidden="true"
 				name={name}
 				type="hidden"
 				value={getValueForHidden(value, locale, time)}
@@ -349,7 +293,6 @@ const DatePicker = ({
 					}
 				}}
 				ref={inputRef}
-				spritemap={spritemap}
 				time={time}
 				use12Hours={use12Hours}
 				value={value}
@@ -372,7 +315,6 @@ const Main = ({
 	placeholder,
 	predefinedValue,
 	readOnly,
-	spritemap,
 	type,
 	value,
 	...otherProps
@@ -393,16 +335,10 @@ const Main = ({
 			localizedValue={localizedValue}
 			name={name}
 			readOnly={readOnly}
-			spritemap={spritemap}
 		>
 			<DatePicker
 				defaultLanguageId={defaultLanguageId}
 				disabled={readOnly}
-				formatInEditingLocale={
-					localizedValue &&
-					localizedValue[locale] !== undefined &&
-					localizedValue[locale] !== null
-				}
 				locale={locale}
 				localizable={localizable}
 				localizedValue={localizedValue}
