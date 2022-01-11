@@ -32,18 +32,14 @@ const getLocaleDateFormat = (locale) => {
 	return moment.localeData().longDateFormat('L');
 };
 
-const getDateFormat = (locale) => {
+const getInputMaskFormat = (locale) => {
 	const dateFormat = getLocaleDateFormat(locale);
-	const lastSymbol = dateFormat.slice(-1).match(NOT_LETTER_REGEX);
-	const dateMask = (lastSymbol ? dateFormat.slice(0, -1) : dateFormat)
-		.replace('YYYY', 'yyyy')
-		.replace('DD', 'dd');
 
 	const inputMask = [...dateFormat].map((char) =>
 		LETTER_REGEX.test(char) ? DIGIT_REGEX : char
 	);
 
-	return {dateMask, inputMask};
+	return inputMask;
 };
 
 const getInitialMonth = (value) => {
@@ -75,13 +71,69 @@ const getInitialValue = (defaultLanguageId, value, locale, localizedValue) => {
 	return value;
 };
 
-const getValueForHidden = (value, locale, isDatetime) => {
+const getMomentMask = (locale, isDatetime) => {
+	let momentMask;
+
 	const momentLocale = moment().locale(locale);
 
 	const date = momentLocale.localeData().longDateFormat('L');
 	const time = momentLocale.localeData().longDateFormat('LT');
 
-	let newMoment = moment(value, isDatetime ? `${date} ${time}` : date, true);
+	if (isDatetime) {
+		const [hourFormat] = time.split(NOT_LETTER_REGEX, 1);
+		if (hourFormat.length === 1) {
+			const newTime = hourFormat[0] === 'H' ? `H${time}` : `h${time}`;
+			momentMask = `${date} ${newTime}`;
+		}
+		else {
+			momentMask = `${date} ${time}`;
+		}
+	}
+	else {
+		momentMask = date;
+	}
+
+	return momentMask;
+};
+
+const getClayMask = (locale) => {
+	const dateFormat = getLocaleDateFormat(locale);
+	//const lastSymbol = dateFormat.slice(-1).match(NOT_LETTER_REGEX);
+	//const clayMask = (lastSymbol ? dateFormat.slice(0, -1) : dateFormat)
+	const clayMask = dateFormat
+		.replace('YYYY', 'yyyy')
+		.replace('DD', 'dd');
+
+	console.log(clayMask);
+
+	return clayMask;
+};
+
+const getPipeMask = (momentMask, isDateTime) => {
+	let pipeMask = momentMask;
+
+	if (isDateTime) {
+		// precisa fazer isso aqui de outro jeito
+		let date = pipeMask.slice(0, 11);
+		let time = pipeMask.slice(11, pipeMask.length);
+		const lastSymbol = date.slice(-1).match(NOT_LETTER_REGEX);
+		date = (lastSymbol ? date.slice(0, -1) : date).toLowerCase();
+		time = time.replace('hh', 'HH')
+		.replace('mm', 'MM');
+		pipeMask = `${date}${time}`;
+
+	} else {
+		const lastSymbol = pipeMask.slice(-1).match(NOT_LETTER_REGEX);
+		pipeMask = (lastSymbol ? pipeMask.slice(0, -1) : pipeMask).toLowerCase();
+	}
+
+	return pipeMask;
+
+
+};
+
+const getValueForHidden = (value, isDatetime, dateMasks) => {
+	let newMoment = moment(value, dateMasks.momentMask, true);
 
 	if (newMoment.isValid()) {
 		return newMoment.locale('en-US').format('YYYY-MM-DD');
@@ -125,10 +177,20 @@ const DatePicker = ({
 	onBlur,
 	onChange,
 	onFocus,
-	time,
-	use12Hours,
+	type,
 	value: initialValue,
 }) => {
+
+	const isDateTime = true;
+
+	// const isDateTime = type === 'date_time';
+
+	if (isDateTime) {
+		const momentLocale = moment().locale(locale);
+		const time = momentLocale.localeData().longDateFormat('LT');
+		use12Hours = time.endsWith('A');
+	}
+
 	const inputRef = useRef(null);
 	const maskInstanceRef = useRef(null);
 
@@ -147,6 +209,20 @@ const DatePicker = ({
 		[defaultLanguageId, initialValue, locale, localizedValue]
 	);
 
+	const dateMasks = useMemo(() => {
+		const momentMask = getMomentMask(locale, isDateTime);
+		const clayMask = getClayMask(locale);
+		const pipeMask = getPipeMask(momentMask, isDateTime);
+
+		return {
+			momentMask,
+			clayMask,
+			pipeMask
+		};
+	}, [locale, defaultLanguageId]);
+
+	console.log(dateMasks);
+
 	const [value, setValue] = useState(initialValueMemoized);
 
 	useEffect(() => {
@@ -162,16 +238,16 @@ const DatePicker = ({
 		};
 	});
 
-	const {dateMask, inputMask} = getDateFormat(locale);
+	const inputMask = getInputMaskFormat(locale);
 
 	useEffect(() => {
-		if (inputRef.current && inputMask && dateMask) {
+		if (inputRef.current && inputMask && dateMasks.clayMask) {
 			maskInstanceRef.current = createTextMaskInputElement({
 				guide: true,
 				inputElement: inputRef.current,
 				keepCharPositions: true,
 				mask: inputMask,
-				pipe: createAutoCorrectedDatePipe(dateMask.toLowerCase()),
+				pipe: createAutoCorrectedDatePipe('dd/mm/yyyy HH:MM'),
 				showMask: true,
 			});
 
@@ -183,7 +259,7 @@ const DatePicker = ({
 					!/[//.-]/.test(currentValue)
 				) {
 					inputRef.current.value = moment(currentValue).format(
-						dateMask.toUpperCase()
+						dateMasks.momentMask
 					);
 				}
 			}
@@ -202,7 +278,7 @@ const DatePicker = ({
 					date.subtract(1900, 'years');
 				}
 
-				inputRef.current.value = date.format(dateMask.toUpperCase());
+				inputRef.current.value = date.format(dateMasks.momentMask);
 			}
 			else {
 				inputRef.current.value = '';
@@ -216,7 +292,7 @@ const DatePicker = ({
 			}
 		}
 	}, [
-		dateMask,
+		dateMasks,
 		inputMask,
 		inputRef,
 		initialValueMemoized,
@@ -225,6 +301,12 @@ const DatePicker = ({
 		locale,
 		value,
 	]);
+
+	console.log(getMomentMask(locale, isDateTime));
+
+	// console.log("newHidden");
+
+	// console.log(getValueForHidden(value, locale, isDateTime));
 
 	const handleNavigation = (date) => {
 		const currentYear = date.getFullYear();
@@ -240,10 +322,10 @@ const DatePicker = ({
 			<input
 				name={name}
 				type="hidden"
-				value={getValueForHidden(value, locale, time)}
+				value={getValueForHidden(value, isDateTime, dateMasks)}
 			/>
 			<ClayDatePicker
-				dateFormat={dateMask}
+				dateFormat={dateMasks.clayMask}
 				disabled={disabled}
 				expanded={expanded}
 				initialMonth={getInitialMonth(value)}
@@ -289,11 +371,13 @@ const DatePicker = ({
 							true
 						).isValid()
 					) {
-						onChange(getValueForHidden(value, locale, time));
+						onChange(
+							getValueForHidden(value, isDateTime, dateMasks)
+						);
 					}
 				}}
 				ref={inputRef}
-				time={time}
+				time={isDateTime}
 				use12Hours={use12Hours}
 				value={value}
 				weekdaysShort={WeekdayShort}
@@ -319,16 +403,6 @@ const Main = ({
 	value,
 	...otherProps
 }) => {
-	let use12Hours;
-
-	const isDateTime = type === 'date_time';
-
-	if (isDateTime) {
-		const momentLocale = moment().locale(locale);
-		const time = momentLocale.localeData().longDateFormat('LT');
-		use12Hours = time.endWith('A');
-	}
-
 	return (
 		<FieldBase
 			{...otherProps}
@@ -347,9 +421,7 @@ const Main = ({
 				onChange={(value) => onChange({}, value)}
 				onFocus={onFocus}
 				placeholder={placeholder}
-				spritemap={spritemap}
-				time={isDateTime}
-				use12Hours={use12Hours}
+				type={type}
 				value={value ? value : predefinedValue}
 			/>
 		</FieldBase>

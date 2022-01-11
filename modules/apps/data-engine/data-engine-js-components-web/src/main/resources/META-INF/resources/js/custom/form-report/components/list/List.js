@@ -29,12 +29,24 @@ export default function List({data, field, summary, totalEntries, type}) {
 		return moment(field).locale(locale).format('L');
 	};
 
+	const formatDateTime = (field) => {
+		const locale = themeDisplay.getLanguageId().split('_', 1).join('');
+		console.log(field);
+
+		const date = moment(field).locale(locale).format('L');
+		const time = moment(field).locale(locale).format('LT');
+
+		return `${date} ${time}`;
+	};
+
 	const checkType = (field, type) => {
 		switch (type) {
 			case 'color':
 				return <Color hexColor={field} />;
 			case 'date':
-				return formatDate(field);
+				return formatDateTime(field);
+			case 'date_time':
+				return formatDateTime(field);
 			default:
 				return field;
 		}
