@@ -104,7 +104,7 @@ const getClayMask = (locale) => {
 		.replace('YYYY', 'yyyy')
 		.replace('DD', 'dd');
 
-	console.log(clayMask);
+	//console.log(clayMask);
 
 	return clayMask;
 };
@@ -136,7 +136,7 @@ const getValueForHidden = (value, isDatetime, dateMasks) => {
 	let newMoment = moment(value, dateMasks.momentMask, true);
 
 	if (newMoment.isValid()) {
-		return newMoment.locale('en-US').format('YYYY-MM-DD');
+		return newMoment.locale('en-US').format(`YYYY-MM-DD${isDatetime ? ' HH:mm' : ''}`);
 	}
 
 	return '';
@@ -181,15 +181,16 @@ const DatePicker = ({
 	value: initialValue,
 }) => {
 
-	const isDateTime = true;
+	//const isDateTime = true;
 
-	// const isDateTime = type === 'date_time';
+	const isDateTime = type === 'date_time';
+	let use12Hours = false;
 
-	if (isDateTime) {
-		const momentLocale = moment().locale(locale);
-		const time = momentLocale.localeData().longDateFormat('LT');
-		use12Hours = time.endsWith('A');
-	}
+	// if (isDateTime) {
+	// 	const momentLocale = moment().locale(locale);
+	// 	const time = momentLocale.localeData().longDateFormat('LT');
+	// 	use12Hours = time.endsWith('A');
+	// }
 
 	const inputRef = useRef(null);
 	const maskInstanceRef = useRef(null);
@@ -221,7 +222,7 @@ const DatePicker = ({
 		};
 	}, [locale, defaultLanguageId]);
 
-	console.log(dateMasks);
+	//console.log(dateMasks);
 
 	const [value, setValue] = useState(initialValueMemoized);
 
@@ -247,7 +248,7 @@ const DatePicker = ({
 				inputElement: inputRef.current,
 				keepCharPositions: true,
 				mask: inputMask,
-				pipe: createAutoCorrectedDatePipe('dd/mm/yyyy HH:MM'),
+				pipe: createAutoCorrectedDatePipe(dateMasks.clayMask.toLowerCase()),
 				showMask: true,
 			});
 
@@ -302,7 +303,7 @@ const DatePicker = ({
 		value,
 	]);
 
-	console.log(getMomentMask(locale, isDateTime));
+	//console.log(getMomentMask(locale, isDateTime));
 
 	// console.log("newHidden");
 
