@@ -242,7 +242,7 @@ const LocalizableText = ({
 				value: currentValue,
 			})
 		);
-	}, [currentValue, defaultLocale, fieldName]);
+	}, []);
 
 	return (
 		<ClayInput.Group>
