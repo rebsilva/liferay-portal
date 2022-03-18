@@ -50,15 +50,8 @@ function closeSidePanel() {
 	parentWindow.Liferay.fire('close-side-panel');
 }
 
-function getObjectFieldSettings(
-	objectFieldSettings: {
-		name: ObjectFieldSettingName;
-		value: string | number;
-	}[]
-) {
-	const settings: {
-		[key in ObjectFieldSettingName]?: string | number;
-	} = {};
+function normalizeFieldSettings(objectFieldSettings: ObjectFieldSetting[]) {
+	const settings: NormalizedSettings = {};
 
 	objectFieldSettings.forEach(({name, value}) => {
 		settings[name] = value;
@@ -127,6 +120,23 @@ export default function EditObjectField({
 		}
 	);
 
+	const handleSettingsChange = ({
+		target: {name, type, value},
+	}: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+		setValues({
+			objectFieldSettings: values.objectFieldSettings?.map((setting) =>
+				setting.name === name
+					? {
+							...setting,
+							value:
+								value && type === 'number'
+									? Number(value)
+									: value,
+					  }
+					: setting
+			),
+		});
+
 	return (
 		<ClayForm
 			className="lfr-objects__edit-object-field"
@@ -163,7 +173,7 @@ export default function EditObjectField({
 							objectFieldSettings={
 								values.objectFieldSettings as ObjectFieldSetting[]
 							}
-							setValues={setValues}
+							onSettingsChange={handleSettingsChange}
 						/>
 					)}
 
@@ -171,12 +181,13 @@ export default function EditObjectField({
 						(values.businessType === 'Text' ||
 							values.businessType === 'LongText') && (
 							<MaxLengthProperties
-								disabled={disabled}
+								disabled={readOnly}
 								errors={errors}
 								objectField={values}
 								objectFieldSettings={
 									values.objectFieldSettings as ObjectFieldSetting[]
 								}
+								onSettingsChange={handleSettingsChange}
 								setValues={setValues}
 							/>
 						)}
@@ -307,20 +318,13 @@ function MaxLengthProperties({
 	errors,
 	objectField,
 	objectFieldSettings,
+	onSettingsChange,
 	setValues,
 }: IMaxLengthPropertiesProps) {
-	const defaultMaxLength = objectField.businessType === 'Text' ? 280 : 65000;
+	const [defaultMaxLength, defaultMaxLengthText] =
+		objectField.businessType === 'Text' ? [280, '280'] : [65000, '65,000'];
 
-	const settings = getObjectFieldSettings(objectFieldSettings);
-
-	const handleChange = ({
-		target: {name, value},
-	}: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-		setValues({
-			objectFieldSettings: objectFieldSettings.map((setting) =>
-				setting.name === name ? {...setting, value} : setting
-			),
-		});
+	const settings = normalizeFieldSettings(objectFieldSettings);
 
 	return (
 		<>
@@ -331,59 +335,44 @@ function MaxLengthProperties({
 						'set-the-maximum-number-of-characters'
 					)}
 					name="showMaxLength"
-					onToggle={(showMaxLength) => {
-						setValues({
-							objectFieldSettings: objectFieldSettings.map(
-								(setting) => {
-									const newValue = showMaxLength
-										? 'true'
-										: 'false';
-									switch (setting.name) {
-										case 'showMaxLength':
-											return {
-												...setting,
-												value: newValue,
-											};
+					onToggle={(value) => {
+						const updatedSettings: ObjectFieldSetting[] = [
+							{name: 'showMaxLength', value},
+						];
 
-										case 'maxLengthValue':
-											return {
-												...setting,
-												value: defaultMaxLength,
-											};
+						if (value) {
+							updatedSettings.push({
+								name: 'maxLengthValue',
+								value: defaultMaxLength,
+							});
+						}
 
-										default:
-											return setting;
-									}
-								}
-							),
-						});
+						setValues({objectFieldSettings: updatedSettings});
 					}}
-					toggled={settings.showMaxLength === 'true'}
+					toggled={settings.showMaxLength as boolean}
 				/>
 			</ClayForm.Group>
 			<ClayForm.Group>
-				{settings.showMaxLength === 'true' && (
+				{settings.showMaxLength && (
 					<Input
 						error={errors.maxLengthValue}
-						feedbackMessage={
-							objectField.businessType === 'Text'
-								? Liferay.Language.get(
-										'set-the-maximum-number-of-characters-accepted-this-value-cant-be-less-than-1-or-greater-than-280'
-								  )
-								: Liferay.Language.get(
-										'set-the-maximum-number-of-characters-accepted-this-value-cant-be-less-than-1-or-greater-than-65000'
-								  )
-						}
+						feedbackMessage={Liferay.Util.sub(
+							Liferay.Language.get(
+								'set-the-maximum-number-of-characters-accepted-this-value-cant-be-less-than-x-or-greater-than-x'
+							),
+							'1',
+							defaultMaxLengthText
+						)}
 						label={Liferay.Language.get(
 							'maximum-number-of-characters'
 						)}
 						max={defaultMaxLength}
 						min={1}
 						name="maxLengthValue"
-						onChange={handleChange}
+						onChange={onSettingsChange}
 						required
 						type="number"
-						value={settings.maxLengthValue}
+						value={settings.maxLengthValue as number}
 					/>
 				)}
 			</ClayForm.Group>
@@ -394,18 +383,9 @@ function MaxLengthProperties({
 function AttachmentProperties({
 	errors,
 	objectFieldSettings,
-	setValues,
+	onSettingsChange: onChange,
 }: IAttachmentPropertiesProps) {
-	const settings = getObjectFieldSettings(objectFieldSettings);
-
-	const handleChange = ({
-		target: {name, value},
-	}: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-		setValues({
-			objectFieldSettings: objectFieldSettings.map((setting) =>
-				setting.name === name ? {...setting, value} : setting
-			),
-		});
+	const settings = normalizeFieldSettings(objectFieldSettings);
 
 	return (
 		<>
@@ -417,9 +397,9 @@ function AttachmentProperties({
 				)}
 				label={Liferay.Language.get('accepted-file-extensions')}
 				name="acceptedFileExtensions"
-				onChange={handleChange}
+				onChange={onChange}
 				required
-				value={settings.acceptedFileExtensions}
+				value={settings.acceptedFileExtensions as string}
 			/>
 
 			<Input
@@ -429,10 +409,10 @@ function AttachmentProperties({
 				max={100}
 				min={0}
 				name="maximumFileSize"
-				onChange={handleChange}
+				onChange={onChange}
 				required
 				type="number"
-				value={settings.maximumFileSize}
+				value={settings.maximumFileSize as number}
 			/>
 		</>
 	);
@@ -441,7 +421,9 @@ function AttachmentProperties({
 interface IAttachmentPropertiesProps {
 	errors: ObjectFieldErrors;
 	objectFieldSettings: ObjectFieldSetting[];
-	setValues: (values: Partial<ObjectField>) => void;
+	onSettingsChange: (
+		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => void;
 }
 
 interface IMaxLengthPropertiesProps {
@@ -449,6 +431,9 @@ interface IMaxLengthPropertiesProps {
 	errors: ObjectFieldErrors;
 	objectField: Partial<ObjectField>;
 	objectFieldSettings: ObjectFieldSetting[];
+	onSettingsChange: (
+		event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+	) => void;
 	setValues: (values: Partial<ObjectField>) => void;
 }
 
@@ -468,3 +453,7 @@ interface ISearchableProps {
 	readOnly: boolean;
 	setValues: (values: Partial<ObjectField>) => void;
 }
+
+type NormalizedSettings = {
+	[key in ObjectFieldSettingName]?: string | number | boolean;
+};
