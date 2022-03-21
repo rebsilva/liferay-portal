@@ -37,8 +37,7 @@ interface ObjectField {
 
 interface ObjectFieldSetting {
 	name: ObjectFieldSettingName;
-	required: boolean;
-	value: string | number;
+	value: string | number | boolean;
 }
 
 type ObjectFieldSettingName =
