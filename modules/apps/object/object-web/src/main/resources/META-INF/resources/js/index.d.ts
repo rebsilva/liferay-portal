@@ -44,5 +44,5 @@ type ObjectFieldSettingName =
 	| 'acceptedFileExtensions'
 	| 'fileSource'
 	| 'maximumFileSize'
-	| 'maxLengthValue'
-	| 'showMaxLength';
+	| 'maxLength'
+	| 'showCounter';

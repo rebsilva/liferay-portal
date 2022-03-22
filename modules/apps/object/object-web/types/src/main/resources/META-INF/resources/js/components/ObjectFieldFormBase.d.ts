@@ -32,8 +32,8 @@ export declare function useObjectFieldForm({
 			acceptedFileExtensions: any;
 			fileSource: any;
 			maximumFileSize: any;
-			maxLengthValue: any;
-			showMaxLength: any;
+			maxLength: any;
+			showCounter: any;
 		}
 	>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;

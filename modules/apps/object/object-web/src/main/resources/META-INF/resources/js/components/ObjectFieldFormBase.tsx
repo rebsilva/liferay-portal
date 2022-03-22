@@ -106,7 +106,7 @@ export default function ObjectFieldFormBase({
 			case 'Text':
 				objectFieldSettings = [
 					{
-						name: 'showMaxLength',
+						name: 'showCounter',
 						value: false,
 					},
 				];
@@ -239,8 +239,8 @@ export function useObjectFieldForm({
 			field.businessType === 'Text' ||
 			field.businessType === 'LongText'
 		) {
-			if (settings.showMaxLength && !settings.maxLengthValue) {
-				errors.maxLengthValue = REQUIRED_MSG;
+			if (settings.showCounter && !settings.maxLength) {
+				errors.maxLength = REQUIRED_MSG;
 			}
 		}
 		else if (field.businessType === 'Picklist') {

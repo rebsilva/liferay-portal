@@ -53,7 +53,7 @@ function closeSidePanel() {
 function normalizeFieldSettings(objectFieldSettings: ObjectFieldSetting[]) {
 	const settings: NormalizedSettings = {};
 
-	objectFieldSettings.forEach(({name, value}) => {
+	objectFieldSettings?.forEach(({name, value}) => {
 		settings[name] = value;
 	});
 
@@ -334,28 +334,28 @@ function MaxLengthProperties({
 					label={Liferay.Language.get(
 						'set-the-maximum-number-of-characters'
 					)}
-					name="showMaxLength"
+					name="showCounter"
 					onToggle={(value) => {
 						const updatedSettings: ObjectFieldSetting[] = [
-							{name: 'showMaxLength', value},
+							{name: 'showCounter', value},
 						];
 
 						if (value) {
 							updatedSettings.push({
-								name: 'maxLengthValue',
+								name: 'maxLength',
 								value: defaultMaxLength,
 							});
 						}
 
 						setValues({objectFieldSettings: updatedSettings});
 					}}
-					toggled={settings.showMaxLength as boolean}
+					toggled={!!settings.showCounter}
 				/>
 			</ClayForm.Group>
 			<ClayForm.Group>
-				{settings.showMaxLength && (
+				{settings.showCounter && (
 					<Input
-						error={errors.maxLengthValue}
+						error={errors.maxLength}
 						feedbackMessage={Liferay.Util.sub(
 							Liferay.Language.get(
 								'set-the-maximum-number-of-characters-accepted-this-value-cant-be-less-than-x-or-greater-than-x'
@@ -368,11 +368,11 @@ function MaxLengthProperties({
 						)}
 						max={defaultMaxLength}
 						min={1}
-						name="maxLengthValue"
+						name="maxLength"
 						onChange={onSettingsChange}
 						required
 						type="number"
-						value={settings.maxLengthValue as number}
+						value={settings.maxLength as number}
 					/>
 				)}
 			</ClayForm.Group>
