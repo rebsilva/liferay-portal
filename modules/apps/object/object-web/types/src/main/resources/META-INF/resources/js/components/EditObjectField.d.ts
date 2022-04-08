@@ -17,17 +17,25 @@
 import './EditObjectField.scss';
 export default function EditObjectField({
 	allowMaxLength,
+	charBlacklist,
+	charLastBlacklist,
 	isApproved,
+	namesBlacklist,
 	objectField: initialValues,
 	objectFieldTypes,
+	objectName,
 	readOnly,
 	showDocumentsAndMediaOption,
 }: IProps): JSX.Element;
 interface IProps {
 	allowMaxLength?: boolean;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
 	isApproved: boolean;
+	namesBlacklist: string[];
 	objectField: ObjectField;
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	readOnly: boolean;
 	showDocumentsAndMediaOption: boolean;
 }

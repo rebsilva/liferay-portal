@@ -53,6 +53,14 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 			).put(
 				"objectFieldTypes", objectDefinitionsFieldsDisplayContext.getObjectFieldBusinessTypeMaps(false, locale)
 			).put(
+				"objectName", objectDefinition.getShortName()
+			).put(
+				"namesBlacklist", PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST)
+			).put(
+				"charBlacklist", PropsUtil.getArray(PropsKeys.DL_CHAR_BLACKLIST)
+			).put(
+				"charLastBlacklist", PropsUtil.getArray(PropsKeys.DL_CHAR_LAST_BLACKLIST)
+			).put(
 				"showDocumentsAndMediaOption", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-146523"))
 			).build()
 		%>'

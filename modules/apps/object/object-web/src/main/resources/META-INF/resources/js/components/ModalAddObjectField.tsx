@@ -34,7 +34,11 @@ const headers = new Headers({
 function ModalAddObjectField({
 	allowMaxLength,
 	apiURL,
+	charBlacklist,
+	charLastBlacklist,
+	namesBlacklist,
 	objectFieldTypes,
+	objectName,
 	observer,
 	onClose,
 	showDocumentsAndMediaOption,
@@ -115,10 +119,14 @@ function ModalAddObjectField({
 
 					<ObjectFieldFormBase
 						allowMaxLength={allowMaxLength}
+						charBlacklist={charBlacklist}
+						charLastBlacklist={charLastBlacklist}
 						errors={errors}
 						handleChange={handleChange}
+						namesBlacklist={namesBlacklist}
 						objectField={values}
 						objectFieldTypes={objectFieldTypes}
+						objectName={objectName}
 						setValues={setValues}
 						showDocumentsAndMediaOption={
 							showDocumentsAndMediaOption
@@ -150,7 +158,11 @@ function ModalAddObjectField({
 export default function ModalWithProvider({
 	allowMaxLength,
 	apiURL,
+	charBlacklist,
+	charLastBlacklist,
+	namesBlacklist,
 	objectFieldTypes,
+	objectName,
 	showDocumentsAndMediaOption,
 }: IProps) {
 	const [isVisible, setVisibility] = useState<boolean>(false);
@@ -168,7 +180,11 @@ export default function ModalWithProvider({
 				<ModalAddObjectField
 					allowMaxLength={allowMaxLength}
 					apiURL={apiURL}
+					charBlacklist={charBlacklist}
+					charLastBlacklist={charLastBlacklist}
+					namesBlacklist={namesBlacklist}
 					objectFieldTypes={objectFieldTypes}
+					objectName={objectName}
 					observer={observer}
 					onClose={onClose}
 					showDocumentsAndMediaOption={showDocumentsAndMediaOption}
@@ -187,6 +203,10 @@ interface IModal extends IProps {
 interface IProps {
 	allowMaxLength: boolean;
 	apiURL: string;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
+	namesBlacklist: string[];
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	showDocumentsAndMediaOption: boolean;
 }

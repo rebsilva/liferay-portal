@@ -14,14 +14,19 @@
 
 import React, {ChangeEventHandler, ReactNode} from 'react';
 import {FormError} from '../hooks/useForm';
+import './EditObjectField.scss';
 export default function ObjectFieldFormBase({
 	allowMaxLength,
+	charBlacklist,
+	charLastBlacklist,
 	children,
 	disabled,
 	errors,
 	handleChange,
+	namesBlacklist,
 	objectField: values,
 	objectFieldTypes,
+	objectName,
 	setValues,
 	showDocumentsAndMediaOption,
 }: IProps): JSX.Element;
@@ -36,6 +41,8 @@ export declare function useObjectFieldForm({
 			maximumFileSize: any;
 			maxLength: any;
 			showCounter: any;
+			showFilesInDocumentsAndMedia: any;
+			storageFolder: any;
 		}
 	>;
 	handleChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -49,12 +56,16 @@ interface IUseObjectFieldForm {
 }
 interface IProps {
 	allowMaxLength?: boolean;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
 	children?: ReactNode;
 	disabled?: boolean;
 	errors: ObjectFieldErrors;
 	handleChange: ChangeEventHandler<HTMLInputElement>;
+	namesBlacklist: string[];
 	objectField: Partial<ObjectField>;
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	setValues: (values: Partial<ObjectField>) => void;
 	showDocumentsAndMediaOption: boolean;
 }

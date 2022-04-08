@@ -17,13 +17,21 @@
 export default function ModalWithProvider({
 	allowMaxLength,
 	apiURL,
+	charBlacklist,
+	charLastBlacklist,
+	namesBlacklist,
 	objectFieldTypes,
+	objectName,
 	showDocumentsAndMediaOption,
 }: IProps): JSX.Element;
 interface IProps {
 	allowMaxLength: boolean;
 	apiURL: string;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
+	namesBlacklist: string[];
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	showDocumentsAndMediaOption: boolean;
 }
 export {};

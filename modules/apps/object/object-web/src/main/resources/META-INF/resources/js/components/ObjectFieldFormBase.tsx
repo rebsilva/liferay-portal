@@ -12,7 +12,8 @@
  * details.
  */
 
-import {ClayToggle} from '@clayui/form';
+import ClayForm, {ClayToggle} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
 import {fetch} from 'frontend-js-web';
 import React, {ChangeEventHandler, ReactNode, useMemo, useState} from 'react';
 
@@ -25,6 +26,8 @@ import {toCamelCase} from '../utils/string';
 import CustomSelect from './Form/CustomSelect/CustomSelect';
 import Input from './Form/Input';
 import Select from './Form/Select';
+
+import './EditObjectField.scss'; // criar um novo para o objectfieldformbase
 
 const REQUIRED_MSG = Liferay.Language.get('required');
 
@@ -71,15 +74,47 @@ async function fetchPickList() {
 
 export default function ObjectFieldFormBase({
 	allowMaxLength,
+	charBlacklist,
+	charLastBlacklist,
 	children,
 	disabled,
 	errors,
 	handleChange,
+	namesBlacklist,
 	objectField: values,
 	objectFieldTypes,
+	objectName,
 	setValues,
 	showDocumentsAndMediaOption,
 }: IProps) {
+
+	// const [invalidPathMessage, setInvalidPathMessage] = useState('');
+
+	const validateSourceFolder = (folderPath: string) => {
+
+		// folder name cannot end with invalid last characters
+
+		for (let i = 0; i < charLastBlacklist.length; i++) {
+			if (folderPath.endsWith(charLastBlacklist[i])) {
+				return false;
+			}
+		}
+
+		// folder name cannot contain invalid characters
+
+		for (let i = 0; i < charBlacklist.length; i++) {
+			if (folderPath.includes(charBlacklist[i])) {
+				return false;
+			}
+		}
+
+		// folder name cannot be a reserved word
+
+		return !folderPath
+			.split('/')
+			.some((word) => namesBlacklist.includes(word));
+	};
+
 	const businessTypeMap = useMemo(() => {
 		const businessTypeMap = new Map<string, ObjectFieldType>();
 
@@ -123,6 +158,10 @@ export default function ObjectFieldFormBase({
 					{
 						name: 'maximumFileSize',
 						value: 100,
+					},
+					{
+						name: 'showFilesInDocumentsAndMedia',
+						value: false,
 					},
 				];
 				break;
@@ -194,7 +233,9 @@ export default function ObjectFieldFormBase({
 					objectFieldSettings={
 						values.objectFieldSettings as ObjectFieldSetting[]
 					}
+					objectName={objectName}
 					onSettingsChange={handleSettingsChange}
+					setValues={setValues}
 					showDocumentsAndMediaOption={showDocumentsAndMediaOption}
 				/>
 			)}
@@ -269,6 +310,25 @@ export function useObjectFieldForm({
 					0
 				);
 			}
+
+			// ver como fazer para usar a função aqui
+
+			// let validacion = validateSourceFolder(settings.storageFolder as string);
+
+			
+			// if (settings.showFilesInDocumentsAndMedia &&
+			// 	invalidateRequired(settings.storageFolder as string | undefined)
+			// ) {
+			// 	errors.storageFolder = REQUIRED_MSG;
+			// }
+			// else if ( settings.showFilesInDocumentsAndMedia &&
+			// 	!validateSourceFolder(settings.storageFolder as string)
+			// ) {
+			// 	errors.storageFolder = Liferay.Language.get(
+			// 		'mudar-isso-aqui-depois'
+			// 	);
+			// }
+
 		}
 		else if (
 			field.businessType === 'Text' ||
@@ -303,7 +363,9 @@ function AttachmentSourceProperty({
 	disabled,
 	error,
 	objectFieldSettings,
+	objectName,
 	onSettingsChange,
+	setValues,
 	showDocumentsAndMediaOption,
 }: IAttachmentSourcePropertyProps) {
 	const attachmentSources = showDocumentsAndMediaOption
@@ -317,24 +379,78 @@ function AttachmentSourceProperty({
 	);
 
 	return (
-		<CustomSelect
-			disabled={disabled}
-			error={error}
-			label={Liferay.Language.get('request-files')}
-			onChange={({value}) =>
-				onSettingsChange({
-					name: 'fileSource',
-					value,
-				})
-			}
-			options={attachmentSources}
-			required
-			value={
-				showDocumentsAndMediaOption
-					? attachmentSource?.label
-					: userComputer.label
-			}
-		/>
+		<>
+			<CustomSelect
+				disabled={disabled}
+				error={error}
+				label={Liferay.Language.get('request-files')}
+				onChange={({value}) =>
+					onSettingsChange({
+						name: 'fileSource',
+						value,
+					})
+				}
+				options={attachmentSources}
+				required
+				value={
+					showDocumentsAndMediaOption
+						? attachmentSource?.label
+						: userComputer.label
+				}
+			/>
+
+			{settings.fileSource === 'userComputer' && (
+				<ClayForm.Group className="lfr-objects__edit-object-field-container">
+					<ClayToggle
+						disabled={disabled}
+						label={Liferay.Language.get(
+							'show-files-in-documents-and-media'
+						)}
+						name="showFilesInDocumentsAndMedia"
+						onToggle={(value) => {
+							const updatedSettings: ObjectFieldSetting[] = objectFieldSettings.filter(
+								(setting) => {
+									return (
+										setting.name !==
+											'showFilesInDocumentsAndMedia' &&
+										setting.name !== 'storageFolder'
+									);
+								}
+							);
+
+							updatedSettings.push({
+								name: 'showFilesInDocumentsAndMedia',
+								value,
+							});
+
+							if (value) {
+								updatedSettings.push({
+									name: 'storageFolder',
+									value: `/${objectName}`,
+								});
+							}
+
+							setValues({
+								objectFieldSettings: updatedSettings,
+							});
+						}}
+						toggled={!!settings.showFilesInDocumentsAndMedia}
+					/>
+
+					<div
+						data-tooltip-align="top"
+						title={Liferay.Language.get(
+							'when-activated-users-can-define-a-folder-within-documents-and-media-to-display-the-files-leave-it-unchecked-for-files-to-be-stored-individually-per-entry'
+						)}
+					>
+						<ClayIcon
+							className="lfr-objects__edit-object-field-tooltip-icon"
+							symbol="question-circle-full"
+						/>
+					</div>
+				</ClayForm.Group>
+			)}
+		</>
 	);
 }
 
@@ -342,7 +458,9 @@ interface IAttachmentSourcePropertyProps {
 	disabled?: boolean;
 	error?: string;
 	objectFieldSettings: ObjectFieldSetting[];
+	objectName: string;
 	onSettingsChange: (setting: ObjectFieldSetting) => void;
+	setValues: (values: Partial<ObjectField>) => void;
 	showDocumentsAndMediaOption: boolean;
 }
 interface IUseObjectFieldForm {
@@ -356,12 +474,16 @@ interface IPickList {
 
 interface IProps {
 	allowMaxLength?: boolean;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
 	children?: ReactNode;
 	disabled?: boolean;
 	errors: ObjectFieldErrors;
 	handleChange: ChangeEventHandler<HTMLInputElement>;
+	namesBlacklist: string[];
 	objectField: Partial<ObjectField>;
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	setValues: (values: Partial<ObjectField>) => void;
 	showDocumentsAndMediaOption: boolean;
 }

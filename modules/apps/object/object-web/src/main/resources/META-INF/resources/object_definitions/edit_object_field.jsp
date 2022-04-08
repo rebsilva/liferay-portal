@@ -37,6 +37,14 @@ ObjectField objectField = (ObjectField)request.getAttribute(ObjectWebKeys.OBJECT
 			).put(
 				"objectFieldTypes", objectDefinitionsFieldsDisplayContext.getObjectFieldBusinessTypeMaps(Validator.isNotNull(objectField.getRelationshipType()), locale)
 			).put(
+				"objectName", objectDefinition.getShortName()
+			).put(
+				"namesBlacklist", PropsUtil.getArray(PropsKeys.DL_NAME_BLACKLIST)
+			).put(
+				"charBlacklist", PropsUtil.getArray(PropsKeys.DL_CHAR_BLACKLIST)
+			).put(
+				"charLastBlacklist", PropsUtil.getArray(PropsKeys.DL_CHAR_LAST_BLACKLIST)
+			).put(
 				"readOnly", !objectDefinitionsFieldsDisplayContext.hasUpdateObjectDefinitionPermission()
 			).put(
 				"showDocumentsAndMediaOption", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-146523"))

@@ -59,9 +59,13 @@ function closeSidePanel() {
 
 export default function EditObjectField({
 	allowMaxLength,
+	charBlacklist,
+	charLastBlacklist,
 	isApproved,
+	namesBlacklist,
 	objectField: initialValues,
 	objectFieldTypes,
+	objectName,
 	readOnly,
 	showDocumentsAndMediaOption,
 }: IProps) {
@@ -150,11 +154,15 @@ export default function EditObjectField({
 
 				<ObjectFieldFormBase
 					allowMaxLength={allowMaxLength}
+					charBlacklist={charBlacklist}
+					charLastBlacklist={charLastBlacklist}
 					disabled={disabled}
 					errors={errors}
 					handleChange={handleChange}
+					namesBlacklist={namesBlacklist}
 					objectField={values}
 					objectFieldTypes={objectFieldTypes}
+					objectName={objectName}
 					setValues={setValues}
 					showDocumentsAndMediaOption={showDocumentsAndMediaOption}
 				>
@@ -465,9 +473,13 @@ interface IMaxLengthPropertiesProps {
 
 interface IProps {
 	allowMaxLength?: boolean;
+	charBlacklist: string[];
+	charLastBlacklist: string[];
 	isApproved: boolean;
+	namesBlacklist: string[];
 	objectField: ObjectField;
 	objectFieldTypes: ObjectFieldType[];
+	objectName: string;
 	readOnly: boolean;
 	showDocumentsAndMediaOption: boolean;
 }
