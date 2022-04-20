@@ -16,6 +16,7 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayModal, {ClayModalProvider, useModal} from '@clayui/modal';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
@@ -31,13 +32,12 @@ const headers = new Headers({
 	'Content-Type': 'application/json',
 });
 
-function ModalAddObjectField({
+function AddObjectField({
 	allowMaxLength,
 	allowUploadDocAndMedia,
 	apiURL,
 	objectFieldTypes,
 	objectName,
-	observer,
 	onClose,
 }: IModal) {
 	const [error, setError] = useState<string>('');
@@ -91,7 +91,7 @@ function ModalAddObjectField({
 	});
 
 	return (
-		<ClayModal observer={observer}>
+		<ClayTooltipProvider>
 			<ClayForm onSubmit={handleSubmit}>
 				<ClayModal.Header>
 					{Liferay.Language.get('new-field')}
@@ -142,7 +142,7 @@ function ModalAddObjectField({
 					}
 				/>
 			</ClayForm>
-		</ClayModal>
+		</ClayTooltipProvider>
 	);
 }
 
@@ -165,15 +165,16 @@ export default function ModalWithProvider({
 	return (
 		<ClayModalProvider>
 			{isVisible && (
-				<ModalAddObjectField
-					allowMaxLength={allowMaxLength}
-					allowUploadDocAndMedia={allowUploadDocAndMedia}
-					apiURL={apiURL}
-					objectFieldTypes={objectFieldTypes}
-					objectName={objectName}
-					observer={observer}
-					onClose={onClose}
-				/>
+				<ClayModal observer={observer}>
+					<AddObjectField
+						allowMaxLength={allowMaxLength}
+						allowUploadDocAndMedia={allowUploadDocAndMedia}
+						apiURL={apiURL}
+						objectFieldTypes={objectFieldTypes}
+						objectName={objectName}
+						onClose={onClose}
+					/>
+				</ClayModal>
 			)}
 		</ClayModalProvider>
 	);
@@ -182,7 +183,6 @@ export default function ModalWithProvider({
 interface IModal extends IProps {
 	allowMaxLength: boolean;
 	allowUploadDocAndMedia: boolean;
-	observer: any;
 	onClose: () => void;
 }
 
