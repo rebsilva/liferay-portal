@@ -13,8 +13,7 @@
  */
 
 import ClayButton from '@clayui/button';
-import ClayForm, {ClayRadio, ClayRadioGroup, ClayToggle} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
+import ClayForm, {ClayRadio, ClayRadioGroup} from '@clayui/form';
 import {useFeatureFlag} from 'data-engine-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
@@ -29,6 +28,7 @@ import {
 import Input from './Form/Input';
 import InputLocalized from './Form/InputLocalized/InputLocalized';
 import Select from './Form/Select';
+import Toggle from './Form/Toggle';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
 	useObjectFieldForm,
@@ -241,15 +241,13 @@ function SearchableContainer({
 
 	return (
 		<Sheet className="mt-4" title={Liferay.Language.get('searchable')}>
-			<ClayForm.Group>
-				<ClayToggle
-					disabled={disabled}
-					label={Liferay.Language.get('searchable')}
-					name="indexed"
-					onToggle={(indexed) => setValues({indexed})}
-					toggled={objectField.indexed}
-				/>
-			</ClayForm.Group>
+			<Toggle
+				disabled={disabled}
+				label={Liferay.Language.get('searchable')}
+				name="indexed"
+				onToggle={(indexed) => setValues({indexed})}
+				toggled={objectField.indexed}
+			/>
 
 			{isSearchableString && (
 				<ClayForm.Group>
@@ -342,40 +340,32 @@ function MaxLengthProperties({
 
 	return (
 		<>
-			<ClayForm.Group className="lfr-objects__edit-object-field-container">
-				<ClayToggle
-					disabled={disabled}
-					label={Liferay.Language.get('limit-characters')}
-					name="showCounter"
-					onToggle={(value) => {
-						const updatedSettings: ObjectFieldSetting[] = [
-							{name: 'showCounter', value},
-						];
+			<Toggle
+				className="lfr-objects__edit-object-field-container"
+				disabled={disabled}
+				label={Liferay.Language.get('limit-characters')}
+				name="showCounter"
+				onToggle={(value) => {
+					const updatedSettings: ObjectFieldSetting[] = [
+						{name: 'showCounter', value},
+					];
 
-						if (value) {
-							updatedSettings.push({
-								name: 'maxLength',
-								value: defaultMaxLength,
-							});
-						}
+					if (value) {
+						updatedSettings.push({
+							name: 'maxLength',
+							value: defaultMaxLength,
+						});
+					}
 
-						setValues({objectFieldSettings: updatedSettings});
-					}}
-					toggled={!!settings.showCounter}
-				/>
+					setValues({objectFieldSettings: updatedSettings});
+				}}
+				toggled={!!settings.showCounter}
+				tooltip={Liferay.Language.get(
+					'when-enabled-a-character-counter-will-be-shown-to-the-user'
+				)}
+				tooltipAlign="top"
+			/>
 
-				<div
-					data-tooltip-align="top"
-					title={Liferay.Language.get(
-						'when-enabled-a-character-counter-will-be-shown-to-the-user'
-					)}
-				>
-					<ClayIcon
-						className="lfr-objects__edit-object-field-tooltip-icon"
-						symbol="question-circle-full"
-					/>
-				</div>
-			</ClayForm.Group>
 			<ClayForm.Group>
 				{settings.showCounter && (
 					<Input

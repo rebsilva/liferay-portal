@@ -12,9 +12,6 @@
  * details.
  */
 
-import ClayForm, {ClayToggle} from '@clayui/form';
-import ClayIcon from '@clayui/icon';
-import {ClayTooltipProvider} from '@clayui/tooltip';
 import {useFeatureFlag} from 'data-engine-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {ChangeEventHandler, ReactNode, useMemo, useState} from 'react';
@@ -28,6 +25,7 @@ import {toCamelCase} from '../utils/string';
 import CustomSelect from './Form/CustomSelect/CustomSelect';
 import Input from './Form/Input';
 import Select from './Form/Select';
+import Toggle from './Form/Toggle';
 
 import './ObjectFieldFormBase.scss';
 
@@ -216,7 +214,7 @@ export default function ObjectFieldFormBase({
 				/>
 			)}
 			{children}
-			<ClayToggle
+			<Toggle
 				disabled={disabled}
 				label={Liferay.Language.get('mandatory')}
 				name="required"
@@ -457,9 +455,9 @@ function AttachmentSourceProperty({
 				value={attachmentSource?.label}
 			/>
 
-			{flags['LPS-148112'] && settings.fileSource === 'userComputer' && (
-				<ClayForm.Group className="lfr-objects__object-field-form-base-container">
-					<ClayToggle
+				{flags['LPS-148112'] && settings.fileSource === 'userComputer' && (
+					<Toggle
+						className="lfr-objects__object-field-form-base-container"
 						disabled={disabled}
 						label={Liferay.Language.get(
 							'show-files-in-documents-and-media'
@@ -467,23 +465,12 @@ function AttachmentSourceProperty({
 						name="showFilesInDocumentsAndMedia"
 						onToggle={toggleShowFiles}
 						toggled={!!settings.showFilesInDocumentsAndMedia}
+						tooltip={Liferay.Language.get(
+							'when-activated-users-can-define-a-folder-within-documents-and-media-to-display-the-files-leave-it-unchecked-for-files-to-be-stored-individually-per-entry'
+						)}
+						tooltipAlign="top"
 					/>
-
-					<ClayTooltipProvider>
-						<div
-							data-tooltip-align="top"
-							title={Liferay.Language.get(
-								'when-activated-users-can-define-a-folder-within-documents-and-media-to-display-the-files-leave-it-unchecked-for-files-to-be-stored-individually-per-entry'
-							)}
-						>
-							<ClayIcon
-								className="lfr-objects__edit-object-field-tooltip-icon"
-								symbol="question-circle-full"
-							/>
-						</div>
-					</ClayTooltipProvider>
-				</ClayForm.Group>
-			)}
+				)}
 		</>
 	);
 }
