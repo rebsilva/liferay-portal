@@ -25,7 +25,7 @@ ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = 
 </liferay-portlet:resourceURL>
 
 <react:component
-	module="js/components/ModalAddObjectAction"
+	module="js/components/ObjectAction/AddObjectAction"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
 			"apiURL", objectDefinitionsActionsDisplayContext.getAPIURL()

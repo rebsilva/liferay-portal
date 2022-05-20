@@ -12,19 +12,20 @@
  * details.
  */
 
-/// <reference types="react" />
-
-import {CustomItem} from './Form/CustomSelect/CustomSelect';
-export default function AddObjectAction({
-	apiURL,
-	getObjectDefinitionsRelationsURL,
-	objectActionExecutors,
-	objectActionTriggers,
-}: IProps): JSX.Element;
-interface IProps {
-	apiURL: string;
-	getObjectDefinitionsRelationsURL: string;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
+import React from 'react';
+import {FormError} from '../../../hooks/useForm';
+export default function BasicInfo({
+	errors,
+	handleChange,
+	readOnly,
+	setValues,
+	values,
+}: IPros): JSX.Element;
+interface IPros {
+	errors: FormError<ObjectAction & ObjectActionParameters>;
+	handleChange: React.ChangeEventHandler<HTMLInputElement>;
+	readOnly?: boolean;
+	setValues: (values: Partial<ObjectAction>) => void;
+	values: Partial<ObjectAction>;
 }
 export {};

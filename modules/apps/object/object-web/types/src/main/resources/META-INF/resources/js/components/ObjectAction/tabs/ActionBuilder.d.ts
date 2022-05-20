@@ -14,19 +14,20 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from './Form/CustomSelect/CustomSelect';
-export default function EditObjectAction({
-	getObjectDefinitionsRelationsURL,
-	objectAction: {id, ...values},
+import {FormError} from '../../../hooks/useForm';
+import {CustomItem} from '../../Form/CustomSelect/CustomSelect';
+export default function ActionBuilder({
+	errors,
 	objectActionExecutors,
 	objectActionTriggers,
-	readOnly,
+	setValues,
+	values,
 }: IProps): JSX.Element;
 interface IProps {
-	getObjectDefinitionsRelationsURL: string;
-	objectAction: ObjectAction;
+	errors: FormError<ObjectAction & ObjectActionParameters>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
-	readOnly?: boolean;
+	setValues: (values: Partial<ObjectAction>) => void;
+	values: Partial<ObjectAction>;
 }
 export {};

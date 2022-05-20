@@ -27,7 +27,7 @@ ObjectAction objectAction = objectDefinitionsActionsDisplayContext.getObjectActi
 </liferay-portlet:resourceURL>
 
 <react:component
-	module="js/components/EditObjectAction"
+	module="js/components/ObjectAction/EditObjectAction"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
 			"getObjectDefinitionsRelationsURL", String.valueOf(getObjectDefinitionsRelationsURL)
