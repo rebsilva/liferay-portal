@@ -18,6 +18,7 @@ import 'codemirror/mode/groovy/groovy';
 import {CustomItem} from '../Form/CustomSelect/CustomSelect';
 export default function Action({
 	ffNotificationTemplates,
+	getObjectDefinitionsRelationshipsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -27,6 +28,7 @@ export default function Action({
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

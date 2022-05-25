@@ -17,6 +17,7 @@
 import {CustomItem} from '../Form/CustomSelect/CustomSelect';
 export default function EditObjectAction({
 	ffNotificationTemplates,
+	getObjectDefinitionsRelationshipsURL,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
@@ -24,6 +25,7 @@ export default function EditObjectAction({
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

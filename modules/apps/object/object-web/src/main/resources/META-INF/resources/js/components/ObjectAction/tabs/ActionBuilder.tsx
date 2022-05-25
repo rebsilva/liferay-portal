@@ -12,7 +12,7 @@
  * details.
  */
 
-import ClayForm, {ClayToggle} from '@clayui/form';
+import ClayForm, {ClayToggle, ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -21,17 +21,29 @@ import Card from '../../Card/Card';
 import CodeMirrorEditor from '../../CodeEditor/CodeMirrorEditor';
 import CustomSelect, {CustomItem} from '../../Form/CustomSelect/CustomSelect';
 import Input from '../../Form/Input';
-
 import './ActionBuilder.scss';
+
+let objectsOptionsList: Array<
+	(
+		| React.ComponentProps<typeof ClaySelect.Option>
+		| React.ComponentProps<typeof ClaySelect.OptGroup>
+	) & {
+		options?: Array<React.ComponentProps<typeof ClaySelect.Option>>;
+		type?: 'group';
+	}
+>;
+
 
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
+	getObjectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
 	values,
 }: IProps) {
+
 	const [notificationTemplates, setNotificationTemplates] = useState<any[]>(
 		[]
 	);
@@ -39,6 +51,63 @@ export default function ActionBuilder({
 		selectedNotificationTemplate,
 		setSelectedNotificationTemplate,
 	] = useState('');
+
+	const [objectList, setObjectList] = useState<
+		Map<number, {label: string; related?: boolean}>
+	>();
+
+	const getObjectDefinitionsRelations = async () => {
+		const result = await fetch(getObjectDefinitionsRelationshipsURL);
+
+		const objectArray = (await result.json()) as ObjectSettings[]; // tem que ter undefined aqui?
+		const objectListMap = new Map<
+			number,
+			{label: string; related?: boolean}
+		>();
+		const relatedObjects: {label: string; value: number}[] = [];
+		const nonRelatedObjects: {label: string; value: number}[] = [];
+
+		objectArray?.forEach((object) => {
+			if (object.related) {
+				const {id, label, related} = object;
+				objectListMap.set(id, {
+					label,
+					related,
+				});
+				relatedObjects.push({label, value: id});
+			}
+			else {
+				const {id, label} = object;
+				objectListMap.set(id, {label});
+				nonRelatedObjects.push({label, value: id});
+			}
+		});
+
+		objectsOptionsList = [
+			{
+				disabled: true,
+				label: Liferay.Language.get('choose-an-object'),
+				selected: true,
+				value: '',
+			},
+			{
+				label: Liferay.Language.get('related-objects'),
+				options: relatedObjects,
+				type: 'group',
+			},
+			{
+				label: Liferay.Language.get('non-related-objects'),
+				options: nonRelatedObjects,
+				type: 'group',
+			},
+		];
+
+		return objectListMap;
+	};
+
+	const handleFetch = async () => {
+		setObjectList(await getObjectDefinitionsRelations());
+	};
 
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
@@ -155,12 +224,15 @@ export default function ActionBuilder({
 					<div className="lfr-object__action-builder-then">
 						<CustomSelect
 							error={errors.objectActionExecutorKey}
-							onChange={({value}) =>
+							onChange={({value}) =>{
+								if (value === 'add-object-entry') {
+									handleFetch();
+								}
 								setValues({
 									objectActionExecutorKey: value,
 									parameters: {},
-								})
-							}
+								});
+							}}
 							options={objectActionExecutors}
 							placeholder={Liferay.Language.get(
 								'choose-an-action'
@@ -169,6 +241,63 @@ export default function ActionBuilder({
 								values.objectActionExecutorKey ?? ''
 							)}
 						/>
+
+					{values.objectActionExecutorKey === 'add-object-entry' && (
+						<>
+							on
+							<ClaySelectWithOption
+								aria-label={Liferay.Language.get(
+									'choose-an-object'
+								)}
+								onChange={({target: {value}}) => {
+									const objectDefinitionId = parseInt(
+										value,
+										10
+									);
+									const object = objectList?.get(
+										objectDefinitionId
+									);
+									if (object?.related) {
+										setValues({
+											parameters: {
+												objectDefinitionId,
+												predefinedValues: [],
+												relatedEntries: false,
+											},
+										});
+									}
+									else {
+										setValues({
+											parameters: {
+												objectDefinitionId,
+												predefinedValues: [],
+											},
+										});
+									}
+								}}
+								options={objectsOptionsList}
+								value={values.parameters?.objectDefinitionId}
+							/>
+							{(values.parameters?.relatedEntries === false ||
+								values.parameters?.relatedEntries === true) && (
+								<ClayCheckbox
+									checked={values.parameters.relatedEntries}
+									disabled={false}
+									label={Liferay.Language.get(
+										'also-relate-entries'
+									)}
+									onChange={({target: {checked}}) => {
+										setValues({
+											parameters: {
+												...values.parameters,
+												relatedEntries: checked,
+											},
+										});
+									}}
+								/>
+							)}
+						</>
+					)}
 
 						{ffNotificationTemplates &&
 							values.objectActionExecutorKey ===
@@ -251,6 +380,7 @@ export default function ActionBuilder({
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;

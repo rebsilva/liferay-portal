@@ -20,6 +20,7 @@ import './ActionBuilder.scss';
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
+	getObjectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
@@ -28,6 +29,7 @@ export default function ActionBuilder({
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;

@@ -16,12 +16,16 @@ interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
 	description?: string;
+	getObjectDefinitionsRelationshipsURL: string;
 	id?: number;
 	name: string;
 	objectActionExecutorKey: string;
 	objectActionTriggerKey: string;
 	parameters?: {
 		notificationTemplateId?: number;
+		objectDefinitionId?: number;
+		predefinedValues?: PredefinedValuesItem[];
+		relatedEntries?: boolean;
 		script?: string;
 		secret?: string;
 		url?: string;
@@ -109,3 +113,15 @@ type ObjectValidationType = {
 	label: string;
 	name: string;
 };
+
+interface PredefinedValuesItem {
+	name: string;
+	required: boolean;
+	value: any;
+}
+
+interface ObjectSettings {
+	id: number;
+	label: string;
+	related?: boolean;
+}

@@ -18,12 +18,14 @@ import {CustomItem} from '../Form/CustomSelect/CustomSelect';
 export default function AddObjectAction({
 	apiURL,
 	ffNotificationTemplates,
+	getObjectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 }: IProps): JSX.Element;
 interface IProps {
 	apiURL: string;
 	ffNotificationTemplates: boolean;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 }
