@@ -22,10 +22,16 @@ ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = 
 ObjectAction objectAction = objectDefinitionsActionsDisplayContext.getObjectAction();
 %>
 
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/object_definitions/get_object_definitions_relations" varImpl="getObjectDefinitionsRelationsURL">
+	<portlet:param name="objectDefinitionId" value="<%= String.valueOf(objectDefinitionsActionsDisplayContext.getObjectDefinitionId()) %>" />
+</liferay-portlet:resourceURL>
+
 <react:component
 	module="js/components/EditObjectAction"
 	props='<%=
 		HashMapBuilder.<String, Object>put(
+			"getObjectDefinitionsRelationsURL", String.valueOf(getObjectDefinitionsRelationsURL)
+		).put(
 			"objectAction", objectDefinitionsActionsDisplayContext.getObjectActionJSONObject(objectAction)
 		).put(
 			"objectActionCodeEditorElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
