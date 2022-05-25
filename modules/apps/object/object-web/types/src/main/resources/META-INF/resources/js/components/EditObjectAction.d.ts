@@ -16,12 +16,14 @@
 
 import {CustomItem} from './Form/CustomSelect/CustomSelect';
 export default function EditObjectAction({
+	getObjectDefinitionsRelationsURL,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
 	readOnly,
 }: IProps): JSX.Element;
 interface IProps {
+	getObjectDefinitionsRelationsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

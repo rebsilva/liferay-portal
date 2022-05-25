@@ -19,11 +19,13 @@ import ObjectActionFormBase from './ObjectActionFormBase';
 
 export default function AddObjectAction({
 	apiURL,
+	getObjectDefinitionsRelationsURL,
 	objectActionExecutors = [],
 	objectActionTriggers = [],
 }: IProps) {
 	return (
 		<ObjectActionFormBase
+			getObjectDefinitionsRelationsURL={getObjectDefinitionsRelationsURL}
 			objectAction={{active: true}}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
@@ -41,6 +43,7 @@ export default function AddObjectAction({
 
 interface IProps {
 	apiURL: string;
+	getObjectDefinitionsRelationsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 }

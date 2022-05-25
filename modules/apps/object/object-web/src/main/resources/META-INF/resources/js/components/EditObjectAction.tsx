@@ -18,6 +18,7 @@ import {CustomItem} from './Form/CustomSelect/CustomSelect';
 import ObjectActionFormBase from './ObjectActionFormBase';
 
 export default function EditObjectAction({
+	getObjectDefinitionsRelationsURL,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
@@ -25,6 +26,7 @@ export default function EditObjectAction({
 }: IProps) {
 	return (
 		<ObjectActionFormBase
+			getObjectDefinitionsRelationsURL={getObjectDefinitionsRelationsURL}
 			objectAction={values}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
@@ -42,6 +44,7 @@ export default function EditObjectAction({
 }
 
 interface IProps {
+	getObjectDefinitionsRelationsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

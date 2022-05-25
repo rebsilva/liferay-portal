@@ -14,6 +14,7 @@
 
 import 'codemirror/mode/groovy/groovy';
 import ClayForm, {ClayToggle} from '@clayui/form';
+import {fetch} from 'frontend-js-web';
 import React, {useMemo} from 'react';
 
 import useForm, {FormError, invalidateRequired} from '../hooks/useForm';
@@ -26,6 +27,7 @@ import {SidePanelForm, closeSidePanel, openToast} from './SidePanelContent';
 const REQUIRED_MSG = Liferay.Language.get('required');
 
 export default function ObjectActionFormBase({
+	getObjectDefinitionsRelationsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -33,6 +35,12 @@ export default function ObjectActionFormBase({
 	requestParams: {method, url},
 	successMessage,
 }: IProps) {
+	const getObjectDefinitionsRelations = async () => {
+		const response = await fetch(getObjectDefinitionsRelationsURL);
+
+		console.log(await response.json());
+	};
+
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
 
@@ -144,12 +152,16 @@ export default function ObjectActionFormBase({
 				<CustomSelect
 					error={errors.objectActionExecutorKey}
 					label={Liferay.Language.get('then[object]')}
-					onChange={({value}) =>
+					onChange={({value}) => {
+						if (value === 'add-object-entry') {
+							getObjectDefinitionsRelations();
+						}
+
 						setValues({
 							objectActionExecutorKey: value,
 							parameters: {},
-						})
-					}
+						});
+					}}
 					options={objectActionExecutors}
 					required
 					value={actionExecutors.get(
@@ -245,6 +257,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 }
 
 interface IProps {
+	getObjectDefinitionsRelationsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
