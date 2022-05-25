@@ -151,6 +151,9 @@ export default function ModalWithProvider({
 		};
 	}) => {
 		const response = await fetch(
+
+			// similar a isso aqui
+
 			createResourceURL(baseResourceURL, {
 				objectDefinitionId: itemData.id,
 				p_p_resource_id:

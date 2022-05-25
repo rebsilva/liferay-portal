@@ -17,7 +17,7 @@
 import 'codemirror/mode/groovy/groovy';
 import {CustomItem} from '../Form/CustomSelect/CustomSelect';
 export default function Action({
-	getObjectDefinitionsRelationsURL,
+	getObjectDefinitionsRelationshipsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -26,7 +26,7 @@ export default function Action({
 	successMessage,
 }: IProps): JSX.Element;
 interface IProps {
-	getObjectDefinitionsRelationsURL: string;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

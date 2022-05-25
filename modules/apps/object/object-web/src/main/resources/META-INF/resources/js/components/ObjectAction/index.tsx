@@ -31,6 +31,7 @@ const TABS = [
 ];
 
 export default function Action({
+	getObjectDefinitionsRelationshipsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -106,6 +107,9 @@ export default function Action({
 				<ClayTabs.TabPane>
 					<ActionBuilder
 						errors={errors}
+						getObjectDefinitionsRelationshipsURL={
+							getObjectDefinitionsRelationshipsURL
+						}
 						objectActionExecutors={objectActionExecutors}
 						objectActionTriggers={objectActionTriggers}
 						setValues={setValues}
@@ -156,6 +160,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 }
 
 interface IProps {
+	getObjectDefinitionsRelationshipsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

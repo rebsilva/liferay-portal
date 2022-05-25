@@ -20,7 +20,7 @@
 ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = (ObjectDefinitionsActionsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/object_definitions/get_object_definitions_relations" varImpl="getObjectDefinitionsRelationsURL">
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/object_definitions/get_object_definitions_relations" varImpl="getObjectDefinitionsRelationshipsURL">
 	<portlet:param name="objectDefinitionId" value="<%= String.valueOf(objectDefinitionsActionsDisplayContext.getObjectDefinitionId()) %>" />
 </liferay-portlet:resourceURL>
 
@@ -30,7 +30,7 @@ ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = 
 		HashMapBuilder.<String, Object>put(
 			"apiURL", objectDefinitionsActionsDisplayContext.getAPIURL()
 		).put(
-			"getObjectDefinitionsRelationsURL", String.valueOf(getObjectDefinitionsRelationsURL)
+			"getObjectDefinitionsRelationshipsURL", String.valueOf(getObjectDefinitionsRelationshipsURL)
 		).put(
 			"objectActionCodeEditorElements", objectDefinitionsActionsDisplayContext.getObjectActionCodeEditorElements()
 		).put(

@@ -19,13 +19,15 @@ import ObjectAction from './index';
 
 export default function AddObjectAction({
 	apiURL,
-	getObjectDefinitionsRelationsURL,
+	getObjectDefinitionsRelationshipsURL,
 	objectActionExecutors = [],
 	objectActionTriggers = [],
 }: IProps) {
 	return (
 		<ObjectAction
-			getObjectDefinitionsRelationsURL={getObjectDefinitionsRelationsURL}
+			getObjectDefinitionsRelationshipsURL={
+				getObjectDefinitionsRelationshipsURL
+			}
 			objectAction={{active: true}}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
@@ -43,7 +45,7 @@ export default function AddObjectAction({
 
 interface IProps {
 	apiURL: string;
-	getObjectDefinitionsRelationsURL: string;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 }

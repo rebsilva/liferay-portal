@@ -18,6 +18,7 @@ import {FormError} from '../../../hooks/useForm';
 import {CustomItem} from '../../Form/CustomSelect/CustomSelect';
 export default function ActionBuilder({
 	errors,
+	getObjectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
@@ -25,6 +26,7 @@ export default function ActionBuilder({
 }: IProps): JSX.Element;
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
+	getObjectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;
