@@ -14,14 +14,15 @@
 
 /// <reference types="react" />
 
+import './PredefinedValueFDS.scss';
 export default function PredefinedValueFDS({
 	currentObjectDefinitionFields,
-	dataSetFields,
-	setDataSetFields,
+	predefinedValues,
+	setValues,
 }: IProps): JSX.Element;
 interface IProps {
-	dataSetFields?: ObjectField[];
-	setDataSetFields: (params: any) => void;
 	currentObjectDefinitionFields: ObjectField[];
+	predefinedValues?: PredefinedValue[];
+	setValues: (params: Partial<ObjectAction>) => void;
 }
 export {};

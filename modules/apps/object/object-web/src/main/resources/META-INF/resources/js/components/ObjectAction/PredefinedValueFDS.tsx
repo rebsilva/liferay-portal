@@ -14,7 +14,8 @@
 
 import {ClayCheckbox} from '@clayui/form';
 import {useModal} from '@clayui/modal';
-
+import ClayIcon from '@clayui/icon';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 // @ts-ignore
 
 import {FrontendDataSet} from '@liferay/frontend-data-set-web';
@@ -22,7 +23,7 @@ import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 // @ts-ignore
 
 import {render} from '@liferay/frontend-js-react-web';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {defaultLanguageId} from '../../utils/locale';
 import Card from '../Card/Card';
@@ -33,147 +34,167 @@ import ModalAddColumns from '../ObjectView/ModalAddColumns/ModalAddColumns';
 
 import TestFrontendDataSet from '../TestFrontendDataSet';
 import {onActionDropdownItemClick} from './fdsUtil'; // mudar esse import quando o PR de dan entrar
-// import {TObjectField, TObjectViewColumn} from '../ObjectView/types';
+
+import './PredefinedValueFDS.scss';
+
+const dataSetProps: IDataSetProps = {
+	creationMenu: {
+		primaryItems: [
+			{
+				href: 'openModalAddColumns',
+				id: 'openModalAddColumns',
+				label: 'funcionou!',
+				target: 'event',
+			},
+		],
+	},
+	id: 'tableTest',
+	items: [],
+	itemsActions: [
+		{
+			href: 'deleteDataSetField',
+			id: 'deleteDataSetField',
+			icon: 'trash',
+			label: 'delete',
+			target: 'event',
+		} as any,
+	],
+	namespace: '',
+
+	onActionDropdownItemClick,
+
+	selectedItemsKey: 'id',
+	showManagementBar: true,
+	showPagination: false,
+	showSearch: false,
+	views: [
+		{
+			contentRenderer: 'table',
+			label: 'Table',
+			name: 'table',
+			schema: {
+				fields: [
+					{
+						fieldName: 'name',
+						label: Liferay.Language.get('field'),
+					} as any,
+					{
+						fieldName: 'inputAsValue',
+						label: Liferay.Language.get('input-method'),
+					},
+					{
+						fieldName: 'newValue',
+						label: Liferay.Language.get('new-value'),
+					} as any,
+				],
+			},
+			thumbnail: 'table',
+		},
+	],
+};
 
 export default function PredefinedValueFDS({
 	currentObjectDefinitionFields,
-	dataSetFields,
-	setDataSetFields,
+	predefinedValues = [],
+	setValues,
 }: IProps) {
-	const dataSetProps: IDataSetProps = {
-		creationMenu: {
-			primaryItems: [
-				{
-					href: 'openModalAddColumns',
-					id: 'openModalAddColumns',
-					label: 'funcionou!',
-					target: 'event',
-				},
-			],
-		},
-		id: 'tableTest',
-		items: [],
-		itemsActions: [
-			{
-				href: 'deleteDataSetField',
-				id: 'deleteDataSetField',
-				label: 'delete',
-				target: 'event',
-			} as any,
-		],
-		namespace: '',
-
-		onActionDropdownItemClick,
-
-		selectedItemsKey: 'id',
-		showManagementBar: true,
-		showPagination: false,
-		showSearch: false,
-		views: [
-			{
-				contentRenderer: 'table',
-				label: 'Table',
-				name: 'table',
-				schema: {
-					fields: [
-						{
-							fieldName: 'name',
-							label: Liferay.Language.get('field'),
-						} as any,
-						{
-							fieldName: 'inputAsValue',
-							label: Liferay.Language.get('input-method'),
-						},
-						{
-							fieldName: 'newValue',
-							label: Liferay.Language.get('new-value'),
-						} as any,
-					],
-				},
-				thumbnail: 'table',
-			},
-		],
-	};
-
-	const [frontEndDataSetProps, setFrontEndDataSetProps] = useState(
-		dataSetProps
-	);
 
 	const [visibleModal, setVisibleModal] = useState(false);
 
+	const [visibleWarningModal, setVisibleWarningModal] = useState(false);
+
 	const {observer, onClose} = useModal({
-		onClose: () => setVisibleModal(false),
+		onClose: () =>
+		visibleWarningModal
+				? setVisibleWarningModal(false)
+				: setVisibleModal(false),
 	});
 
-	const getEntityFields = (dataSetFields: ObjectField[] | undefined) => {
-		const dataSetItems = dataSetFields?.map((item) => {
+	const props = useMemo(() => {
+
+		const items = predefinedValues?.map((item) => {
 			return {
 				inputAsValue: (
-					<ClayCheckbox
-						checked={false}
-						disabled={false}
-						label={Liferay.Language.get('input-as-a-value')}
-						onChange={({target: {checked}}) => {}}
-					/>
+					<div className="lfr-object-web__predefined-values-render-fds-input-method">
+						<ClayCheckbox
+							checked={false}
+							disabled={false}
+							label={Liferay.Language.get('input-as-a-value')}
+							onChange={({target: {checked}}) => {}}
+						/>
+
+						<ClayTooltipProvider>
+							<div
+								data-tooltip-align="top"
+								title={Liferay.Language.get(
+									'by-checking-expressions-wont-be-used-for-filling-the-field-predefined-value'
+								)}
+							>
+								<ClayIcon
+									className="lfr-object-web__predefined-values-render-fds-tooltip-icon"
+									symbol="question-circle-full"
+								/>
+							</div>
+						</ClayTooltipProvider>
+					</div>
 				),
-				name: item.name,
+				name: (
+					<>
+						{item.name}
+						{item.required === true && (
+							<span className="ml-1 reference-mark text-warning">
+								<ClayIcon symbol="asterisk" />
+							</span>
+						)}
+					</>
+				),
 				newValue: <TestFrontendDataSet />,
-
-				//  checkbox: <CheckboxItem
-				//  checked={false}
-				// 				key={""}
-				// 				label={"Input Manually"}
-				// 				onChange={({target: {checked}}) => {
-				// Liferay.fire
-
-				// 				}}
-
-				//  />
-
 			};
 		});
 
-		setFrontEndDataSetProps({
-			...frontEndDataSetProps,
-			items: dataSetItems,
-		});
-	};
+		return {...dataSetProps, items};
 
-	useEffect(() => {
-		getEntityFields(dataSetFields);
-	}, [dataSetFields]);
+	},[predefinedValues])
 
 	const datasetDisplayLauncher = (...frontEndDataSetProps: any[]) =>
 		render(FrontendDataSet, ...frontEndDataSetProps);
 
 	useEffect(() => {
 		datasetDisplayLauncher(
-			frontEndDataSetProps,
+			props,
 			document.getElementById(
 				'lfr-object-web__predefined-values-render-fds'
 			)
 		);
-	}, [frontEndDataSetProps]);
+	}, [props]);
 
-	const deleteDataSetField = (event: any) => {
-		const {itemData} = event;
-		const updatedFieldList = dataSetFields?.filter(
-			(field) => field.name !== itemData.name
-		);
-		setDataSetFields(updatedFieldList);
-	};
-
-	const openModal = (event: any) => {
+	const openModal = (event: any) => { // fazer um desse
 		setVisibleModal(true);
 	};
 
 	useEffect(() => {
+		const deleteDataSetField = (event: any) => {
+			alert("yeooo");
+			// const [name, required] = event.itemData.name.props.children;
+
+			// if (required) {
+			// 	alert('I am required!');
+
+			// 	return;
+			// }
+
+			// const updatedFieldList = dataSetFields.filter(
+			// 	(field) => field.name !== name
+			// );
+
+			// setDataSetFields(updatedFieldList);
+		};
+
 		Liferay.on('deleteDataSetField', deleteDataSetField);
 
 		return () => {
 			Liferay.detach('deleteDataSetField');
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {
@@ -188,10 +209,11 @@ export default function PredefinedValueFDS({
 	return (
 		<>
 			<Card title={Liferay.Language.get('predefined-values')}>
-				<div id="lfr-object-web__predefined-values-render-fds" />
+				<div id="lfr-object-web__predefined-values-render-fds" >
+				</div>
 			</Card>
 
-			{visibleModal && (
+			 {/* {visibleModal && (
 				<ModalAddColumns
 					handleSubmit={setDataSetFields}
 					isActionBuilder={true}
@@ -200,15 +222,16 @@ export default function PredefinedValueFDS({
 					observer={observer}
 					onClose={onClose}
 				/>
-			)}
+			)}  */}
+
 		</>
 	);
 }
 
 interface IProps {
-	dataSetFields?: ObjectField[];
-	setDataSetFields: (params: any) => void;
 	currentObjectDefinitionFields: ObjectField[];
+	predefinedValues?: PredefinedValue[];
+	setValues: (params: Partial<ObjectAction>) => void;
 }
 
 interface IDataSetProps {

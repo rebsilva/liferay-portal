@@ -18,6 +18,8 @@ import ClayForm, {
 	ClaySelectWithOption,
 	ClayToggle,
 } from '@clayui/form';
+import ClayIcon from '@clayui/icon';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -45,12 +47,10 @@ let objectsOptionsList: Array<
 	}
 >;
 
-let currentObjectDefinitionFields: ObjectField[] = [];
-
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
-	getObjectDefinitionsRelationshipsURL,
+	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
@@ -64,36 +64,24 @@ export default function ActionBuilder({
 		setSelectedNotificationTemplate,
 	] = useState('');
 
-	const [objectList, setObjectList] = useState<
-		Map<number, {label: string; related?: boolean}>
-	>();
-	const [dataSetFields, setDataSetFields] = useState<ObjectField[]>();
+	const [relationships, setRelationships] = useState<ObjectDefinitionsRelationship[]>([]);
 
-	const handleFetchObjectDefinitions = async () => {
-		const result = await fetch(getObjectDefinitionsRelationshipsURL);
+	const [currentObjectDefinitionFields, setCurrentObjectDefinitionFields ] = useState<ObjectField[]>([]);
 
-		const objectArray = (await result.json()) as ObjectSettings[]; // tem que ter undefined aqui?
-		const objectListMap = new Map<
-			number,
-			{label: string; related?: boolean}
-		>();
-		const relatedObjects: {label: string; value: number}[] = [];
-		const nonRelatedObjects: {label: string; value: number}[] = [];
+	const fetchObjectDefinitions = async () => {
+		const response = await fetch(objectDefinitionsRelationshipsURL);
 
-		objectArray?.forEach((object) => {
-			if (object.related) {
-				const {id, label, related} = object;
-				objectListMap.set(id, {
-					label,
-					related,
-				});
-				relatedObjects.push({label, value: id});
-			}
-			else {
-				const {id, label} = object;
-				objectListMap.set(id, {label});
-				nonRelatedObjects.push({label, value: id});
-			}
+		const relationships = (await response.json()) as ObjectDefinitionsRelationship[];
+		const relatedObjects: SelectItem[] = [];
+		const nonRelatedObjects: SelectItem[] = [];
+
+		relationships?.forEach((object) => {
+			
+			const {id, label} = object;
+
+			const target = object.related ? relatedObjects : nonRelatedObjects;
+
+			target.push({label, value: id});
 		});
 
 		objectsOptionsList = [];
@@ -105,26 +93,21 @@ export default function ActionBuilder({
 			value: '',
 		});
 
-		if (relatedObjects.length > 0) {
-			objectsOptionsList.push({
-				label: Liferay.Language.get('related-objects'),
-				options: relatedObjects,
-				type: 'group',
-			});
+		const fillSelect = (label: string, options: SelectItem[]) => {
+			if (options.length) {
+				objectsOptionsList.push({label, options, type: 'group'});
+			}
 		}
 
-		if (nonRelatedObjects.length > 0) {
-			objectsOptionsList.push({
-				label: Liferay.Language.get('non-related-objects'),
-				options: nonRelatedObjects,
-				type: 'group',
-			});
-		}
+		fillSelect(Liferay.Language.get('related-objects'), relatedObjects);
 
-		setObjectList(objectListMap);
+		fillSelect(Liferay.Language.get('non-related-objects'), nonRelatedObjects);
+
+		setRelationships(relationships);
+
 	};
 
-	const handleFetchObjectFields = async (objectDefinitionId: number) => {
+	const fetchObjectFields = async (objectDefinitionId: number) => {
 		const response = await fetch(
 			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
 			{
@@ -135,14 +118,34 @@ export default function ActionBuilder({
 
 		const {items} = (await response.json()) as {items: ObjectField[]};
 
-		currentObjectDefinitionFields = items;
+		const currentObjectDefinitionFields = items.filter(
+			(field) => field.businessType !== 'Relationship' // falar com gabriel ou carol depois
+		);
+
+		// talvez mudar para forEach depois se não der para tirar esse filter do relationship
+
+		setCurrentObjectDefinitionFields(currentObjectDefinitionFields);
 
 		// logo depois que o objeto é selecionado, se retorna por default
 		// os fields required para o FDS, por isso esse filter abaixo existe
 
-		const requiredFields = items.filter((field) => field.required === true);
+		const requiredFields: PredefinedValue[] = [];
 
-		setDataSetFields(requiredFields);
+		currentObjectDefinitionFields.forEach(({name, required}) => {
+				if (required === true) {
+					requiredFields.push({name, value: "", inputAsValue: false, required})
+				}
+			}
+		);
+		// console.log("antes do set");
+		// console.log(values);
+
+		setValues(((values: Partial<ObjectAction>) => ({
+			parameters:{
+				...values.parameters,
+				predefinedValues: requiredFields
+			}
+		}))as any)
 	};
 
 	const actionExecutors = useMemo(() => {
@@ -193,28 +196,19 @@ export default function ActionBuilder({
 		}
 	}, [values]);
 
-	const setPredefinedValues = () => {
+	// const dataSetFields = useMemo(() => {
 
-		// se for logo após a mudança de seleção de um objeto fazer desse jeito abaixo
+	// 	if (!values.parameters?.predefinedValues) {
+	// 		return [] as ObjectField[];
+	// 	}
 
-		const predefinedValues = dataSetFields?.map(({name, required}) => {
-			return {name, inputAsValue: false, value: '', required};
-		});
+	// 	const rows = values.parameters.predefinedValues.map(() => {
 
-		// senão alterar apenas algum/alguns dos parâmetros
+	// 	})
 
-		return predefinedValues;
-	};
-
-	useEffect(() => {
-		const predefinedValues = setPredefinedValues();
-		setValues({
-			parameters: {
-				...values.parameters,
-				predefinedValues,
-			},
-		});
-	}, [dataSetFields]); // tentar tirar esse useEffect depois
+	// },[values])
+	// console.log("depois do set");
+	// console.log(values);
 
 	return (
 		<>
@@ -285,10 +279,7 @@ export default function ActionBuilder({
 							error={errors.objectActionExecutorKey}
 							onChange={({value}) => {
 								if (value === 'add-object-entry') {
-									handleFetchObjectDefinitions();
-								}
-								else {
-									setDataSetFields([]);
+									fetchObjectDefinitions();
 								}
 								setValues({
 									objectActionExecutorKey: value,
@@ -317,56 +308,63 @@ export default function ActionBuilder({
 											value,
 											10
 										);
-										const object = objectList?.get(
-											objectDefinitionId
-										);
-										if (object?.related) {
-											setValues({
-												parameters: {
-													objectDefinitionId,
-													predefinedValues: [],
-													relatedEntries: false,
-												},
-											});
-										}
-										else {
-											setValues({
-												parameters: {
-													objectDefinitionId,
-													predefinedValues: [],
-												},
-											});
-										}
+										console.log(relationships);
+										const object = relationships.find(({id}) => 
+											id == objectDefinitionId
+										)
 
-										handleFetchObjectFields(
-											objectDefinitionId
-										);
+										const parameters: ObjectActionParameters = {
+												objectDefinitionId,
+												predefinedValues: [],
+										};
+
+										if (object?.related) {
+											parameters.relatedObjectEntries = false;
+										}
+										
+										setValues({parameters});
+
+										fetchObjectFields(objectDefinitionId);
 									}}
-									options={objectsOptionsList} // isso aqui eu preciso mudar para pegar a label de acordo com as traduções
+									options={objectsOptionsList}
 									value={
 										values.parameters?.objectDefinitionId
 									}
 								/>
-								{(values.parameters?.relatedEntries === false ||
-									values.parameters?.relatedEntries ===
-										true) && (
-									<ClayCheckbox
-										checked={
-											values.parameters.relatedEntries
-										}
-										disabled={false}
-										label={Liferay.Language.get(
-											'also-relate-entries'
-										)}
-										onChange={({target: {checked}}) => {
-											setValues({
-												parameters: {
-													...values.parameters,
-													relatedEntries: checked,
-												},
-											});
-										}}
-									/>
+								{(values.parameters?.hasOwnProperty('relatedObjectEntries')) && (
+									<>
+										<ClayCheckbox
+											checked={
+												values.parameters
+													.relatedObjectEntries === true
+											}
+											disabled={false}
+											label={Liferay.Language.get(
+												'also-relate-entries'
+											)}
+											onChange={({target: {checked}}) => {
+												setValues({
+													parameters: {
+														...values.parameters,
+														relatedObjectEntries: checked,
+													},
+												});
+											}}
+										/>
+										<ClayTooltipProvider>
+											<div
+												data-tooltip-align="top"
+												title={Liferay.Language.get(
+													'automatically-relate-object-entries-involved-in-the-action'
+												)}
+											>
+												<ClayIcon
+													className=".lfr-object__action-builder-tooltip-icon"
+													symbol="question-circle-full"
+												/>
+											</div>
+										</ClayTooltipProvider>
+									</>
 								)}
 							</>
 						)}
@@ -401,8 +399,8 @@ export default function ActionBuilder({
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
-							dataSetFields={dataSetFields}
-							setDataSetFields={setDataSetFields}
+							predefinedValues={values.parameters.predefinedValues}
+							setValues={setValues}
 						/>
 					)}
 
@@ -463,11 +461,16 @@ export default function ActionBuilder({
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
-	getObjectDefinitionsRelationshipsURL: string;
+	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;
 	values: Partial<ObjectAction>;
+}
+
+interface SelectItem {
+	label: string; 
+	value: number;
 }
 
 type TNotificationTemplate = {

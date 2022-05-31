@@ -16,28 +16,30 @@ interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
 	description?: string;
-	getObjectDefinitionsRelationshipsURL: string;
+	objectDefinitionsRelationshipsURL: string;
 	id?: number;
 	name: string;
 	objectActionExecutorKey: string;
 	objectActionTriggerKey: string;
-	parameters?: {
-		notificationTemplateId?: number;
-		objectDefinitionId?: number;
-		predefinedValues?: PredefinedValuesItem[];
-		relatedEntries?: boolean;
-		script?: string;
-		secret?: string;
-		url?: string;
-	};
+	parameters?: ObjectActionParameters;
 }
 
 interface ObjectActionParameters {
-	secret: string;
-	url: string;
+	notificationTemplateId?: number;
+	objectDefinitionId?: number;
+	predefinedValues?: PredefinedValue[];
+	relatedObjectEntries?: boolean;
+	script?: string;
+	secret?: string;
+	url?: string;
 }
 
-type ObjectFieldBusinessType = 'Attachment' | 'LongText' | 'Picklist' | 'Text';
+type ObjectFieldBusinessType =
+	| 'Attachment'
+	| 'LongText'
+	| 'Picklist'
+	| 'Relationship'
+	| 'Text';
 interface ObjectFieldType {
 	businessType: ObjectFieldBusinessType;
 	dbType: string;
@@ -54,7 +56,7 @@ interface ObjectField {
 	indexedLanguageId: Locale | null;
 	label: LocalizedValue<string>;
 	listTypeDefinitionId: number;
-	name?: string;
+	name: string;
 	objectFieldSettings?: ObjectFieldSetting[];
 	relationshipType?: unknown;
 	required: boolean;
@@ -138,14 +140,14 @@ type ObjectValidationType = {
 	name: string;
 };
 
-interface PredefinedValuesItem {
-	name?: string; // pensar num jeito de tirar esse ?
+interface PredefinedValue {
+	name: string;
 	required: boolean;
 	value: string;
 	inputAsValue: boolean;
 }
 
-interface ObjectSettings {
+interface ObjectDefinitionsRelationship {
 	id: number;
 	label: string;
 	related?: boolean;

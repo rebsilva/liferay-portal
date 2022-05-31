@@ -22,7 +22,7 @@ ObjectDefinitionsActionsDisplayContext objectDefinitionsActionsDisplayContext = 
 ObjectAction objectAction = objectDefinitionsActionsDisplayContext.getObjectAction();
 %>
 
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/object_definitions/get_object_definitions_relations" varImpl="getObjectDefinitionsRelationshipsURL">
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="/object_definitions/get_object_definitions_relations" varImpl="objectDefinitionsRelationshipsURL">
 	<portlet:param name="objectDefinitionId" value="<%= String.valueOf(objectDefinitionsActionsDisplayContext.getObjectDefinitionId()) %>" />
 </liferay-portlet:resourceURL>
 
@@ -32,7 +32,7 @@ ObjectAction objectAction = objectDefinitionsActionsDisplayContext.getObjectActi
 		HashMapBuilder.<String, Object>put(
 			"ffNotificationTemplates", GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-149050"))
 		).put(
-			"getObjectDefinitionsRelationshipsURL", objectDefinitionsActionsDisplayContext.getObjectDefinitionsRelationshipsURL()
+			"objectDefinitionsRelationshipsURL", objectDefinitionsActionsDisplayContext.getObjectDefinitionsRelationshipsURL()
 		).put(
 			"objectAction", objectDefinitionsActionsDisplayContext.getObjectActionJSONObject(objectAction)
 		).put(

@@ -19,7 +19,7 @@ import ObjectAction from './index';
 
 export default function EditObjectAction({
 	ffNotificationTemplates,
-	getObjectDefinitionsRelationshipsURL,
+	objectDefinitionsRelationshipsURL,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
@@ -28,8 +28,8 @@ export default function EditObjectAction({
 	return (
 		<ObjectAction
 			ffNotificationTemplates={ffNotificationTemplates}
-			getObjectDefinitionsRelationshipsURL={
-				getObjectDefinitionsRelationshipsURL
+			objectDefinitionsRelationshipsURL={
+				objectDefinitionsRelationshipsURL
 			}
 			objectAction={values}
 			objectActionExecutors={objectActionExecutors}
@@ -49,7 +49,7 @@ export default function EditObjectAction({
 
 interface IProps {
 	ffNotificationTemplates: boolean;
-	getObjectDefinitionsRelationshipsURL: string;
+	objectDefinitionsRelationshipsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

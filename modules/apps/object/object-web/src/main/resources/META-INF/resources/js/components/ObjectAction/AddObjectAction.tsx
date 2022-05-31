@@ -20,15 +20,15 @@ import ObjectAction from './index';
 export default function AddObjectAction({
 	apiURL,
 	ffNotificationTemplates,
-	getObjectDefinitionsRelationshipsURL,
+	objectDefinitionsRelationshipsURL,
 	objectActionExecutors = [],
 	objectActionTriggers = [],
 }: IProps) {
 	return (
 		<ObjectAction
 			ffNotificationTemplates={ffNotificationTemplates}
-			getObjectDefinitionsRelationshipsURL={
-				getObjectDefinitionsRelationshipsURL
+			objectDefinitionsRelationshipsURL={
+				objectDefinitionsRelationshipsURL
 			}
 			objectAction={{active: true}}
 			objectActionExecutors={objectActionExecutors}
@@ -48,7 +48,7 @@ export default function AddObjectAction({
 interface IProps {
 	apiURL: string;
 	ffNotificationTemplates: boolean;
-	getObjectDefinitionsRelationshipsURL: string;
+	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 }
