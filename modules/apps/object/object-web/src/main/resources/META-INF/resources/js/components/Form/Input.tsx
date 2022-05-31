@@ -78,6 +78,6 @@ interface IProps
 	label?: string;
 	name?: string;
 	required?: boolean;
-	type?: 'number' | 'text';
+	type?: 'number' | 'textarea' | 'text';
 	value?: string | number | string[];
 }

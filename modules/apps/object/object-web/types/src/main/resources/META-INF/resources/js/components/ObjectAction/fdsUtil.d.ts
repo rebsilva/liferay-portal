@@ -12,21 +12,15 @@
  * details.
  */
 
-import React from 'react';
-declare const Input: React.ForwardRefExoticComponent<
-	IProps & React.RefAttributes<HTMLInputElement>
->;
-export default Input;
-interface IProps
-	extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-	component?: 'input' | 'textarea' | React.ForwardRefExoticComponent<any>;
-	disabled?: boolean;
-	error?: string;
-	feedbackMessage?: string;
-	id?: string;
-	label?: string;
-	name?: string;
-	required?: boolean;
-	type?: 'number' | 'textarea' | 'text';
-	value?: string | number | string[];
+export declare function onActionDropdownItemClick<T>({
+	action,
+	itemData,
+}: {
+	action: FDSAction;
+	itemData: T;
+}): void;
+interface FDSAction {
+	target: 'event' | 'async';
+	id: string;
 }
+export {};

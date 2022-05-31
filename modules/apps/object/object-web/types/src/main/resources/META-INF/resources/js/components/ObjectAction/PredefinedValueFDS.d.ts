@@ -12,21 +12,17 @@
  * details.
  */
 
-import React from 'react';
-declare const Input: React.ForwardRefExoticComponent<
-	IProps & React.RefAttributes<HTMLInputElement>
->;
-export default Input;
-interface IProps
-	extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
-	component?: 'input' | 'textarea' | React.ForwardRefExoticComponent<any>;
-	disabled?: boolean;
-	error?: string;
-	feedbackMessage?: string;
-	id?: string;
-	label?: string;
-	name?: string;
-	required?: boolean;
-	type?: 'number' | 'textarea' | 'text';
-	value?: string | number | string[];
+/// <reference types="react" />
+
+import './PredefinedValueFDS.scss';
+export default function PredefinedValueFDS({
+	currentObjectDefinitionFields,
+	dataSetFields,
+	setDataSetFields,
+}: IProps): JSX.Element;
+interface IProps {
+	currentObjectDefinitionFields: ObjectField[];
+	dataSetFields?: ObjectField[];
+	setDataSetFields: (params: any) => void;
 }
+export {};

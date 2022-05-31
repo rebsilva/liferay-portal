@@ -12,7 +12,14 @@
  * details.
  */
 
-import ClayForm, {ClayToggle, ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
+import ClayForm, {
+	ClayCheckbox,
+	ClaySelect,
+	ClaySelectWithOption,
+	ClayToggle,
+} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -21,7 +28,14 @@ import Card from '../../Card/Card';
 import CodeMirrorEditor from '../../CodeEditor/CodeMirrorEditor';
 import CustomSelect, {CustomItem} from '../../Form/CustomSelect/CustomSelect';
 import Input from '../../Form/Input';
+import PredefinedValueFDS from '../PredefinedValueFDS';
+
 import './ActionBuilder.scss';
+
+const HEADERS = new Headers({
+	'Accept': 'application/json',
+	'Content-Type': 'application/json',
+});
 
 let objectsOptionsList: Array<
 	(
@@ -33,6 +47,7 @@ let objectsOptionsList: Array<
 	}
 >;
 
+let currentObjectDefinitionFields: ObjectField[] = [];
 
 export default function ActionBuilder({
 	errors,
@@ -43,7 +58,6 @@ export default function ActionBuilder({
 	setValues,
 	values,
 }: IProps) {
-
 	const [notificationTemplates, setNotificationTemplates] = useState<any[]>(
 		[]
 	);
@@ -55,8 +69,9 @@ export default function ActionBuilder({
 	const [objectList, setObjectList] = useState<
 		Map<number, {label: string; related?: boolean}>
 	>();
+	const [dataSetFields, setDataSetFields] = useState<ObjectField[]>([]);
 
-	const getObjectDefinitionsRelations = async () => {
+	const handleFetchObjectDefinitions = async () => {
 		const result = await fetch(getObjectDefinitionsRelationshipsURL);
 
 		const objectArray = (await result.json()) as ObjectSettings[]; // tem que ter undefined aqui?
@@ -83,30 +98,58 @@ export default function ActionBuilder({
 			}
 		});
 
-		objectsOptionsList = [
-			{
-				disabled: true,
-				label: Liferay.Language.get('choose-an-object'),
-				selected: true,
-				value: '',
-			},
-			{
+		objectsOptionsList = [];
+
+		objectsOptionsList.push({
+			disabled: true,
+			label: Liferay.Language.get('choose-an-object'),
+			selected: true,
+			value: '',
+		});
+
+		if (relatedObjects.length > 0) {
+			objectsOptionsList.push({
 				label: Liferay.Language.get('related-objects'),
 				options: relatedObjects,
 				type: 'group',
-			},
-			{
+			});
+		}
+
+		if (nonRelatedObjects.length > 0) {
+			objectsOptionsList.push({
 				label: Liferay.Language.get('non-related-objects'),
 				options: nonRelatedObjects,
 				type: 'group',
-			},
-		];
+			});
+		}
 
-		return objectListMap;
+		setObjectList(objectListMap);
 	};
 
-	const handleFetch = async () => {
-		setObjectList(await getObjectDefinitionsRelations());
+	const handleFetchObjectFields = async (objectDefinitionId: number) => {
+		const response = await fetch(
+			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+			{
+				headers: HEADERS,
+				method: 'GET',
+			}
+		);
+
+		const {items} = (await response.json()) as {items: ObjectField[]};
+
+		currentObjectDefinitionFields = items.filter(
+			(field) => field.businessType !== 'Relationship'
+		);
+		console.log(currentObjectDefinitionFields);
+
+		// logo depois que o objeto é selecionado, se retorna por default
+		// os fields required para o FDS, por isso esse filter abaixo existe
+
+		const requiredFields = currentObjectDefinitionFields.filter(
+			(field) => field.required === true
+		);
+
+		setDataSetFields(currentObjectDefinitionFields); // mudar para os required depois
 	};
 
 	const actionExecutors = useMemo(() => {
@@ -156,6 +199,29 @@ export default function ActionBuilder({
 			makeFetch();
 		}
 	}, [values]);
+
+	const setPredefinedValues = () => {
+
+		// se for logo após a mudança de seleção de um objeto fazer desse jeito abaixo
+
+		const predefinedValues = dataSetFields?.map(({name, required}) => {
+			return {name, inputAsValue: false, value: '', required};
+		});
+
+		// senão alterar apenas algum/alguns dos parâmetros
+
+		return predefinedValues;
+	};
+
+	useEffect(() => {
+		const predefinedValues = setPredefinedValues();
+		setValues({
+			parameters: {
+				...values.parameters,
+				predefinedValues,
+			},
+		});
+	}, [dataSetFields]); // tentar tirar esse useEffect depois
 
 	return (
 		<>
@@ -224,9 +290,12 @@ export default function ActionBuilder({
 					<div className="lfr-object__action-builder-then">
 						<CustomSelect
 							error={errors.objectActionExecutorKey}
-							onChange={({value}) =>{
+							onChange={({value}) => {
 								if (value === 'add-object-entry') {
-									handleFetch();
+									handleFetchObjectDefinitions();
+								}
+								else {
+									setDataSetFields([]);
 								}
 								setValues({
 									objectActionExecutorKey: value,
@@ -242,62 +311,89 @@ export default function ActionBuilder({
 							)}
 						/>
 
-					{values.objectActionExecutorKey === 'add-object-entry' && (
-						<>
-							on
-							<ClaySelectWithOption
-								aria-label={Liferay.Language.get(
-									'choose-an-object'
-								)}
-								onChange={({target: {value}}) => {
-									const objectDefinitionId = parseInt(
-										value,
-										10
-									);
-									const object = objectList?.get(
-										objectDefinitionId
-									);
-									if (object?.related) {
-										setValues({
-											parameters: {
-												objectDefinitionId,
-												predefinedValues: [],
-												relatedEntries: false,
-											},
-										});
-									}
-									else {
-										setValues({
-											parameters: {
-												objectDefinitionId,
-												predefinedValues: [],
-											},
-										});
-									}
-								}}
-								options={objectsOptionsList}
-								value={values.parameters?.objectDefinitionId}
-							/>
-							{(values.parameters?.relatedEntries === false ||
-								values.parameters?.relatedEntries === true) && (
-								<ClayCheckbox
-									checked={values.parameters.relatedEntries}
-									disabled={false}
-									label={Liferay.Language.get(
-										'also-relate-entries'
+						{values.objectActionExecutorKey ===
+							'add-object-entry' && (
+							<>
+								on
+								<ClaySelectWithOption
+									aria-label={Liferay.Language.get(
+										'choose-an-object'
 									)}
-									onChange={({target: {checked}}) => {
-										setValues({
-											parameters: {
-												...values.parameters,
-												relatedEntries: checked,
-											},
-										});
+									onChange={({target: {value}}) => {
+										const objectDefinitionId = parseInt(
+											value,
+											10
+										);
+										const object = objectList?.get(
+											objectDefinitionId
+										);
+										if (object?.related) {
+											setValues({
+												parameters: {
+													objectDefinitionId,
+													predefinedValues: [],
+													relatedObjectEntries: false,
+												},
+											});
+										}
+										else {
+											setValues({
+												parameters: {
+													objectDefinitionId,
+													predefinedValues: [],
+												},
+											});
+										}
+
+										handleFetchObjectFields(
+											objectDefinitionId
+										);
 									}}
+									options={objectsOptionsList} // isso aqui eu preciso mudar para pegar a label de acordo com as traduções
+									value={
+										values.parameters?.objectDefinitionId
+									}
 								/>
-							)}
-						</>
-					)}
+								{(values.parameters?.relatedObjectEntries ===
+									false ||
+									values.parameters?.relatedObjectEntries ===
+										true) && (
+									<>
+										<ClayCheckbox
+											checked={
+												values.parameters
+													.relatedObjectEntries
+											}
+											disabled={false}
+											label={Liferay.Language.get(
+												'also-relate-entries'
+											)}
+											onChange={({target: {checked}}) => {
+												setValues({
+													parameters: {
+														...values.parameters,
+														relatedObjectEntries: checked,
+													},
+												});
+											}}
+										/>
+										<ClayTooltipProvider>
+											<div
+												data-tooltip-align="top"
+												title={Liferay.Language.get(
+													'automatically-relate-object-entries-involved-in-the-action'
+												)}
+											>
+												<ClayIcon
+													className=".lfr-object__action-builder-tooltip-icon"
+													symbol="question-circle-full"
+												/>
+											</div>
+										</ClayTooltipProvider>
+									</>
+								)}
+							</>
+						)}
 
 						{ffNotificationTemplates &&
 							values.objectActionExecutorKey ===
@@ -322,6 +418,17 @@ export default function ActionBuilder({
 							)}
 					</div>
 				</Card>
+
+				{values.objectActionExecutorKey === 'add-object-entry' &&
+					values.parameters?.objectDefinitionId && (
+						<PredefinedValueFDS
+							currentObjectDefinitionFields={
+								currentObjectDefinitionFields
+							}
+							dataSetFields={dataSetFields}
+							setDataSetFields={setDataSetFields}
+						/>
+					)}
 
 				{values.objectActionExecutorKey === 'webhook' && (
 					<>

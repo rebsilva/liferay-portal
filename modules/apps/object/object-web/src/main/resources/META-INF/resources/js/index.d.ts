@@ -25,7 +25,7 @@ interface ObjectAction {
 		notificationTemplateId?: number;
 		objectDefinitionId?: number;
 		predefinedValues?: PredefinedValuesItem[];
-		relatedEntries?: boolean;
+		relatedObjectEntries?: boolean;
 		script?: string;
 		secret?: string;
 		url?: string;
@@ -37,7 +37,12 @@ interface ObjectActionParameters {
 	url: string;
 }
 
-type ObjectFieldBusinessType = 'Attachment' | 'LongText' | 'Picklist' | 'Text';
+type ObjectFieldBusinessType =
+	| 'Attachment'
+	| 'LongText'
+	| 'Picklist'
+	| 'Relationship'
+	| 'Text';
 interface ObjectFieldType {
 	businessType: ObjectFieldBusinessType;
 	dbType: string;
@@ -59,6 +64,30 @@ interface ObjectField {
 	relationshipType?: unknown;
 	required: boolean;
 	state: boolean;
+}
+
+interface ObjectDefinition {
+	active: boolean;
+	dateCreated: string;
+	dateModified: string;
+	id: number;
+	label: LocalizedValue<string>;
+	name: string;
+	objectActions: [];
+	objectFields: ObjectField[];
+	objectLayouts: [];
+	objectViews: [];
+	panelCategoryKey: string;
+	pluralLabel: LocalizedValue<string>;
+	portlet: boolean;
+	scope: string;
+	status: {
+		code: number;
+		label: string;
+		label_i18n: string;
+	};
+	system: boolean;
+	titleObjectFieldId: number;
 }
 
 interface ObjectFieldSetting {
@@ -115,9 +144,10 @@ type ObjectValidationType = {
 };
 
 interface PredefinedValuesItem {
-	name: string;
+	name?: string; // pensar num jeito de tirar esse ?
 	required: boolean;
-	value: any;
+	value: string;
+	inputAsValue: boolean;
 }
 
 interface ObjectSettings {
