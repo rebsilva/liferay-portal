@@ -158,9 +158,9 @@ const Layout: React.FC<React.HTMLAttributes<HTMLElement>> = () => {
 
 			const {
 				items: objectFields,
-			}: {
+			} = (await objectFieldsResponse.json()) as {
 				items: TObjectField[];
-			} = (await objectFieldsResponse.json()) as any;
+			};
 
 			dispatch({
 				payload: {
