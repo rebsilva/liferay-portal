@@ -14,13 +14,19 @@
 
 import {ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
 import {fetch} from 'frontend-js-web';
-import React, {useMemo, useState} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 
 import {FormError} from '../../../hooks/useForm';
 import Card from '../../Card/Card';
 import CodeMirrorEditor from '../../CodeMirrorEditor';
 import CustomSelect, {CustomItem} from '../../Form/CustomSelect/CustomSelect';
 import Input from '../../Form/Input';
+import PredefinedValueFDS from '../PredefinedValueFDS';
+
+const HEADERS = new Headers({
+	'Accept': 'application/json',
+	'Content-Type': 'application/json',
+});
 
 let objectsOptionsList: Array<
 	(
@@ -43,8 +49,11 @@ export default function ActionBuilder({
 	const [objectList, setObjectList] = useState<
 		Map<number, {label: string; related?: boolean}>
 	>();
+	const [selectedObjectFields, setSelectedObjectFields] = useState<
+		ObjectField[]
+	>();
 
-	const getObjectDefinitionsRelations = async () => {
+	const handleFetchObjectDefinitions = async () => {
 		const result = await fetch(getObjectDefinitionsRelationshipsURL);
 
 		const objectArray = (await result.json()) as ObjectSettings[]; // tem que ter undefined aqui?
@@ -90,11 +99,21 @@ export default function ActionBuilder({
 			},
 		];
 
-		return objectListMap;
+		setObjectList(objectListMap);
 	};
 
-	const handleFetch = async () => {
-		setObjectList(await getObjectDefinitionsRelations());
+	const handleFetchObjectFields = async (objectDefinitionId: number) => {
+		const response = await fetch(
+			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+			{
+				headers: HEADERS,
+				method: 'GET',
+			}
+		);
+
+		const {items} = (await response.json()) as {items: ObjectField[]};
+
+		setSelectedObjectFields(items);
 	};
 
 	const actionExecutors = useMemo(() => {
@@ -116,6 +135,32 @@ export default function ActionBuilder({
 
 		return triggers;
 	}, [objectActionTriggers]);
+
+	const setPredefinedValues = () => {	 
+		const predefinedValues = selectedObjectFields?.map(({name, required}) => {
+			return {name, inputAsValue: false, value:"", required} // alterar para só mudar um certo parametro tambem
+		})
+
+		return predefinedValues;
+	}
+
+	useEffect(() => {
+		const predefinedValues = setPredefinedValues();
+		setValues({
+			parameters: {
+				...values.parameters,
+				predefinedValues,
+			},
+		});
+
+	}, [selectedObjectFields]);
+
+
+	console.log(values);
+
+	console.log(selectedObjectFields);
+
+	console.log(values.parameters?.predefinedValues);
 
 	return (
 		<>
@@ -147,7 +192,10 @@ export default function ActionBuilder({
 						error={errors.objectActionExecutorKey}
 						onChange={({value}) => {
 							if (value === 'add-object-entry') {
-								handleFetch();
+								handleFetchObjectDefinitions();
+							}
+							else {
+								setSelectedObjectFields([]);
 							}
 
 							setValues({
@@ -194,8 +242,10 @@ export default function ActionBuilder({
 											},
 										});
 									}
+
+									handleFetchObjectFields(objectDefinitionId);
 								}}
-								options={objectsOptionsList}
+								options={objectsOptionsList} // isso aqui eu preciso mudar para pegar a label de acordo com as traduções
 								value={values.parameters?.objectDefinitionId}
 							/>
 							{(values.parameters?.relatedEntries === false ||
@@ -219,6 +269,13 @@ export default function ActionBuilder({
 						</>
 					)}
 				</Card>
+
+				{values.objectActionExecutorKey === 'add-object-entry' &&
+					values.parameters?.objectDefinitionId && (
+						<PredefinedValueFDS
+							selectedObjectFields={selectedObjectFields}
+						/>
+					)}
 
 				{values.objectActionExecutorKey === 'webhook' && (
 					<>
