@@ -14,7 +14,9 @@
 
 import React, {useContext} from 'react';
 
-import ViewContext from '../context';
+import {defaultLanguageId} from '../../../utils/locale';
+import ViewContext, {TYPES} from '../context';
+import {TObjectField} from '../types';
 import ModalAddColumns from './ModalAddColumns';
 interface IProps extends React.HTMLAttributes<HTMLElement> {
 	observer: any;
@@ -32,14 +34,29 @@ const ModalAddColumnsObjectCustomView: React.FC<IProps> = ({
 		},
 		dispatch,
 	] = useContext(ViewContext);
+	const objectFieldNames = new Set(
+		objectViewColumns.map(({objectFieldName}) => objectFieldName)
+	);
+
+	const selected = objectFields.filter(({name}) =>
+		objectFieldNames.has(name)
+	);
 
 	return (
 		<ModalAddColumns
-			handleSubmit={dispatch}
-			objectFields={objectFields}
-			objectViewColumns={objectViewColumns}
+			getName={({label}: TObjectField) => label[defaultLanguageId]}
+			items={objectFields}
 			observer={observer}
 			onClose={onClose}
+			onSave={(selectedObjectFields) => {
+				dispatch({
+					payload: {
+						selectedObjectFields,
+					},
+					type: TYPES.ADD_OBJECT_VIEW_COLUMN,
+				});
+			}}
+			selected={selected}
 		/>
 	);
 };
