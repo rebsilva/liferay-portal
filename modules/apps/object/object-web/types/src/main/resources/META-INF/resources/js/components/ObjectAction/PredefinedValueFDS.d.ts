@@ -15,6 +15,7 @@
 /// <reference types="react" />
 
 export default function PredefinedValueFDS({
+	currentObjectDefinitionFields,
 	dataSetFields,
 	setDataSetFields,
 }: IProps): JSX.Element;
