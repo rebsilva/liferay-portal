@@ -1,0 +1,38 @@
+@import 'atlas-variables';
+
+.reference-mark {
+	color: #b95000;
+	font-size: 6px;
+	margin-top: 2px;
+	padding-left: 4px;
+}
+
+.lfr-object-web__predefined-values-render-fds {
+	&-container {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	&-input-method {
+		display: contents;
+
+		.custom-control.custom-checkbox {
+			margin-bottom: 0;
+		}
+	}
+
+	&-tooltip-icon {
+		color: $secondary-l1;
+		margin-left: 12px;
+	}
+
+	// &-form-group-toggles {
+	// 	display: contents;
+
+	// 	.modal & {
+	// 		display: grid;
+	// 		gap: 1.56rem;
+	// 		margin-bottom: 1.5rem;
+	// 	}
+	// }
+}

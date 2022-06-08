@@ -14,24 +14,15 @@
 
 /// <reference types="react" />
 
-import {CustomItem, FormError} from '@liferay/object-js-components-web';
-import './ActionBuilder.scss';
-export default function ActionBuilder({
-	errors,
-	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
-	objectActionExecutors,
-	objectActionTriggers,
+import './PredefinedValueFDS.scss';
+export default function PredefinedValueFDS({
+	currentObjectDefinitionFields,
+	predefinedValues,
 	setValues,
-	values,
 }: IProps): JSX.Element;
 interface IProps {
-	errors: FormError<ObjectAction & ObjectActionParameters>;
-	ffNotificationTemplates: boolean;
-	objectDefinitionsRelationshipsURL: string;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	setValues: (values: Partial<ObjectAction>) => void;
-	values: Partial<ObjectAction>;
+	currentObjectDefinitionFields: ObjectField[];
+	predefinedValues?: PredefinedValue[];
+	setValues: (params: Partial<ObjectAction>) => void;
 }
 export {};
