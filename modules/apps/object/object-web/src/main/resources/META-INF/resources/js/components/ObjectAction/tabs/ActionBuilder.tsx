@@ -12,7 +12,9 @@
  * details.
  */
 
-import ClayForm, {ClayToggle} from '@clayui/form';
+import ClayForm, {ClayToggle, ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
+import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
 	Card,
 	CodeMirrorEditor,
@@ -24,12 +26,28 @@ import {
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
-
+import PredefinedValueFDS from '../PredefinedValueFDS';
 import './ActionBuilder.scss';
+
+const HEADERS = new Headers({
+	'Accept': 'application/json',
+	'Content-Type': 'application/json',
+});
+
+let objectsOptionsList: Array<
+	(
+		| React.ComponentProps<typeof ClaySelect.Option>
+		| React.ComponentProps<typeof ClaySelect.OptGroup>
+	) & {
+		options?: Array<React.ComponentProps<typeof ClaySelect.Option>>;
+		type?: 'group';
+	}
+>;
 
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
+	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 	setValues,
@@ -42,6 +60,91 @@ export default function ActionBuilder({
 		selectedNotificationTemplate,
 		setSelectedNotificationTemplate,
 	] = useState('');
+
+	const [relationships, setRelationships] = useState<ObjectDefinitionsRelationship[]>([]);
+
+	const [currentObjectDefinitionFields, setCurrentObjectDefinitionFields ] = useState<ObjectField[]>([]);
+
+	const fetchObjectDefinitions = async () => {
+		const response = await fetch(objectDefinitionsRelationshipsURL);
+
+		const relationships = (await response.json()) as ObjectDefinitionsRelationship[];
+		const relatedObjects: SelectItem[] = [];
+		const nonRelatedObjects: SelectItem[] = [];
+
+		relationships?.forEach((object) => {
+			
+			const {id, label} = object;
+
+			const target = object.related ? relatedObjects : nonRelatedObjects;
+
+			target.push({label, value: id});
+		});
+
+		objectsOptionsList = [];
+
+		objectsOptionsList.push({
+			disabled: true,
+			label: Liferay.Language.get('choose-an-object'),
+			selected: true,
+			value: '',
+		});
+
+		const fillSelect = (label: string, options: SelectItem[]) => {
+			if (options.length) {
+				objectsOptionsList.push({label, options, type: 'group'});
+			}
+		}
+
+		fillSelect(Liferay.Language.get('related-objects'), relatedObjects);
+
+		fillSelect(Liferay.Language.get('non-related-objects'), nonRelatedObjects);
+
+		setRelationships(relationships);
+
+	};
+
+	const fetchObjectFields = async (objectDefinitionId: number) => {
+		const response = await fetch(
+			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+			{
+				headers: HEADERS,
+				method: 'GET',
+			}
+		);
+
+		const {items} = (await response.json()) as {items: ObjectField[]};
+
+		const currentObjectDefinitionFields = items.filter(
+			(field) => field.businessType !== 'Relationship' // falar com gabriel ou carol depois
+		);
+
+		// talvez mudar para forEach depois se não der para tirar esse filter do relationship
+
+		setCurrentObjectDefinitionFields(currentObjectDefinitionFields);
+
+		// logo depois que o objeto é selecionado, se retorna por default
+		// os fields required para o FDS, por isso esse filter abaixo existe
+
+		const requiredFields: PredefinedValue[] = [];
+
+		currentObjectDefinitionFields.forEach(({name, required}) => {
+				if (required === true) {
+					requiredFields.push({name, value: "", inputAsValue: false, required})
+				}
+			}
+		);
+		// console.log("antes do set");
+		// console.log(values);
+		//console.log(requiredFields);
+
+		setValues(((values: Partial<ObjectAction>) => ({
+			parameters:{
+				...values.parameters,
+				predefinedValues: requiredFields
+			}
+		}))as any);
+	};
 
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
@@ -92,8 +195,21 @@ export default function ActionBuilder({
 	}, [values]);
 
 	const handleSave = (conditionExpression?: string) => {
-		setValues({conditionExpression});
+		setValues({conditionExpression}); // isso não era para ter um spread?
 	};
+
+	// const dataSetFields = useMemo(() => {
+	// 	if (!values.parameters?.predefinedValues) {
+	// 		return [] as ObjectField[];
+	// 	}
+
+	// 	const rows = values.parameters.predefinedValues.map(() => {
+
+	// 	})
+
+	// },[values])
+	// console.log("depois do set");
+	// console.log(values);
 
 	return (
 		<>
@@ -179,12 +295,15 @@ export default function ActionBuilder({
 					<div className="lfr-object__action-builder-then">
 						<FormCustomSelect
 							error={errors.objectActionExecutorKey}
-							onChange={({value}) =>
+							onChange={({value}) => {
+								if (value === 'add-object-entry') {
+									fetchObjectDefinitions();
+								}
 								setValues({
 									objectActionExecutorKey: value,
 									parameters: {},
-								})
-							}
+								});
+							}}
 							options={objectActionExecutors}
 							placeholder={Liferay.Language.get(
 								'choose-an-action'
@@ -193,6 +312,80 @@ export default function ActionBuilder({
 								values.objectActionExecutorKey ?? ''
 							)}
 						/>
+
+						{values.objectActionExecutorKey ===
+							'add-object-entry' && (
+							<>
+								on
+								<ClaySelectWithOption
+									aria-label={Liferay.Language.get(
+										'choose-an-object'
+									)}
+									onChange={({target: {value}}) => {
+										const objectDefinitionId = parseInt(
+											value,
+											10
+										);
+	
+										const object = relationships.find(({id}) => 
+											id == objectDefinitionId
+										)
+
+										const parameters: ObjectActionParameters = {
+												objectDefinitionId,
+												predefinedValues: [],
+										};
+
+										if (object?.related) {
+											parameters.relatedObjectEntries = false;
+										}
+										
+										setValues({parameters});
+
+										fetchObjectFields(objectDefinitionId);
+									}}
+									options={objectsOptionsList}
+									value={
+										values.parameters?.objectDefinitionId
+									}
+								/>
+								{(values.parameters?.hasOwnProperty('relatedObjectEntries')) && (
+									<>
+										<ClayCheckbox
+											checked={
+												values.parameters
+													.relatedObjectEntries === true
+											}
+											disabled={false}
+											label={Liferay.Language.get(
+												'also-relate-entries'
+											)}
+											onChange={({target: {checked}}) => {
+												setValues({
+													parameters: {
+														...values.parameters,
+														relatedObjectEntries: checked,
+													},
+												});
+											}}
+										/>
+										<ClayTooltipProvider>
+											<div
+												data-tooltip-align="top"
+												title={Liferay.Language.get(
+													'automatically-relate-object-entries-involved-in-the-action'
+												)}
+											>
+												<ClayIcon
+													className=".lfr-object__action-builder-tooltip-icon"
+													symbol="question-circle-full"
+												/>
+											</div>
+										</ClayTooltipProvider>
+									</>
+								)}
+							</>
+						)}
 
 						{ffNotificationTemplates &&
 							values.objectActionExecutorKey ===
@@ -217,6 +410,17 @@ export default function ActionBuilder({
 							)}
 					</div>
 				</Card>
+
+				{values.objectActionExecutorKey === 'add-object-entry' &&
+					values.parameters?.objectDefinitionId && (
+						<PredefinedValueFDS
+							currentObjectDefinitionFields={
+								currentObjectDefinitionFields
+							}
+							predefinedValues={values.parameters.predefinedValues}
+							setValues={setValues}
+						/>
+					)}
 
 				{values.objectActionExecutorKey === 'webhook' && (
 					<>
@@ -275,10 +479,16 @@ export default function ActionBuilder({
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
+	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 	setValues: (values: Partial<ObjectAction>) => void;
 	values: Partial<ObjectAction>;
+}
+
+interface SelectItem {
+	label: string; 
+	value: number;
 }
 
 type TNotificationTemplate = {

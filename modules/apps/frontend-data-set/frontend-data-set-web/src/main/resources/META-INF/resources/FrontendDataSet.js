@@ -456,9 +456,10 @@ const FrontendDataSet = ({
 					value={selectedItemsValue.join(',')}
 				/>
 
-				{items?.length ||
-				overrideEmptyResultView ||
-				inlineAddingSettings ? (
+				{(items?.length ||
+					overrideEmptyResultView ||
+					inlineAddingSettings) &&
+				CurrentViewComponent ? (
 					<CurrentViewComponent
 						frontendDataSetContext={FrontendDataSetContext}
 						items={items}

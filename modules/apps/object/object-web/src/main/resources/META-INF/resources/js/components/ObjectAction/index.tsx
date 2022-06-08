@@ -39,6 +39,7 @@ const TABS = [
 
 export default function Action({
 	ffNotificationTemplates,
+	objectDefinitionsRelationshipsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
@@ -112,6 +113,9 @@ export default function Action({
 					<ActionBuilder
 						errors={errors}
 						ffNotificationTemplates={ffNotificationTemplates}
+						objectDefinitionsRelationshipsURL={
+							objectDefinitionsRelationshipsURL
+						}
 						objectActionExecutors={objectActionExecutors}
 						objectActionTriggers={objectActionTriggers}
 						setValues={setValues}
@@ -170,6 +174,7 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 
 interface IProps {
 	ffNotificationTemplates: boolean;
+	objectDefinitionsRelationshipsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
