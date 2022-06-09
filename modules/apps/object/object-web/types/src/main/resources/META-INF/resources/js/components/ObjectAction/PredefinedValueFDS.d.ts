@@ -19,10 +19,12 @@ export default function PredefinedValueFDS({
 	currentObjectDefinitionFields,
 	predefinedValues,
 	setValues,
+	values,
 }: IProps): JSX.Element;
 interface IProps {
 	currentObjectDefinitionFields: ObjectField[];
 	predefinedValues?: PredefinedValue[];
 	setValues: (params: Partial<ObjectAction>) => void;
+	values: Partial<ObjectAction>;
 }
 export {};

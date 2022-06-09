@@ -91,9 +91,12 @@
 	 currentObjectDefinitionFields,
 	 predefinedValues = [],
 	 setValues,
+	 values,
  }: IProps) {
 
-	predefinedValues = [{name: 'textRelated', value: '', inputAsValue: false, required: true}];
+	if (predefinedValues.length === 0) {
+		predefinedValues = [{name: 'text', value: '', inputAsValue: false, required: true}];
+	}
  
 	 const [visibleModal, setVisibleModal] = useState(false);
  
@@ -108,7 +111,7 @@
  
 	 const props = useMemo(() => {
  
-		 const items = predefinedValues.map((item) => {
+		 const items = predefinedValues?.map((item) => {
 			 return {
 				 inputAsValue: (
 					 <div className="lfr-object-web__predefined-values-render-fds-input-method">
@@ -144,7 +147,7 @@
 						 )}
 					 </>
 				 ),
-				 newValue: //<TestFrontendDataSet />
+				 newValue:
 				 <ExpressionBuilder
 				 error={""}
 				 feedbackMessage={Liferay.Language.get(
@@ -167,7 +170,7 @@
 					 );
 				 }}
 				 placeholder={Liferay.Language.get(
-					 'create-an-expression'
+					 'input-a-value-or-create-an-expression.'
 				 )}
 				 value={""}
 				 />
@@ -177,38 +180,29 @@
  
 		 return getDataSetProps(items);
  
-	 },[predefinedValues])
- 
-	//  const datasetDisplayLauncher = (...frontEndDataSetProps: any[]) =>
-	//  	render(FrontendDataSet, ...frontEndDataSetProps);
- 
-	//  useEffect(() => {
-	//  	datasetDisplayLauncher(
-	//  		props,
-	//  		document.getElementById(
-	//  			'lfr-object-web__predefined-values-render-fds'
-	//  		)
-	//  	);
-	//  }, [props]);
- 
+	 },[predefinedValues]) 
 	
- 
 	 useEffect(() => {
 		 const deleteDataSetField = (event: any) => {
-			 alert("yeooo");
-			 // const [name, required] = event.itemData.name.props.children;
+			 const [name, required] = event.itemData.name.props.children;
  
-			 // if (required) {
-			 // 	alert('I am required!');
+			 if (required) {
+			 	alert('I am required!');
  
-			 // 	return;
-			 // }
+			 	return;
+			 }
  
-			 // const updatedFieldList = dataSetFields.filter(
-			 // 	(field) => field.name !== name
-			 // );
+			 const newPredefinedValues = predefinedValues.filter(
+			 	(field) => field.name !== name
+			 );
  
-			 // setDataSetFields(updatedFieldList);
+			 setValues(((values: Partial<ObjectAction>) => (
+				{
+				parameters:{
+					...values.parameters,
+					predefinedValues: newPredefinedValues
+				}
+			}))as any);
 		 };
 
 		 const openModal = (event: any) => {
@@ -223,6 +217,20 @@
 			 Liferay.detach('openModalAddColumns');
 		 };
 	 }, [setVisibleModal]);
+
+	 const getSelectedFields = () => {
+		 let objectFields: ObjectField[] = [];
+
+		predefinedValues?.forEach(({name}) => {
+			 currentObjectDefinitionFields.forEach((field) => {
+				if (field.name === name) {
+					objectFields.push(field);
+				}
+			})
+		});
+
+		return objectFields;
+	 }
  
 	 return (
 		 <>
@@ -232,16 +240,37 @@
 				 </div>
 			 </Card>
  
-			  {visibleModal && (
-				 <ModalAddColumns
-					 handleSubmit={setValues}
-					 isActionBuilder={true}
-					 objectFields={currentObjectDefinitionFields}
-					 objectViewColumns={predefinedValues}
-					 observer={observer}
-					 onClose={onClose}
-				 />
-			 )} 
+			 {visibleModal && (
+				<ModalAddColumns
+					disableRequired
+					getName={({name}: ObjectField) => name}
+					items={currentObjectDefinitionFields}
+					observer={observer}
+					onClose={onClose}
+					onSave={(items) => {
+						let newPredefinedValues = [];
+						newPredefinedValues = items.map(({name, required}) => {
+							let existValue;
+							predefinedValues.forEach((item) => {
+								if (item.name === name) {
+									existValue = item;
+									return;
+								} 
+							})
+							
+							return existValue ? existValue : {name, required, value:'', inputAsValue: false};
+							
+						})
+						setValues({
+							parameters: {
+								...values.parameters,
+								predefinedValues: newPredefinedValues as PredefinedValue[]
+							},
+						});
+					}}
+					selected={getSelectedFields() as ObjectField[]}
+				/>
+			)}
  
 		 </>
 	 );
@@ -251,6 +280,7 @@
 	 currentObjectDefinitionFields: ObjectField[];
 	 predefinedValues?: PredefinedValue[];
 	 setValues: (params: Partial<ObjectAction>) => void;
+	 values: Partial<ObjectAction>;
  }
  
  interface IDataSetProps {

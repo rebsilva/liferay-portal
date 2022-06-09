@@ -65,6 +65,8 @@ export default function ActionBuilder({
 
 	const [currentObjectDefinitionFields, setCurrentObjectDefinitionFields ] = useState<ObjectField[]>([]);
 
+	const [predefinedValues, setPredefinedValues] = useState<PredefinedValue[]>([]);
+
 	const fetchObjectDefinitions = async () => {
 		const response = await fetch(objectDefinitionsRelationshipsURL);
 
@@ -116,7 +118,8 @@ export default function ActionBuilder({
 		const {items} = (await response.json()) as {items: ObjectField[]};
 
 		const currentObjectDefinitionFields = items.filter(
-			(field) => field.businessType !== 'Relationship' // falar com gabriel ou carol depois
+			(field) => field.businessType !== 'Relationship' //&& !filter.system 
+			// falar com gabriel ou carol depois
 		);
 
 		// talvez mudar para forEach depois se não der para tirar esse filter do relationship
@@ -134,11 +137,9 @@ export default function ActionBuilder({
 				}
 			}
 		);
-		// console.log("antes do set");
-		// console.log(values);
-		//console.log(requiredFields);
 
-		setValues(((values: Partial<ObjectAction>) => ({
+		setValues(((values: Partial<ObjectAction>) => (
+			{
 			parameters:{
 				...values.parameters,
 				predefinedValues: requiredFields
@@ -195,21 +196,23 @@ export default function ActionBuilder({
 	}, [values]);
 
 	const handleSave = (conditionExpression?: string) => {
-		setValues({conditionExpression}); // isso não era para ter um spread?
+		setValues({conditionExpression});
 	};
 
-	// const dataSetFields = useMemo(() => {
-	// 	if (!values.parameters?.predefinedValues) {
-	// 		return [] as ObjectField[];
-	// 	}
+	const dataSetFields = useMemo(() => {
+		if (!values.parameters?.predefinedValues) {
+			return [] as PredefinedValue[];
+		}
 
-	// 	const rows = values.parameters.predefinedValues.map(() => {
+		const rows = values.parameters.predefinedValues;
 
-	// 	})
+		//console.log(rows);
 
-	// },[values])
-	// console.log("depois do set");
-	// console.log(values);
+		return rows;
+
+	},[values]);
+
+	console.log("tentando");
 
 	return (
 		<>
@@ -420,8 +423,9 @@ export default function ActionBuilder({
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
-							predefinedValues={values.parameters.predefinedValues}
+							predefinedValues={dataSetFields}
 							setValues={setValues}
+							values={values}
 						/>
 					)}
 
