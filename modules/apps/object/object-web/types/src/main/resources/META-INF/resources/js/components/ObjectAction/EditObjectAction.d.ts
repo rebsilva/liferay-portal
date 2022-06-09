@@ -20,6 +20,7 @@ export default function EditObjectAction({
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 }: IProps): JSX.Element;
 interface IProps {
@@ -27,6 +28,7 @@ interface IProps {
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
 }
 export {};

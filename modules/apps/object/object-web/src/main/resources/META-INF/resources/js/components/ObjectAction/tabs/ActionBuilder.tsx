@@ -12,7 +12,13 @@
  * details.
  */
 
-import ClayForm, {ClayToggle, ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
+import ClayAlert from '@clayui/alert';
+import ClayForm, {
+	ClayCheckbox,
+	ClaySelect,
+	ClaySelectWithOption,
+	ClayToggle,
+} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
@@ -26,7 +32,9 @@ import {
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
 import React, {useEffect, useMemo, useState} from 'react';
-import PredefinedValueFDS from '../PredefinedValueFDS';
+
+import PredefinedValuesTable from '../PredefinedValuesTable';
+
 import './ActionBuilder.scss';
 
 const HEADERS = new Headers({
@@ -47,9 +55,9 @@ let objectsOptionsList: Array<
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	setValues,
 	values,
 }: IProps) {
@@ -61,9 +69,14 @@ export default function ActionBuilder({
 		setSelectedNotificationTemplate,
 	] = useState('');
 
-	const [relationships, setRelationships] = useState<ObjectDefinitionsRelationship[]>([]);
+	const [relationships, setRelationships] = useState<
+		ObjectDefinitionsRelationship[]
+	>([]);
 
-	const [currentObjectDefinitionFields, setCurrentObjectDefinitionFields ] = useState<ObjectField[]>([]);
+	const [
+		currentObjectDefinitionFields,
+		setCurrentObjectDefinitionFields,
+	] = useState<ObjectField[]>([]);
 
 	const fetchObjectDefinitions = async () => {
 		const response = await fetch(objectDefinitionsRelationshipsURL);
@@ -73,7 +86,6 @@ export default function ActionBuilder({
 		const nonRelatedObjects: SelectItem[] = [];
 
 		relationships?.forEach((object) => {
-			
 			const {id, label} = object;
 
 			const target = object.related ? relatedObjects : nonRelatedObjects;
@@ -94,56 +106,16 @@ export default function ActionBuilder({
 			if (options.length) {
 				objectsOptionsList.push({label, options, type: 'group'});
 			}
-		}
+		};
 
 		fillSelect(Liferay.Language.get('related-objects'), relatedObjects);
 
-		fillSelect(Liferay.Language.get('non-related-objects'), nonRelatedObjects);
+		fillSelect(
+			Liferay.Language.get('non-related-objects'),
+			nonRelatedObjects
+		);
 
 		setRelationships(relationships);
-
-	};
-
-	const fetchObjectFields = async (objectDefinitionId: number) => {
-		const response = await fetch(
-			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
-			{
-				headers: HEADERS,
-				method: 'GET',
-			}
-		);
-
-		const {items} = (await response.json()) as {items: ObjectField[]};
-
-		const currentObjectDefinitionFields = items.filter(
-			(field) => field.businessType !== 'Relationship' // falar com gabriel ou carol depois
-		);
-
-		// talvez mudar para forEach depois se não der para tirar esse filter do relationship
-
-		setCurrentObjectDefinitionFields(currentObjectDefinitionFields);
-
-		// logo depois que o objeto é selecionado, se retorna por default
-		// os fields required para o FDS, por isso esse filter abaixo existe
-
-		const requiredFields: PredefinedValue[] = [];
-
-		currentObjectDefinitionFields.forEach(({name, required}) => {
-				if (required === true) {
-					requiredFields.push({name, value: "", inputAsValue: false, required})
-				}
-			}
-		);
-		// console.log("antes do set");
-		// console.log(values);
-		//console.log(requiredFields);
-
-		setValues(((values: Partial<ObjectAction>) => ({
-			parameters:{
-				...values.parameters,
-				predefinedValues: requiredFields
-			}
-		}))as any);
 	};
 
 	const actionExecutors = useMemo(() => {
@@ -165,6 +137,16 @@ export default function ActionBuilder({
 
 		return triggers;
 	}, [objectActionTriggers]);
+
+	const objectFieldsMap = useMemo(() => {
+		const fields = new Map<string, ObjectField>();
+
+		currentObjectDefinitionFields.forEach((field) => {
+			fields.set(field.name, field);
+		});
+
+		return fields;
+	}, [currentObjectDefinitionFields]);
 
 	useEffect(() => {
 		if (values.objectActionExecutorKey === 'notificationTemplate') {
@@ -195,24 +177,83 @@ export default function ActionBuilder({
 	}, [values]);
 
 	const handleSave = (conditionExpression?: string) => {
-		setValues({conditionExpression}); // isso não era para ter um spread?
+		setValues({conditionExpression});
 	};
 
-	// const dataSetFields = useMemo(() => {
-	// 	if (!values.parameters?.predefinedValues) {
-	// 		return [] as ObjectField[];
-	// 	}
+	const handleSelectObject = async ({
+		target: {value},
+	}: React.ChangeEvent<HTMLSelectElement>) => {
+		const objectDefinitionId = parseInt(value, 10);
 
-	// 	const rows = values.parameters.predefinedValues.map(() => {
+		const object = relationships.find(({id}) => id === objectDefinitionId);
 
-	// 	})
+		const parameters: ObjectActionParameters = {
+			objectDefinitionId,
+			predefinedValues: [],
+		};
 
-	// },[values])
-	// console.log("depois do set");
-	// console.log(values);
+		if (object?.related) {
+			parameters.relatedObjectEntries = false;
+		}
+
+		const response = await fetch(
+			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+			{
+				headers: HEADERS,
+				method: 'GET',
+			}
+		);
+
+		const {items} = (await response.json()) as {items: ObjectField[]};
+
+		const allFields: ObjectField[] = [];
+
+		items.forEach((field) => {
+			if (field.businessType !== 'Relationship' && !field.system) {
+				allFields.push(field);
+
+				if (field.required) {
+					(parameters.predefinedValues as PredefinedValue[]).push({
+						inputAsValue: false,
+						name: field.name,
+						value: '',
+					});
+				}
+			}
+		});
+
+		setCurrentObjectDefinitionFields(allFields);
+
+		const normalizedParameters = {...values.parameters};
+
+		delete normalizedParameters.relatedObjectEntries;
+
+		setValues({
+			parameters: {
+				...normalizedParameters,
+				...parameters,
+			},
+		});
+	};
 
 	return (
 		<>
+			<ClayAlert
+				className="lfr-objects__side-panel-content-container"
+				displayType="info"
+				title={`${Liferay.Language.get('info')}:`}
+			>
+				{Liferay.Language.get(
+					'create-conditions-and-predefined-values-using-expressions'
+				) + ' '}
+
+				<a
+					className="alert-link"
+					href="https://learn.liferay.com/dxp/latest/en/building-applications/objects/creating-and-managing-objects/expression-builder-validations-reference.html"
+				>
+					{Liferay.Language.get('click-here-for-documentation')}
+				</a>
+			</ClayAlert>
 			<Card title={Liferay.Language.get('trigger')}>
 				<Card
 					title={Liferay.Language.get('when[object]')}
@@ -321,40 +362,20 @@ export default function ActionBuilder({
 									aria-label={Liferay.Language.get(
 										'choose-an-object'
 									)}
-									onChange={({target: {value}}) => {
-										const objectDefinitionId = parseInt(
-											value,
-											10
-										);
-	
-										const object = relationships.find(({id}) => 
-											id == objectDefinitionId
-										)
-
-										const parameters: ObjectActionParameters = {
-												objectDefinitionId,
-												predefinedValues: [],
-										};
-
-										if (object?.related) {
-											parameters.relatedObjectEntries = false;
-										}
-										
-										setValues({parameters});
-
-										fetchObjectFields(objectDefinitionId);
-									}}
+									onChange={handleSelectObject}
 									options={objectsOptionsList}
 									value={
 										values.parameters?.objectDefinitionId
 									}
 								/>
-								{(values.parameters?.hasOwnProperty('relatedObjectEntries')) && (
+								{values.parameters?.relatedObjectEntries !==
+									undefined && (
 									<>
 										<ClayCheckbox
 											checked={
 												values.parameters
-													.relatedObjectEntries === true
+													.relatedObjectEntries ===
+												true
 											}
 											disabled={false}
 											label={Liferay.Language.get(
@@ -413,12 +434,13 @@ export default function ActionBuilder({
 
 				{values.objectActionExecutorKey === 'add-object-entry' &&
 					values.parameters?.objectDefinitionId && (
-						<PredefinedValueFDS
+						<PredefinedValuesTable
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
-							predefinedValues={values.parameters.predefinedValues}
+							objectFieldsMap={objectFieldsMap}
 							setValues={setValues}
+							values={values}
 						/>
 					)}
 
@@ -479,15 +501,15 @@ export default function ActionBuilder({
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
-	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	setValues: (values: Partial<ObjectAction>) => void;
 	values: Partial<ObjectAction>;
 }
 
 interface SelectItem {
-	label: string; 
+	label: string;
 	value: number;
 }
 

@@ -1,0 +1,26 @@
+@import 'atlas-variables';
+
+.reference-mark {
+	color: #b95000;
+	font-size: 6px;
+	margin-top: 2px;
+	padding-left: 4px;
+}
+
+.lfr-object-web__predefined-values-table-add-modal-button {
+	display: flex;
+	justify-content: end;
+}
+
+.lfr-object-web__predefined-values-table {
+	&-field,
+	&-input-method {
+		display: flex;
+		align-items: center;
+	}
+
+	&-tooltip-icon {
+		color: $secondary-l1;
+		margin-left: 12px;
+	}
+}

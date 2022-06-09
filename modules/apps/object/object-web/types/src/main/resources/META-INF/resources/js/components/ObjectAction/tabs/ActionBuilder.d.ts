@@ -19,18 +19,18 @@ import './ActionBuilder.scss';
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	setValues,
 	values,
 }: IProps): JSX.Element;
 interface IProps {
 	errors: FormError<ObjectAction & ObjectActionParameters>;
 	ffNotificationTemplates: boolean;
-	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	setValues: (values: Partial<ObjectAction>) => void;
 	values: Partial<ObjectAction>;
 }

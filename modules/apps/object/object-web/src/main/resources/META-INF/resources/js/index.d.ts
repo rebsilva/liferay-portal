@@ -21,11 +21,11 @@ interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;
 	description?: string;
-	objectDefinitionsRelationshipsURL: string;
 	id?: number;
 	name: string;
 	objectActionExecutorKey: string;
 	objectActionTriggerKey: string;
+	objectDefinitionsRelationshipsURL: string;
 	parameters?: ObjectActionParameters;
 }
 
@@ -139,10 +139,9 @@ type ObjectValidationType = {
 };
 
 interface PredefinedValue {
-	name: string;
-	required: boolean;
-	value: string;
 	inputAsValue: boolean;
+	name: string;
+	value: string;
 }
 
 interface ObjectDefinitionsRelationship {

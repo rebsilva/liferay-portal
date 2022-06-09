@@ -14,19 +14,18 @@
 
 /// <reference types="react" />
 
-import {CustomItem} from '@liferay/object-js-components-web';
-export default function AddObjectAction({
-	apiURL,
-	ffNotificationTemplates,
-	objectActionExecutors,
-	objectActionTriggers,
-	objectDefinitionsRelationshipsURL,
+import './PredefinedValuesTable.scss';
+export default function PredefinedValuesTable({
+	currentObjectDefinitionFields,
+	objectFieldsMap,
+	setValues,
+	values,
 }: IProps): JSX.Element;
 interface IProps {
-	apiURL: string;
-	ffNotificationTemplates: boolean;
-	objectActionExecutors: CustomItem[];
-	objectActionTriggers: CustomItem[];
-	objectDefinitionsRelationshipsURL: string;
+	currentObjectDefinitionFields: ObjectField[];
+	objectFieldsMap: Map<string, ObjectField>;
+	predefinedValues?: PredefinedValue[];
+	setValues: (params: Partial<ObjectAction>) => void;
+	values: Partial<ObjectAction>;
 }
 export {};

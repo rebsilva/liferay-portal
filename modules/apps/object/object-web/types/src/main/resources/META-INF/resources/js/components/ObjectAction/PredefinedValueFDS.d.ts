@@ -17,12 +17,15 @@
 import './PredefinedValueFDS.scss';
 export default function PredefinedValueFDS({
 	currentObjectDefinitionFields,
-	predefinedValues,
+	objectFieldsMap,
 	setValues,
+	values,
 }: IProps): JSX.Element;
 interface IProps {
 	currentObjectDefinitionFields: ObjectField[];
 	predefinedValues?: PredefinedValue[];
 	setValues: (params: Partial<ObjectAction>) => void;
+	values: Partial<ObjectAction>;
+	objectFieldsMap: Map<string, ObjectField>;
 }
 export {};

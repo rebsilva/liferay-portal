@@ -19,21 +19,21 @@ import ObjectAction from './index';
 
 export default function EditObjectAction({
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 }: IProps) {
 	return (
 		<ObjectAction
 			ffNotificationTemplates={ffNotificationTemplates}
-			objectDefinitionsRelationshipsURL={
-				objectDefinitionsRelationshipsURL
-			}
 			objectAction={values}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
+			objectDefinitionsRelationshipsURL={
+				objectDefinitionsRelationshipsURL
+			}
 			readOnly={readOnly}
 			requestParams={{
 				method: 'PUT',
@@ -49,9 +49,9 @@ export default function EditObjectAction({
 
 interface IProps {
 	ffNotificationTemplates: boolean;
-	objectDefinitionsRelationshipsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
 }
