@@ -95,9 +95,14 @@ function ModalAddColumns<T extends ModalItem>({
 									items.length !== selectedItems.length
 								}
 								onChange={() => {
+									const requiredFields = selectedItems.filter(
+										(item) => item.required
+									);
 									const selected =
-										items.length === selectedItems.length
-											? []
+										items.length - requiredFields.length ===
+										selectedItems.length -
+											requiredFields.length
+											? [...requiredFields]
 											: [...items];
 									setSelectedItems(selected);
 								}}
