@@ -21,12 +21,14 @@ export default function Action({
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 	requestParams: {method, url},
 	successMessage,
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
+	objectDefinitionsRelationshipsURL: string;
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

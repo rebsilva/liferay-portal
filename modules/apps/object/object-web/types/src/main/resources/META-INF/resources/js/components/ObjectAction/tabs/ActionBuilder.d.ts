@@ -19,9 +19,9 @@ import './ActionBuilder.scss';
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	setValues,
 	values,
 }: IProps): JSX.Element;

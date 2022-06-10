@@ -98,7 +98,7 @@ const FrontendDataSet = ({
 	views,
 }) => {
 	const wrapperRef = useRef(null);
-	const [componentLoading, setComponentLoading] = useState(false);
+	const [componentLoading, setComponentLoading] = useState(true);
 	const [dataLoading, setDataLoading] = useState(!!apiURL);
 	const [dataSetSupportModalId] = useState(`support-modal-${getRandomId()}`);
 	const [dataSetSupportSidePanelId] = useState(
@@ -339,16 +339,18 @@ const FrontendDataSet = ({
 	}, [selectedItemsValue, items, selectedItemsKey]);
 
 	useEffect(() => {
-		setComponentLoading(true);
+		if (componentLoading) {
+			requestComponent().then((component) => {
+				if (isMounted()) {
+					dispatch(updateViewComponent(activeViewName, component));
 
-		requestComponent().then((component) => {
-			if (isMounted()) {
-				setComponentLoading(false);
-				dispatch(updateViewComponent(activeViewName, component));
-			}
-		});
+					setComponentLoading(false);
+				}
+			});
+		}
 	}, [
 		activeViewName,
+		componentLoading,
 		dispatch,
 		isMounted,
 		requestComponent,

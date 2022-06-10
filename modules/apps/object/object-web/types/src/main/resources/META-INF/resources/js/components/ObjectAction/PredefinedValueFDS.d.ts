@@ -17,7 +17,6 @@
 import './PredefinedValueFDS.scss';
 export default function PredefinedValueFDS({
 	currentObjectDefinitionFields,
-	predefinedValues,
 	setValues,
 	values,
 }: IProps): JSX.Element;

@@ -20,10 +20,12 @@ export default function EditObjectAction({
 	objectAction: {id, ...values},
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 }: IProps): JSX.Element;
 interface IProps {
 	ffNotificationTemplates: boolean;
+	objectDefinitionsRelationshipsURL: string;
 	objectAction: ObjectAction;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];

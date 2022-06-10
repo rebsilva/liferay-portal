@@ -18,12 +18,14 @@ import {CustomItem} from '@liferay/object-js-components-web';
 export default function AddObjectAction({
 	apiURL,
 	ffNotificationTemplates,
+	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
 }: IProps): JSX.Element;
 interface IProps {
 	apiURL: string;
 	ffNotificationTemplates: boolean;
+	objectDefinitionsRelationshipsURL: string;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
 }

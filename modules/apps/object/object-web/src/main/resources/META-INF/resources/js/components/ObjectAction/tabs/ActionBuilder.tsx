@@ -12,7 +12,12 @@
  * details.
  */
 
-import ClayForm, {ClayToggle, ClayCheckbox, ClaySelect, ClaySelectWithOption} from '@clayui/form';
+import ClayForm, {
+	ClayCheckbox,
+	ClaySelect,
+	ClaySelectWithOption,
+	ClayToggle,
+} from '@clayui/form';
 import ClayIcon from '@clayui/icon';
 import {ClayTooltipProvider} from '@clayui/tooltip';
 import {
@@ -25,8 +30,10 @@ import {
 	Input,
 } from '@liferay/object-js-components-web';
 import {fetch} from 'frontend-js-web';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+
 import PredefinedValueFDS from '../PredefinedValueFDS';
+
 import './ActionBuilder.scss';
 
 const HEADERS = new Headers({
@@ -47,9 +54,9 @@ let objectsOptionsList: Array<
 export default function ActionBuilder({
 	errors,
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	setValues,
 	values,
 }: IProps) {
@@ -61,11 +68,14 @@ export default function ActionBuilder({
 		setSelectedNotificationTemplate,
 	] = useState('');
 
-	const [relationships, setRelationships] = useState<ObjectDefinitionsRelationship[]>([]);
+	const [relationships, setRelationships] = useState<
+		ObjectDefinitionsRelationship[]
+	>([]);
 
-	const [currentObjectDefinitionFields, setCurrentObjectDefinitionFields ] = useState<ObjectField[]>([]);
-
-	const [predefinedValues, setPredefinedValues] = useState<PredefinedValue[]>([]);
+	const [
+		currentObjectDefinitionFields,
+		setCurrentObjectDefinitionFields,
+	] = useState<ObjectField[]>([]);
 
 	const fetchObjectDefinitions = async () => {
 		const response = await fetch(objectDefinitionsRelationshipsURL);
@@ -75,7 +85,6 @@ export default function ActionBuilder({
 		const nonRelatedObjects: SelectItem[] = [];
 
 		relationships?.forEach((object) => {
-			
 			const {id, label} = object;
 
 			const target = object.related ? relatedObjects : nonRelatedObjects;
@@ -96,56 +105,21 @@ export default function ActionBuilder({
 			if (options.length) {
 				objectsOptionsList.push({label, options, type: 'group'});
 			}
-		}
+		};
 
 		fillSelect(Liferay.Language.get('related-objects'), relatedObjects);
 
-		fillSelect(Liferay.Language.get('non-related-objects'), nonRelatedObjects);
+		fillSelect(
+			Liferay.Language.get('non-related-objects'),
+			nonRelatedObjects
+		);
 
 		setRelationships(relationships);
-
 	};
 
-	const fetchObjectFields = async (objectDefinitionId: number) => {
-		const response = await fetch(
-			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
-			{
-				headers: HEADERS,
-				method: 'GET',
-			}
-		);
+	// const fetchObjectFields = async (objectDefinitionId: number) => {
 
-		const {items} = (await response.json()) as {items: ObjectField[]};
-
-		const currentObjectDefinitionFields = items.filter(
-			(field) => field.businessType !== 'Relationship' //&& !filter.system 
-			// falar com gabriel ou carol depois
-		);
-
-		// talvez mudar para forEach depois se não der para tirar esse filter do relationship
-
-		setCurrentObjectDefinitionFields(currentObjectDefinitionFields);
-
-		// logo depois que o objeto é selecionado, se retorna por default
-		// os fields required para o FDS, por isso esse filter abaixo existe
-
-		const requiredFields: PredefinedValue[] = [];
-
-		currentObjectDefinitionFields.forEach(({name, required}) => {
-				if (required === true) {
-					requiredFields.push({name, value: "", inputAsValue: false, required})
-				}
-			}
-		);
-
-		setValues(((values: Partial<ObjectAction>) => (
-			{
-			parameters:{
-				...values.parameters,
-				predefinedValues: requiredFields
-			}
-		}))as any);
-	};
+	// };
 
 	const actionExecutors = useMemo(() => {
 		const executors = new Map<string, string>();
@@ -199,20 +173,60 @@ export default function ActionBuilder({
 		setValues({conditionExpression});
 	};
 
-	const dataSetFields = useMemo(() => {
-		if (!values.parameters?.predefinedValues) {
-			return [] as PredefinedValue[];
+	const handleSelectObject = async ({
+		target: {value},
+	}: React.ChangeEvent<HTMLSelectElement>) => {
+		const objectDefinitionId = parseInt(value, 10);
+
+		const object = relationships.find(({id}) => id == objectDefinitionId);
+
+		const parameters: ObjectActionParameters = {
+			objectDefinitionId,
+			predefinedValues: [],
+		};
+
+		if (object?.related) {
+			parameters.relatedObjectEntries = false;
 		}
 
-		const rows = values.parameters.predefinedValues;
+		const response = await fetch(
+			`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields`,
+			{
+				headers: HEADERS,
+				method: 'GET',
+			}
+		);
 
-		//console.log(rows);
+		const {items} = (await response.json()) as {items: ObjectField[]};
 
-		return rows;
+		const currentObjectDefinitionFields = items.filter(
+			(field) => field.businessType !== 'Relationship' // && !filter.system
+			// falar com gabriel ou carol depois
 
-	},[values]);
+		);
 
-	console.log("tentando");
+		setCurrentObjectDefinitionFields(currentObjectDefinitionFields);
+
+		currentObjectDefinitionFields.forEach(({name, required}) => {
+			if (required === true) {
+				(parameters.predefinedValues as PredefinedValue[]).push({
+					name,
+					value: '',
+					inputAsValue: false,
+					required,
+				});
+			}
+		});
+
+		setValues({
+			parameters: {
+				...values.parameters,
+				...parameters,
+			},
+		});
+	};
+
+	console.log('mudei');
 
 	return (
 		<>
@@ -327,40 +341,21 @@ export default function ActionBuilder({
 									aria-label={Liferay.Language.get(
 										'choose-an-object'
 									)}
-									onChange={({target: {value}}) => {
-										const objectDefinitionId = parseInt(
-											value,
-											10
-										);
-	
-										const object = relationships.find(({id}) => 
-											id == objectDefinitionId
-										)
-
-										const parameters: ObjectActionParameters = {
-												objectDefinitionId,
-												predefinedValues: [],
-										};
-
-										if (object?.related) {
-											parameters.relatedObjectEntries = false;
-										}
-										
-										setValues({parameters});
-
-										fetchObjectFields(objectDefinitionId);
-									}}
+									onChange={handleSelectObject}
 									options={objectsOptionsList}
 									value={
 										values.parameters?.objectDefinitionId
 									}
 								/>
-								{(values.parameters?.hasOwnProperty('relatedObjectEntries')) && (
+								{values.parameters?.hasOwnProperty(
+									'relatedObjectEntries'
+								) && (
 									<>
 										<ClayCheckbox
 											checked={
 												values.parameters
-													.relatedObjectEntries === true
+													.relatedObjectEntries ===
+												true
 											}
 											disabled={false}
 											label={Liferay.Language.get(
@@ -423,7 +418,6 @@ export default function ActionBuilder({
 							currentObjectDefinitionFields={
 								currentObjectDefinitionFields
 							}
-							predefinedValues={dataSetFields}
 							setValues={setValues}
 							values={values}
 						/>
@@ -494,7 +488,7 @@ interface IProps {
 }
 
 interface SelectItem {
-	label: string; 
+	label: string;
 	value: number;
 }
 

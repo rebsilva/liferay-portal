@@ -27,12 +27,12 @@ export default function AddObjectAction({
 	return (
 		<ObjectAction
 			ffNotificationTemplates={ffNotificationTemplates}
-			objectDefinitionsRelationshipsURL={
-				objectDefinitionsRelationshipsURL
-			}
 			objectAction={{active: true}}
 			objectActionExecutors={objectActionExecutors}
 			objectActionTriggers={objectActionTriggers}
+			objectDefinitionsRelationshipsURL={
+				objectDefinitionsRelationshipsURL
+			}
 			requestParams={{
 				method: 'POST',
 				url: apiURL,

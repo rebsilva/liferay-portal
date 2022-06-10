@@ -39,10 +39,10 @@ const TABS = [
 
 export default function Action({
 	ffNotificationTemplates,
-	objectDefinitionsRelationshipsURL,
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 	requestParams: {method, url},
 	successMessage,
@@ -113,11 +113,11 @@ export default function Action({
 					<ActionBuilder
 						errors={errors}
 						ffNotificationTemplates={ffNotificationTemplates}
+						objectActionExecutors={objectActionExecutors}
+						objectActionTriggers={objectActionTriggers}
 						objectDefinitionsRelationshipsURL={
 							objectDefinitionsRelationshipsURL
 						}
-						objectActionExecutors={objectActionExecutors}
-						objectActionTriggers={objectActionTriggers}
 						setValues={setValues}
 						values={values}
 					/>
