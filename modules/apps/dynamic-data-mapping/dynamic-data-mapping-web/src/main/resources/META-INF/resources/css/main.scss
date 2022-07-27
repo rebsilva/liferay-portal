@@ -74,8 +74,8 @@
 	}
 
 	.lfr-ddm-small-image-preview {
-		background-color: #fff;
-		border: 1px solid #ccc;
+		background-color: $white;
+		border: 1px solid $border-color;
 		margin-right: 1em;
 		max-height: 120px;
 		max-width: 120px;
@@ -319,7 +319,7 @@ textarea.script {
 }
 
 .lfr-ddm-legend {
-	color: #272833;
+	color: $gray-900;
 	font-size: 0.875rem;
 	font-weight: 600;
 	margin-bottom: 0.25rem;
