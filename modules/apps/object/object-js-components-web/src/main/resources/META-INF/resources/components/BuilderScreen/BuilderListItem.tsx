@@ -35,6 +35,7 @@ interface IProps {
 	onVisibleEditModal?: (boolean: boolean) => void;
 	secondColumnValue?: string;
 	thirdColumnValues?: TThirdColumnValues[] | string;
+	editColumns?: (string: string) => void | undefined;
 }
 
 type TThirdColumnValues = {
@@ -57,12 +58,13 @@ const BuilderListItem: React.FC<IProps> = ({
 	hasDragAndDrop,
 	index,
 	label,
-	objectFieldName,
+	objectFieldName = '',
 	onChangeColumnOrder,
 	onDeleteColumn,
 	onEditing,
 	onEditingObjectFieldName,
 	onVisibleEditModal,
+	editColumns,
 	secondColumnValue,
 	thirdColumnValues,
 }) => {
@@ -120,11 +122,11 @@ const BuilderListItem: React.FC<IProps> = ({
 
 	dragRef(dropRef(ref));
 
-	const handleEnableEditModal = (objectFieldName: string) => {
-		onEditingObjectFieldName && onEditingObjectFieldName(objectFieldName);
-		onEditing && onEditing(true);
-		onVisibleEditModal && onVisibleEditModal(true);
-	};
+	// const handleEnableEditModal = (objectFieldName: string) => {
+	// 	onEditingObjectFieldName && onEditingObjectFieldName(objectFieldName);
+	// 	onEditing && onEditing(true);
+	// 	onVisibleEditModal && onVisibleEditModal(true);
+	// };
 
 	return (
 		<ClayList.Item
@@ -201,7 +203,11 @@ const BuilderListItem: React.FC<IProps> = ({
 					{!disableEdit && (
 						<ClayDropDown.Item
 							onClick={() =>
-								handleEnableEditModal(objectFieldName)
+								//handleEnableEditModal(objectFieldName)
+								{if (editColumns) {
+
+									editColumns(objectFieldName)
+								}}
 							}
 						>
 							<ClayIcon

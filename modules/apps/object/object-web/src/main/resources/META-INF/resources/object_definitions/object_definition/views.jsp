@@ -54,3 +54,9 @@ renderResponse.setTitle(objectDefinition.getLabel(locale, true));
 		module="js/components/ModalAddColumns"
 	/>
 </div>
+
+<div>
+	<react:component
+		module="js/components/ModalAddDefaultSortColumn"
+	/>
+</div>

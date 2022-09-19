@@ -14,8 +14,7 @@
 
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
-import ClayModal from '@clayui/modal';
-import {Observer} from '@clayui/modal/lib/types';
+import ClayModal, {useModal} from '@clayui/modal';
 import {
 	AutoComplete,
 	SingleSelect,
@@ -23,21 +22,8 @@ import {
 } from '@liferay/object-js-components-web';
 import React, {FormEvent, useEffect, useMemo, useState} from 'react';
 
-import {TYPES, useViewContext} from '../objectViewContext';
-import {TObjectViewColumn, TObjectViewSortColumn} from '../types';
-
-interface IProps extends React.HTMLAttributes<HTMLElement> {
-	editingObjectFieldName: string;
-	header: string;
-	isEditingSort: boolean;
-	observer: Observer;
-	onClose: () => void;
-}
-
-type TSortOptions = {
-	label: string;
-	value: string;
-};
+import {TYPES} from './ObjectView/objectViewContext';
+import {TObjectViewColumn, TObjectViewSortColumn} from './ObjectView/types';
 
 const SORT_OPTIONS: TSortOptions[] = [
 	{
@@ -50,41 +36,91 @@ const SORT_OPTIONS: TSortOptions[] = [
 	},
 ];
 
-export function ModalAddDefaultSortColumn({
-	editingObjectFieldName,
-	header,
-	isEditingSort,
-	observer,
-	onClose,
-}: IProps) {
+function ModalAddDefaultSortColumn() {
+
 	const [
 		{
+			availableViewColumns,
+			dispatch,
+			editingObjectFieldName,
+			header,
 			objectFields,
-			objectView: {objectViewColumns, objectViewSortColumns},
+			objectViewColumns,
+			objectViewSortColumns,
+			selectedObjectSort,
+			selectedObjectSortColumn,
+			modalType,
 		},
-		dispatch,
-	] = useViewContext();
+		setState,
+	] = useState<IState>({
+		availableViewColumns: [],
+		dispatch: {},
+		selectedObjectSort: SORT_OPTIONS[0],
+		modalType: 'add',
+	});
 
-	const [availableViewColumns, setAvailableViewColumns] = useState<
-		TObjectViewColumn[]
-	>(objectViewColumns);
+	const [query, setQuery] = useState<string>('');
+
+	const resetModal = () => {
+		setState({
+			availableViewColumns: [],
+			dispatch: {},
+			selectedObjectSort: SORT_OPTIONS[0],
+			modalType: 'add',
+		});
+
+		setQuery('');
+	};
+
+	const {observer} = useModal({
+		onClose: resetModal,
+	});
 
 	useEffect(() => {
-		const newAvailableViewColumns = objectViewColumns.filter(
-			(objectViewColumn) =>
-				!objectViewColumn.defaultSort &&
-				objectViewColumn.objectFieldBusinessType !== 'Aggregation' &&
-				objectViewColumn.objectFieldBusinessType !== 'Relationship'
-		);
+		const openModal = ({
+			availableViewColumns = [],
+			dispatch = {},
+			selectedObjectSort = SORT_OPTIONS[0],
+			...otherProps
+		}: IState) => {
+			setState({
+				availableViewColumns,
+				dispatch,
+				selectedObjectSort,
+				...otherProps
+			});
 
-		setAvailableViewColumns(newAvailableViewColumns);
+			setQuery('');
+		};
+
+		Liferay.on('openModalDefaultSortColumn', openModal);
+
+		return () =>
+			Liferay.detach(
+				'openModalDefaultSortColumn',
+				openModal as () => void
+			);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
+	useEffect(() => {
+
+		if (objectViewColumns) {
+
+			const newAvailableViewColumns = objectViewColumns.filter(
+				(objectViewColumn) =>
+					!objectViewColumn.defaultSort &&
+					objectViewColumn.objectFieldBusinessType !== 'Aggregation' &&
+					objectViewColumn.objectFieldBusinessType !== 'Relationship'
+			);
+	
+			setState((state) => ({
+				...state,
+				availableViewColumns: newAvailableViewColumns,
+			}));
+		}
+		
 	}, [objectViewColumns]);
-
-	const [selectedObjectSortColumn, setSelectedObjectSortColumn] = useState<
-		TObjectViewSortColumn
-	>();
-	const [selectedObjetSort, setSelectedObjetSort] = useState(SORT_OPTIONS[0]);
-	const [query, setQuery] = useState<string>('');
 
 	const filteredObjectSortColumn = useMemo(() => {
 		return availableViewColumns.filter(({fieldLabel}) =>
@@ -101,11 +137,11 @@ export function ModalAddDefaultSortColumn({
 			objectFieldName = filteredObjectSortColumn[0].objectFieldName;
 		}
 
-		if (isEditingSort) {
+		if (modalType === 'edit-sort') {
 			dispatch({
 				payload: {
 					editingObjectFieldName,
-					selectedObjectSort: selectedObjetSort.value,
+					selectedObjectSort: selectedObjectSort.value,
 				},
 				type: TYPES.EDIT_OBJECT_VIEW_SORT_COLUMN_SORT_ORDER,
 			});
@@ -116,22 +152,22 @@ export function ModalAddDefaultSortColumn({
 					objectFieldName: objectFieldName!,
 					objectFields,
 					objectViewSortColumns,
-					selectedObjetSort,
+					selectedObjectSort,
 				},
 				type: TYPES.ADD_OBJECT_VIEW_SORT_COLUMN,
 			});
 		}
 
-		onClose();
+		resetModal();
 	};
 
-	return (
+	return typeof objectViewColumns?.length === 'number' ? (
 		<ClayModal observer={observer}>
 			<ClayForm onSubmit={onSubmit}>
 				<ClayModal.Header>{header}</ClayModal.Header>
 
 				<ClayModal.Body>
-					{!isEditingSort && (
+					{modalType !== 'edit-sort' && (
 						<AutoComplete
 							emptyStateMessage={Liferay.Language.get(
 								'there-are-no-columns-added-in-this-view-yet'
@@ -140,7 +176,10 @@ export function ModalAddDefaultSortColumn({
 							label={Liferay.Language.get('columns')}
 							onChangeQuery={setQuery}
 							onSelectItem={(item) => {
-								setSelectedObjectSortColumn(item);
+								setState((state) => ({
+									...state,
+									selectedObjectSortColumn: item,
+								}));
 							}}
 							query={query}
 							required
@@ -157,10 +196,13 @@ export function ModalAddDefaultSortColumn({
 					<SingleSelect
 						label={Liferay.Language.get('sorting')}
 						onChange={(item: TSortOptions) => {
-							setSelectedObjetSort(item);
+							setState((state) => ({
+								...state,
+								selectedObjectSort: item,
+							}));
 						}}
 						options={SORT_OPTIONS}
-						value={selectedObjetSort.label}
+						value={selectedObjectSort.label}
 					/>
 				</ClayModal.Body>
 
@@ -169,14 +211,14 @@ export function ModalAddDefaultSortColumn({
 						<ClayButton.Group key={1} spaced>
 							<ClayButton
 								displayType="secondary"
-								onClick={() => onClose()}
+								onClick={resetModal}
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
 
 							<ClayButton
 								disabled={
-									isEditingSort
+									modalType === 'edit-sort'
 										? false
 										: !selectedObjectSortColumn
 								}
@@ -190,5 +232,26 @@ export function ModalAddDefaultSortColumn({
 				/>
 			</ClayForm>
 		</ClayModal>
-	);
+	) : null;
 }
+
+export default ModalAddDefaultSortColumn;
+
+interface IState extends React.HTMLAttributes<HTMLElement> {
+	availableViewColumns: TObjectViewColumn[];
+	dispatch: any;
+	editingObjectFieldName?: string;
+	header?: string;
+	isEditingSort?: boolean;
+	objectFields?: ObjectField[];
+	objectViewColumns?: TObjectViewColumn[];
+	objectViewSortColumns?: TObjectViewSortColumn[];
+	selectedObjectSort: TSortOptions;
+	selectedObjectSortColumn?: TObjectViewSortColumn;
+	modalType: string;
+}
+
+type TSortOptions = {
+	label: string;
+	value: string;
+};

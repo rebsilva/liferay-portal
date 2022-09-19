@@ -27,6 +27,7 @@ interface IProps {
 	onVisibleEditModal?: (boolean: boolean) => void;
 	secondColumnValue?: string;
 	thirdColumnValues?: TThirdColumnValues[] | string;
+	editColumns?: (string: string) => void | undefined;
 }
 declare type TThirdColumnValues = {
 	label: string;

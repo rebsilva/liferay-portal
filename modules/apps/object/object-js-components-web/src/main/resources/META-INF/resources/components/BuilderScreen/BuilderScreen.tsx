@@ -42,6 +42,7 @@ export function BuilderScreen({
 	onDeleteColumn,
 	onEditing,
 	onEditingObjectFieldName,
+	editColumns,
 	onVisibleEditModal,
 	openModal,
 	secondColumnHeader,
@@ -140,6 +141,7 @@ export function BuilderScreen({
 									onEditingObjectFieldName={
 										onEditingObjectFieldName
 									}
+									editColumns={editColumns}
 									onVisibleEditModal={onVisibleEditModal}
 									secondColumnValue={
 										defaultSort
@@ -232,6 +234,7 @@ interface IProps {
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
 	onVisibleEditModal: (boolean: boolean) => void;
 	openModal: () => void;
+	editColumns?: (string: string) => void | undefined;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
 	title: string;

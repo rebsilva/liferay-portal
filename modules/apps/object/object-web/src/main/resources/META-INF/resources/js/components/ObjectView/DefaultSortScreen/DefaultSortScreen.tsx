@@ -13,32 +13,54 @@
  */
 
 import ClayAlert from '@clayui/alert';
-import {useModal} from '@clayui/modal';
 import {BuilderScreen} from '@liferay/object-js-components-web';
 import React, {useEffect, useState} from 'react';
 
-import {ModalAddDefaultSortColumn} from '../ModalAddDefaultSortColumn/ModalAddDefaultSortColumn';
 import {TYPES, useViewContext} from '../objectViewContext';
 
 export function DefaultSortScreen() {
 	const [
 		{
-			objectView: {objectViewSortColumns},
+			objectFields,
+			objectView: {objectViewColumns, objectViewSortColumns},
 		},
 		dispatch,
 	] = useViewContext();
 
 	const [visibleModal, setVisibleModal] = useState(false);
-	const [isEditingSort, setIsEditingSort] = useState(false);
-	const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
+	//const [isEditingSort, setIsEditingSort] = useState(false);
+	//const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
 
-	const {observer, onClose} = useModal({
-		onClose: () => setVisibleModal(false),
-	});
+	// useEffect(() => {
+	// 	visibleModal === false && setIsEditingSort(false);
+	// }, [visibleModal]);
 
-	useEffect(() => {
-		visibleModal === false && setIsEditingSort(false);
-	}, [visibleModal]);
+	const handleAddColumns = () => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalDefaultSortColumn', {
+			dispatch,
+			header: Liferay.Language.get('new-default-sort'),
+			objectFields,
+			objectViewColumns,
+			objectViewSortColumns,
+			modalType: 'add',
+		});
+	};
+
+	const handleEditColumns = (objectFieldName: string) => {
+		const parentWindow = Liferay.Util.getOpener();
+
+		parentWindow.Liferay.fire('openModalDefaultSortColumn', {
+			dispatch,
+			editingObjectFieldName: objectFieldName,
+			header: Liferay.Language.get('edit-default-sort'),
+			objectFields,
+			objectViewColumns,
+			objectViewSortColumns,
+			modalType: 'edit-sort',
+		});
+	}
 
 	const handleChangeColumnOrder = (
 		draggedIndex: number,
@@ -85,27 +107,12 @@ export function DefaultSortScreen() {
 				objectColumns={objectViewSortColumns ?? []}
 				onChangeColumnOrder={handleChangeColumnOrder}
 				onDeleteColumn={handleDeleteColumn}
-				onEditing={setIsEditingSort}
-				onEditingObjectFieldName={setEditingObjectFieldName}
 				onVisibleEditModal={setVisibleModal}
-				openModal={() => setVisibleModal(true)}
+				openModal={handleAddColumns}
+				editColumns={handleEditColumns}
 				secondColumnHeader={Liferay.Language.get('sorting')}
 				title={Liferay.Language.get('default-sort')}
 			/>
-
-			{visibleModal && (
-				<ModalAddDefaultSortColumn
-					editingObjectFieldName={editingObjectFieldName}
-					header={
-						isEditingSort
-							? Liferay.Language.get('edit-default-sort')
-							: Liferay.Language.get('new-default-sort')
-					}
-					isEditingSort={isEditingSort}
-					observer={observer}
-					onClose={onClose}
-				/>
-			)}
 		</>
 	);
 }

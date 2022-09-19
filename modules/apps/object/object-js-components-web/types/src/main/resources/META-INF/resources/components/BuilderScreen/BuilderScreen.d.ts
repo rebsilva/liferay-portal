@@ -27,6 +27,7 @@ export declare function BuilderScreen({
 	onDeleteColumn,
 	onEditing,
 	onEditingObjectFieldName,
+	editColumns,
 	onVisibleEditModal,
 	openModal,
 	secondColumnHeader,
@@ -72,6 +73,7 @@ interface IProps {
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
 	onVisibleEditModal: (boolean: boolean) => void;
 	openModal: () => void;
+	editColumns?: (string: string) => void | undefined;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
 	title: string;
