@@ -22,49 +22,15 @@ import {useDrag, useDrop} from 'react-dnd';
 
 import './BuilderListItem.scss';
 
-interface IProps {
-	disableEdit?: boolean;
-	hasDragAndDrop?: boolean;
-	index: number;
-	label?: string;
-	objectFieldName: string;
-	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
-	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal?: (boolean: boolean) => void;
-	secondColumnValue?: string;
-	thirdColumnValues?: TThirdColumnValues[] | string;
-	editColumns?: (string: string) => void | undefined;
-}
-
-type TThirdColumnValues = {
-	label: string;
-	value: string;
-};
-
-type TItemHover = {
-	index: number;
-	type: string;
-};
-
-type TDraggedOffset = {
-	x: number;
-	y: number;
-} | null;
-
 const BuilderListItem: React.FC<IProps> = ({
 	disableEdit,
+	editColumns,
 	hasDragAndDrop,
 	index,
 	label,
 	objectFieldName = '',
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	onVisibleEditModal,
-	editColumns,
 	secondColumnValue,
 	thirdColumnValues,
 }) => {
@@ -121,12 +87,6 @@ const BuilderListItem: React.FC<IProps> = ({
 	});
 
 	dragRef(dropRef(ref));
-
-	// const handleEnableEditModal = (objectFieldName: string) => {
-	// 	onEditingObjectFieldName && onEditingObjectFieldName(objectFieldName);
-	// 	onEditing && onEditing(true);
-	// 	onVisibleEditModal && onVisibleEditModal(true);
-	// };
 
 	return (
 		<ClayList.Item
@@ -202,13 +162,7 @@ const BuilderListItem: React.FC<IProps> = ({
 				<ClayDropDown.ItemList>
 					{!disableEdit && (
 						<ClayDropDown.Item
-							onClick={() =>
-								//handleEnableEditModal(objectFieldName)
-								{if (editColumns) {
-
-									editColumns(objectFieldName)
-								}}
-							}
+							onClick={() => editColumns(objectFieldName)}
 						>
 							<ClayIcon
 								className="lfr-object__object-custom-view-builder-item-icon"
@@ -236,3 +190,31 @@ const BuilderListItem: React.FC<IProps> = ({
 };
 
 export default BuilderListItem;
+
+interface IProps {
+	disableEdit?: boolean;
+	editColumns: (string: string) => void;
+	hasDragAndDrop?: boolean;
+	index: number;
+	label?: string;
+	objectFieldName: string;
+	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
+	onDeleteColumn: (objectFieldName: string) => void;
+	secondColumnValue?: string;
+	thirdColumnValues?: TThirdColumnValues[] | string;
+}
+
+type TThirdColumnValues = {
+	label: string;
+	value: string;
+};
+
+type TItemHover = {
+	index: number;
+	type: string;
+};
+
+type TDraggedOffset = {
+	x: number;
+	y: number;
+} | null;

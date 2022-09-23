@@ -33,6 +33,7 @@ const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 export function BuilderScreen({
 	defaultSort,
 	disableEdit,
+	editColumns,
 	emptyState,
 	filter,
 	firstColumnHeader,
@@ -40,10 +41,6 @@ export function BuilderScreen({
 	objectColumns,
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	editColumns,
-	onVisibleEditModal,
 	openModal,
 	secondColumnHeader,
 	thirdColumnHeader,
@@ -131,18 +128,13 @@ export function BuilderScreen({
 										disableEdit ||
 										(filter && viewColumn?.disableEdit)
 									}
+									editColumns={editColumns}
 									hasDragAndDrop={hasDragAndDrop}
 									index={index}
 									label={viewColumn?.fieldLabel}
 									objectFieldName={viewColumn.objectFieldName}
 									onChangeColumnOrder={onChangeColumnOrder}
 									onDeleteColumn={onDeleteColumn}
-									onEditing={onEditing}
-									onEditingObjectFieldName={
-										onEditingObjectFieldName
-									}
-									editColumns={editColumns}
-									onVisibleEditModal={onVisibleEditModal}
 									secondColumnValue={
 										defaultSort
 											? viewColumn.sortOrder === 'asc'
@@ -219,6 +211,7 @@ type TBuilderScreenColumn = {
 interface IProps {
 	defaultSort?: boolean;
 	disableEdit?: boolean;
+	editColumns: (string: string) => void;
 	emptyState: {
 		buttonText: string;
 		description: string;
@@ -230,11 +223,7 @@ interface IProps {
 	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal: (boolean: boolean) => void;
 	openModal: () => void;
-	editColumns?: (string: string) => void | undefined;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
 	title: string;

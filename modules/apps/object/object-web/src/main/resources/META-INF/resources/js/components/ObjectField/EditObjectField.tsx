@@ -594,6 +594,7 @@ export default function EditObjectField({
 				</ObjectFieldFormBase>
 			</Card>
 
+			{/* 
 			{values.businessType === 'Aggregation' && (
 				<BuilderScreen
 					disableEdit
@@ -610,14 +611,16 @@ export default function EditObjectField({
 					firstColumnHeader={Liferay.Language.get('filter-by')}
 					objectColumns={aggregationFilters}
 					onDeleteColumn={handleDeleteFilterColumn}
-					onEditingObjectFieldName={setEditingObjectFieldName}
-					onVisibleEditModal={setVisibleModal}
+
+					// onEditingObjectFieldName={setEditingObjectFieldName}
+					// onVisibleEditModal={setVisibleModal}
+
 					openModal={() => setVisibleModal(true)}
 					secondColumnHeader={Liferay.Language.get('type')}
 					thirdColumnHeader={Liferay.Language.get('value')}
 					title={Liferay.Language.get('filters')}
 				/>
-			)}
+			)} */}
 
 			{visibleModal && (
 				<ModalAddFilter

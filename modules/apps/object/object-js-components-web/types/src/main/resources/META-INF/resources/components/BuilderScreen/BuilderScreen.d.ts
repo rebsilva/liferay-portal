@@ -18,6 +18,7 @@ import './BuilderScreen.scss';
 export declare function BuilderScreen({
 	defaultSort,
 	disableEdit,
+	editColumns,
 	emptyState,
 	filter,
 	firstColumnHeader,
@@ -25,10 +26,6 @@ export declare function BuilderScreen({
 	objectColumns,
 	onChangeColumnOrder,
 	onDeleteColumn,
-	onEditing,
-	onEditingObjectFieldName,
-	editColumns,
-	onVisibleEditModal,
 	openModal,
 	secondColumnHeader,
 	thirdColumnHeader,
@@ -58,6 +55,7 @@ declare type TBuilderScreenColumn = {
 interface IProps {
 	defaultSort?: boolean;
 	disableEdit?: boolean;
+	editColumns: (string: string) => void;
 	emptyState: {
 		buttonText: string;
 		description: string;
@@ -69,11 +67,7 @@ interface IProps {
 	objectColumns: TBuilderScreenColumn[];
 	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
 	onDeleteColumn: (objectFieldName: string) => void;
-	onEditing?: (boolean: boolean) => void;
-	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onVisibleEditModal: (boolean: boolean) => void;
 	openModal: () => void;
-	editColumns?: (string: string) => void | undefined;
 	secondColumnHeader: string;
 	thirdColumnHeader?: string;
 	title: string;

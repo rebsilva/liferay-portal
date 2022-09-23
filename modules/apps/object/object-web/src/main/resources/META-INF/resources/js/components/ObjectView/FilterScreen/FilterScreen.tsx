@@ -121,7 +121,7 @@ export function FilterScreen() {
 
 	return (
 		<>
-			<BuilderScreen
+			{/* <BuilderScreen
 				emptyState={{
 					buttonText: Liferay.Language.get('new-filter'),
 					description: Liferay.Language.get(
@@ -148,14 +148,16 @@ export function FilterScreen() {
 					}) ?? []
 				}
 				onDeleteColumn={handleDeleteColumn}
-				onEditing={setEditingFilter}
-				onEditingObjectFieldName={setEditingObjectFieldName}
-				onVisibleEditModal={setVisibleModal}
+
+				// onEditing={setEditingFilter}
+				// onEditingObjectFieldName={setEditingObjectFieldName}
+				// onVisibleEditModal={setVisibleModal}
+
 				openModal={() => setVisibleModal(true)}
 				secondColumnHeader={Liferay.Language.get('type')}
 				thirdColumnHeader={Liferay.Language.get('value')}
 				title={Liferay.Language.get('filters')}
-			/>
+			/> */}
 
 			{visibleModal && (
 				<ModalAddFilter

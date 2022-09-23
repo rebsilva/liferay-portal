@@ -14,7 +14,7 @@
 
 import ClayAlert from '@clayui/alert';
 import {BuilderScreen} from '@liferay/object-js-components-web';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {TYPES, useViewContext} from '../objectViewContext';
 
@@ -27,24 +27,17 @@ export function DefaultSortScreen() {
 		dispatch,
 	] = useViewContext();
 
-	const [visibleModal, setVisibleModal] = useState(false);
-	//const [isEditingSort, setIsEditingSort] = useState(false);
-	//const [editingObjectFieldName, setEditingObjectFieldName] = useState('');
-
-	// useEffect(() => {
-	// 	visibleModal === false && setIsEditingSort(false);
-	// }, [visibleModal]);
-
 	const handleAddColumns = () => {
 		const parentWindow = Liferay.Util.getOpener();
 
 		parentWindow.Liferay.fire('openModalDefaultSortColumn', {
 			dispatch,
 			header: Liferay.Language.get('new-default-sort'),
+			modalType: 'add',
 			objectFields,
 			objectViewColumns,
 			objectViewSortColumns,
-			modalType: 'add',
+			showModal: true,
 		});
 	};
 
@@ -55,12 +48,13 @@ export function DefaultSortScreen() {
 			dispatch,
 			editingObjectFieldName: objectFieldName,
 			header: Liferay.Language.get('edit-default-sort'),
+			modalType: 'edit-sort',
 			objectFields,
 			objectViewColumns,
 			objectViewSortColumns,
-			modalType: 'edit-sort',
+			showModal: true,
 		});
-	}
+	};
 
 	const handleChangeColumnOrder = (
 		draggedIndex: number,
@@ -93,6 +87,7 @@ export function DefaultSortScreen() {
 
 			<BuilderScreen
 				defaultSort
+				editColumns={handleEditColumns}
 				emptyState={{
 					buttonText: Liferay.Language.get('new-default-sort'),
 					description: Liferay.Language.get(
@@ -107,9 +102,7 @@ export function DefaultSortScreen() {
 				objectColumns={objectViewSortColumns ?? []}
 				onChangeColumnOrder={handleChangeColumnOrder}
 				onDeleteColumn={handleDeleteColumn}
-				onVisibleEditModal={setVisibleModal}
 				openModal={handleAddColumns}
-				editColumns={handleEditColumns}
 				secondColumnHeader={Liferay.Language.get('sorting')}
 				title={Liferay.Language.get('default-sort')}
 			/>

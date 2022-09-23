@@ -37,26 +37,27 @@ const SORT_OPTIONS: TSortOptions[] = [
 ];
 
 function ModalAddDefaultSortColumn() {
-
 	const [
 		{
 			availableViewColumns,
 			dispatch,
 			editingObjectFieldName,
 			header,
+			modalType,
 			objectFields,
 			objectViewColumns,
 			objectViewSortColumns,
 			selectedObjectSort,
 			selectedObjectSortColumn,
-			modalType,
+			showModal,
 		},
 		setState,
 	] = useState<IState>({
 		availableViewColumns: [],
 		dispatch: {},
-		selectedObjectSort: SORT_OPTIONS[0],
 		modalType: 'add',
+		selectedObjectSort: SORT_OPTIONS[0],
+		showModal: false,
 	});
 
 	const [query, setQuery] = useState<string>('');
@@ -65,8 +66,9 @@ function ModalAddDefaultSortColumn() {
 		setState({
 			availableViewColumns: [],
 			dispatch: {},
-			selectedObjectSort: SORT_OPTIONS[0],
 			modalType: 'add',
+			selectedObjectSort: SORT_OPTIONS[0],
+			showModal: false,
 		});
 
 		setQuery('');
@@ -80,14 +82,18 @@ function ModalAddDefaultSortColumn() {
 		const openModal = ({
 			availableViewColumns = [],
 			dispatch = {},
+			modalType = 'add',
 			selectedObjectSort = SORT_OPTIONS[0],
+			showModal = true,
 			...otherProps
-		}: IState) => {
+		}: Partial<IState>) => {
 			setState({
 				availableViewColumns,
 				dispatch,
+				modalType,
 				selectedObjectSort,
-				...otherProps
+				showModal,
+				...otherProps,
 			});
 
 			setQuery('');
@@ -104,22 +110,20 @@ function ModalAddDefaultSortColumn() {
 	}, []);
 
 	useEffect(() => {
-
 		if (objectViewColumns) {
-
 			const newAvailableViewColumns = objectViewColumns.filter(
 				(objectViewColumn) =>
 					!objectViewColumn.defaultSort &&
-					objectViewColumn.objectFieldBusinessType !== 'Aggregation' &&
+					objectViewColumn.objectFieldBusinessType !==
+						'Aggregation' &&
 					objectViewColumn.objectFieldBusinessType !== 'Relationship'
 			);
-	
+
 			setState((state) => ({
 				...state,
 				availableViewColumns: newAvailableViewColumns,
 			}));
 		}
-		
 	}, [objectViewColumns]);
 
 	const filteredObjectSortColumn = useMemo(() => {
@@ -161,7 +165,7 @@ function ModalAddDefaultSortColumn() {
 		resetModal();
 	};
 
-	return typeof objectViewColumns?.length === 'number' ? (
+	return showModal ? (
 		<ClayModal observer={observer}>
 			<ClayForm onSubmit={onSubmit}>
 				<ClayModal.Header>{header}</ClayModal.Header>
@@ -242,13 +246,13 @@ interface IState extends React.HTMLAttributes<HTMLElement> {
 	dispatch: any;
 	editingObjectFieldName?: string;
 	header?: string;
-	isEditingSort?: boolean;
+	modalType: string;
 	objectFields?: ObjectField[];
 	objectViewColumns?: TObjectViewColumn[];
 	objectViewSortColumns?: TObjectViewSortColumn[];
 	selectedObjectSort: TSortOptions;
 	selectedObjectSortColumn?: TObjectViewSortColumn;
-	modalType: string;
+	showModal: boolean;
 }
 
 type TSortOptions = {

@@ -12,23 +12,7 @@
  * details.
  */
 
-import React from 'react';
-import './BuilderListItem.scss';
-declare const BuilderListItem: React.FC<IProps>;
-export default BuilderListItem;
-interface IProps {
-	disableEdit?: boolean;
-	editColumns: (string: string) => void;
-	hasDragAndDrop?: boolean;
-	index: number;
-	label?: string;
-	objectFieldName: string;
-	onChangeColumnOrder?: (draggedIndex: number, targetIndex: number) => void;
-	onDeleteColumn: (objectFieldName: string) => void;
-	secondColumnValue?: string;
-	thirdColumnValues?: TThirdColumnValues[] | string;
-}
-declare type TThirdColumnValues = {
-	label: string;
-	value: string;
-};
+/// <reference types="react" />
+
+declare function ModalEditViewColumn(): JSX.Element | null;
+export default ModalEditViewColumn;
