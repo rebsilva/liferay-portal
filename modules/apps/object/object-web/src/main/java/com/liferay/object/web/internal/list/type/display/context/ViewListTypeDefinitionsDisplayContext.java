@@ -27,7 +27,9 @@ import com.liferay.portal.kernel.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.portlet.url.builder.ResourceURLBuilder;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -81,7 +83,7 @@ public class ViewListTypeDefinitionsDisplayContext {
 	public List<FDSActionDropdownItem> getFDSActionDropdownItems()
 		throws Exception {
 
-		return Arrays.asList(
+		List<FDSActionDropdownItem> fdsActionDropdownItems = Arrays.asList(
 			new FDSActionDropdownItem(
 				PortletURLBuilder.create(
 					getPortletURL()
@@ -96,17 +98,6 @@ public class ViewListTypeDefinitionsDisplayContext {
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "view"),
 				"get", null, "sidePanel"),
 			new FDSActionDropdownItem(
-				ResourceURLBuilder.createResourceURL(
-					_objectRequestHelper.getLiferayPortletResponse()
-				).setParameter(
-					"listTypeDefinitionId", "{id}"
-				).setResourceID(
-					"/list_type_definitions/export_list_type_definition"
-				).buildString(),
-				"export", "export",
-				LanguageUtil.get(_objectRequestHelper.getRequest(), "export"),
-				"get", null, null),
-			new FDSActionDropdownItem(
 				getAPIURL() + "/{id}", "trash", "delete",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", "async"),
@@ -115,6 +106,24 @@ public class ViewListTypeDefinitionsDisplayContext {
 				LanguageUtil.get(
 					_objectRequestHelper.getRequest(), "permissions"),
 				"get", "permissions", "modal-permissions"));
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-167536"))) {
+			fdsActionDropdownItems.add(
+				new FDSActionDropdownItem(
+					ResourceURLBuilder.createResourceURL(
+						_objectRequestHelper.getLiferayPortletResponse()
+					).setParameter(
+						"listTypeDefinitionId", "{id}"
+					).setResourceID(
+						"/list_type_definitions/export_list_type_definition"
+					).buildString(),
+					"export", "export",
+					LanguageUtil.get(
+						_objectRequestHelper.getRequest(), "export"),
+					"get", null, null));
+		}
+
+		return fdsActionDropdownItems;
 	}
 
 	public PortletURL getPortletURL() throws PortletException {
