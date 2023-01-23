@@ -19,40 +19,30 @@ import React from 'react';
 
 interface ModalImportWarningProps {
 	handleImport: () => void;
+	header: string;
 	onClose: (value: boolean) => void;
+	paragraphs: string[];
 }
 
 export function ModalImportWarning({
 	handleImport,
+	header,
 	onClose,
+	paragraphs,
 }: ModalImportWarningProps) {
 	const {observer} = useModal();
 
 	return (
 		<ClayModal center observer={observer} status="warning">
-			<ClayModal.Header>
-				{Liferay.Language.get('update-existing-object-definition')}
-			</ClayModal.Header>
+			<ClayModal.Header>{header}</ClayModal.Header>
 
 			<ClayModal.Body>
 				<div className="text-secondary">
-					<Text as="p" color="secondary">
-						{Liferay.Language.get(
-							'there-is-an-object-definition-with-the-same-external-reference-code-as-the-imported-one'
-						)}
-					</Text>
-
-					<Text as="p" color="secondary">
-						{Liferay.Language.get(
-							'before-importing-the-new-object-definition-you-may-want-to-back-up-its-entries-to-prevent-data-loss'
-						)}
-					</Text>
-
-					<Text as="p" color="secondary">
-						{Liferay.Language.get(
-							'do-you-want-to-proceed-with-the-import-process'
-						)}
-					</Text>
+					{paragraphs.map((paragraph) => {
+						<Text as="p" color="secondary">
+							{paragraph}
+						</Text>;
+					})}
 				</div>
 			</ClayModal.Body>
 

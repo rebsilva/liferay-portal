@@ -54,6 +54,17 @@ export default function ModalImportObjectDefinition({
 	const [{fileName, inputFile, inputFileValue}, setFile] = useState<TFile>(
 		{}
 	);
+
+	const warningModalBody: string[] = [
+		Liferay.Language.get(
+			'there-is-an-object-definition-with-the-same-external-reference-code-as-the-imported-one'
+		),
+		Liferay.Language.get(
+			'before-importing-the-new-object-definition-you-may-want-to-back-up-its-entries-to-prevent-data-loss'
+		),
+		Liferay.Language.get('do-you-want-to-proceed-with-the-import-process'),
+	];
+
 	const {observer, onClose} = useModal({
 		onClose: () => {
 			setVisible(false);
@@ -273,10 +284,12 @@ export default function ModalImportObjectDefinition({
 	) : warningModalVisible ? (
 		<ModalImportWarning
 			handleImport={() => handleImport(importFormData as FormData)}
+			header={Liferay.Language.get('update-existing-object-definition')}
 			onClose={() => {
 				setWarningModalVisible(false);
 				setImportFormData(undefined);
 			}}
+			paragraphs={warningModalBody}
 		/>
 	) : null;
 }
