@@ -1,7 +1,7 @@
 definition {
 
 	macro activeCustomObject {
-		ObjectPortlet.selectCustomObject(label = "${objectName}");
+		ObjectPortlet.selectCustomObject(label = "${objectLabel}");
 
 		CreateObject.checkToggleActive();
 
@@ -175,7 +175,7 @@ definition {
 
 	macro assertObjectNotPresentInSubmissions {
 		AssertElementNotPresent(
-			key_submissionName = "${objectName}",
+			key_submissionName = "${objectLabel}",
 			locator1 = "WorkflowSubmissions#SUBMISSION_BY_NAME");
 	}
 
@@ -338,7 +338,7 @@ definition {
 	}
 
 	macro inactiveCustomObject {
-		ObjectPortlet.selectCustomObject(label = "${objectName}");
+		ObjectPortlet.selectCustomObject(label = "${objectLabel}");
 
 		CreateObject.checkToggleInactive();
 
@@ -422,7 +422,7 @@ definition {
 
 	macro withdrawObjectTask {
 		Click(
-			key_taskName = "${objectName}",
+			key_taskName = "${objectLabel}",
 			locator1 = "WorkflowSubmissions#SUBMISSIONS_TASK_NAME");
 
 		Click(locator1 = "WorkflowSubmissions#SUBMISSIONS_DETAILS_PAGE_ELLIPSIS");
