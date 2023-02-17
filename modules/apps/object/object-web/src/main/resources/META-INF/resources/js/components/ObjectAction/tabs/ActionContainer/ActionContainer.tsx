@@ -72,6 +72,7 @@ export function ActionContainer({
 
 	const isValidField = ({
 		businessType,
+		name,
 		objectFieldSettings,
 		system,
 	}: ObjectField) => {
@@ -84,12 +85,19 @@ export function ActionContainer({
 			return true;
 		}
 
-		return (
-			businessType !== 'Aggregation' &&
-			businessType !== 'Formula' &&
-			businessType !== 'Relationship' &&
-			!system
-		);
+		return Liferay.FeatureFlags['LPS-173537'] && systemObject
+			? businessType !== 'Aggregation' &&
+					businessType !== 'Formula' &&
+					businessType !== 'Relationship' &&
+					name !== 'creator' &&
+					name !== 'createDate' &&
+					name !== 'id' &&
+					name !== 'modifiedDate' &&
+					name !== 'status'
+			: businessType !== 'Aggregation' &&
+					businessType !== 'Formula' &&
+					businessType !== 'Relationship' &&
+					!system;
 	};
 
 	const updateParameters = useCallback(
