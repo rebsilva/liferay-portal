@@ -25,11 +25,14 @@ import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.PropsUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,11 +66,22 @@ public class GetObjectDefinitionsRelationshipsMVCResourceCommand
 			_objectRelationshipLocalService.getObjectRelationships(
 				ParamUtil.getLong(resourceRequest, "objectDefinitionId"));
 
-		for (ObjectDefinition objectDefinition :
+		List<ObjectDefinition> objectDefinitions = new ArrayList<>();
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-173537"))) {
+			objectDefinitions =
 				_objectDefinitionLocalService.getObjectDefinitions(
 					_portal.getCompanyId(resourceRequest), true,
-					WorkflowConstants.STATUS_APPROVED)) {
+					WorkflowConstants.STATUS_APPROVED);
+		}
+		else {
+			objectDefinitions =
+				_objectDefinitionLocalService.getObjectDefinitions(
+					_portal.getCompanyId(resourceRequest), true, false,
+					WorkflowConstants.STATUS_APPROVED);
+		}
 
+		for (ObjectDefinition objectDefinition : objectDefinitions) {
 			objectDefinitionsJSONArray.put(
 				JSONUtil.put(
 					"externalReferenceCode",

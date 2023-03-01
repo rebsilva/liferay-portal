@@ -66,6 +66,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.util.PropsUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -568,7 +569,10 @@ public class ObjectActionLocalServiceImpl
 			}
 
 			if ((objectDefinition == null) || !objectDefinition.isActive() ||
-				!objectDefinition.isApproved()) {
+				!objectDefinition.isApproved() ||
+				(!GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LPS-173537")) &&
+				 objectDefinition.isSystem())) {
 
 				errorMessageKeys.put("objectDefinitionId", "invalid");
 			}
