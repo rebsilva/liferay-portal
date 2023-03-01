@@ -107,6 +107,8 @@ public class GetObjectDefinitionsRelationshipsMVCResourceCommand
 
 						return null;
 					}
+				).put(
+					"system", objectDefinition.isSystem()
 				));
 		}
 
