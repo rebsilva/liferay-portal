@@ -12,6 +12,8 @@
  * details.
  */
 
+// @ts-ignore
+
 import DefaultRenderer from './DefaultRenderer';
 import {
 	INTERNAL_CELL_RENDERERS,
