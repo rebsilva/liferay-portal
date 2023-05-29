@@ -65,7 +65,6 @@ type ObjectFieldBusinessType =
 	| 'Aggregation'
 	| 'Attachment'
 	| 'Date'
-	| 'DateTime'
 	| 'Decimal'
 	| 'Encrypted'
 	| 'Formula'
@@ -332,7 +331,6 @@ interface HTTPMethod {
 }
 
 interface PredefinedValue {
-	businessType: ObjectFieldBusinessType;
 	inputAsValue: boolean;
 	label: LocalizedValue<string>;
 	name: string;

@@ -141,7 +141,6 @@ export function ActionContainer({
 					) {
 						(parameters.predefinedValues as PredefinedValue[]).push(
 							{
-								businessType: field.businessType,
 								inputAsValue: false,
 								label: field.label,
 								name: field.name,
