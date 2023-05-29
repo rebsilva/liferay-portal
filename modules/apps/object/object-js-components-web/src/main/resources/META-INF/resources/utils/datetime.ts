@@ -27,13 +27,12 @@ const WORD_CHARACTER_REGEX = /\w/g;
 const SERVER_DATE_FORMAT = 'YYYY-MM-DD';
 const SERVER_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 
-export interface Date {
+interface Date {
 	formattedDate?: string;
 	locale?: string;
 	name?: string;
 	predefinedValue?: string;
 	rawDate?: string;
-	value?: string;
 	years?: {
 		end: number;
 		start: number;
@@ -62,11 +61,13 @@ export function generateDateConfigurations({
 }: GenerateDateConfigurationsProps) {
 	let use12Hours = false;
 
-	const isDateTime = type === 'date_time' || type === 'DateTime';
+	const isDateTime = type === 'date_time';
 	const momentLocale = moment().locale(locale ?? defaultLanguageId);
 	const dateFormat = momentLocale.localeData().longDateFormat('L');
 	const firstDayOfWeek = momentLocale.localeData().firstDayOfWeek();
+	const months = momentLocale.localeData().months();
 	const time = momentLocale.localeData().longDateFormat('LT');
+	const weekdaysShort = momentLocale.localeData().weekdaysShort();
 
 	let momentFormat = dateFormat;
 
@@ -100,9 +101,11 @@ export function generateDateConfigurations({
 		firstDayOfWeek,
 		isDateTime,
 		momentFormat,
+		months,
 		placeholder,
 		serverFormat,
 		use12Hours,
+		weekdaysShort,
 	};
 }
 

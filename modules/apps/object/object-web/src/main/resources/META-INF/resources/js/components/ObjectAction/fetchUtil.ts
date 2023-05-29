@@ -154,11 +154,9 @@ export async function fetchObjectDefinitionFields(
 			required &&
 			values.objectActionExecutorKey === 'add-object-entry'
 		) {
-			const inputAsValue = businessType === 'DateTime' ? true : false;
-
 			newPredefinedValues.push({
 				businessType,
-				inputAsValue,
+				inputAsValue: false,
 				label,
 				name,
 				value: '',

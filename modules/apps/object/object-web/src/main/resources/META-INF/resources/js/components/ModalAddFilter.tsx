@@ -593,7 +593,6 @@ export function ModalAddFilter({
 										setFilterStartDate(value);
 									}}
 									required
-									type="Date"
 									value={filterStartDate}
 								/>
 							</div>
@@ -616,7 +615,6 @@ export function ModalAddFilter({
 										setFilterEndDate(value);
 									}}
 									required
-									type="Date"
 									value={filterEndDate}
 								/>
 							</div>
