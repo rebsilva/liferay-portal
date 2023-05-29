@@ -151,23 +151,19 @@ const FrontendDataSet = ({
 			...initialActiveView,
 		};
 
-		const filters = initialFilters
-			? initialFilters.map((filter) => {
-					const preloadedData = filter.preloadedData;
+		const filters = initialFilters.map((filter) => {
+			const preloadedData = filter.preloadedData;
 
-					if (preloadedData) {
-						filter.active = true;
-						filter.selectedData = preloadedData;
+			if (preloadedData) {
+				filter.active = true;
+				filter.selectedData = preloadedData;
 
-						filter.odataFilterString = getOdataFilterString(filter);
-						filter.selectedItemsLabel = getFilterSelectedItemsLabel(
-							filter
-						);
-					}
+				filter.odataFilterString = getOdataFilterString(filter);
+				filter.selectedItemsLabel = getFilterSelectedItemsLabel(filter);
+			}
 
-					return filter;
-			  })
-			: [];
+			return filter;
+		});
 
 		const paginationDelta =
 			showPagination &&
@@ -840,6 +836,7 @@ const FrontendDataSet = ({
 FrontendDataSet.defaultProps = {
 	bulkActions: [],
 	customViews: '{}',
+	filters: [],
 	inlineEditingSettings: null,
 	items: null,
 	itemsActions: null,
