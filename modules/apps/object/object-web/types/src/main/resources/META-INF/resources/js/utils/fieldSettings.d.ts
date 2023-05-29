@@ -186,15 +186,6 @@ export declare function normalizeFieldSettings(
 		| NameValueObject[]
 		| ObjectFieldFilterSetting[]
 		| undefined;
-	timeStorage?:
-		| string
-		| number
-		| boolean
-		| Partial<Liferay.Language.FullyLocalizedValue<string>>
-		| ObjectFieldPicklistSetting
-		| NameValueObject[]
-		| ObjectFieldFilterSetting[]
-		| undefined;
 	uniqueValues?:
 		| string
 		| number
