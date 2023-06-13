@@ -12,32 +12,17 @@
  * details.
  */
 
-import React from 'react';
-import './Card.scss';
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-	disabled?: boolean;
-	header?: JSX.Element;
-	title?: string;
-	tooltip?: ITooltip | null;
-	viewMode?:
-		| 'inline'
-		| 'no-header-border'
-		| 'no-children'
-		| 'no-margin'
-		| 'no-padding';
-}
-interface ITooltip {
-	content: string;
-	symbol: string;
-}
-export declare function Card({
-	children,
-	className,
-	disabled,
-	header,
-	title,
-	tooltip,
-	viewMode,
-	...otherProps
-}: CardProps): JSX.Element;
-export {};
+/// <reference types="react" />
+
+import {IFDSTableProps} from '../utils/fds';
+import './ViewObjectDefinitions.scss';
+export default function ViewObjectDefinitions({
+	apiURL,
+	creationMenu,
+	formName,
+	id,
+	items,
+	sorting,
+	style,
+	url,
+}: IFDSTableProps): JSX.Element;
