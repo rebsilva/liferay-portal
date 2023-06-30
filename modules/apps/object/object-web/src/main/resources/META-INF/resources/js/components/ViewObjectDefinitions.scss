@@ -17,4 +17,19 @@
 		display: flex;
 		justify-content: space-between;
 	}
+
+	&-view-in-model-builder-button {
+		align-items: center;
+		display: flex;
+		max-height: 40px;
+	}
+
+	&-title-kebab {
+		align-items: center;
+		margin-bottom: 16px;
+	}
+
+	&-card {
+		min-width: 900px;
+	}
 }

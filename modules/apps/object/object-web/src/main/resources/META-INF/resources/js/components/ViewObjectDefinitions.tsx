@@ -25,7 +25,7 @@ import {
 } from '@liferay/frontend-data-set-web';
 import {Card, getLocalizableLabel} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
 	IFDSTableProps,
@@ -45,6 +45,21 @@ interface ItemData {
 	system: boolean;
 }
 
+type TModel = {
+	erc?: string;
+	id?: string;
+	label?: string;
+	name?: string;
+};
+
+const MOCK_MODELS_LIST: TModel[] = [
+	{
+		erc: 'uncategorized',
+		id: 'uncategorized',
+		label: 'Uncategorized',
+		name: 'uncategorized',
+	},
+];
 export default function ViewObjectDefinitions({
 	apiURL,
 	creationMenu,
@@ -55,6 +70,23 @@ export default function ViewObjectDefinitions({
 	style,
 	url,
 }: IFDSTableProps) {
+	const initialValues: TModel = {
+		erc: '',
+		id: '',
+		label: '',
+		name: '',
+	};
+	const [selectedModel, setSelectedModel] = useState<TModel>(initialValues);
+	const [modelsList, setModelsList] = useState<TModel[]>([initialValues]);
+
+	useEffect(() => {
+		setModelsList(MOCK_MODELS_LIST);
+	}, []);
+
+	useEffect(() => {
+		setSelectedModel(modelsList[0]);
+	}, [modelsList]);
+
 	function objectDefinitionLabelDataRenderer({
 		itemData,
 		value,
@@ -137,7 +169,17 @@ export default function ViewObjectDefinitions({
 		itemsActions: items,
 		namespace:
 			'_com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet_',
-
+		onActionDropdownItemClick({
+			action,
+			itemData,
+		}: {
+			action: {data: {id: string}};
+			itemData: {id: string};
+		}) {
+			if (action.data.id === 'deleteObjectDefinition') {
+				Liferay.fire('deleteObjectDefinition', {itemData});
+			}
+		},
 		portletId:
 			'com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet',
 		sorting,
@@ -202,25 +244,45 @@ export default function ViewObjectDefinitions({
 	const header = () => {
 		return (
 			<div className="lfr__object-web-view-object-definitions-card-header">
-				<div className="d-flex">
-					<h3>Uncategorized</h3>
+				<div>
+					<div className="d-flex lfr__object-web-view-object-definitions-title-kebab">
+						<h3 className="mb-0">{selectedModel.label}</h3>
 
-					<ClayDropDownWithItems
-						items={[]}
-						trigger={
-							<ClayButton
-								className="component-action"
-								displayType="unstyled"
-								monospaced
-							>
-								<ClayIcon symbol="ellipsis-v" />
-							</ClayButton>
-						}
-					/>
+						<ClayDropDownWithItems
+							items={[]}
+							trigger={
+								<ClayButton
+									className="component-action"
+									displayType="unstyled"
+									monospaced
+								>
+									<ClayIcon symbol="ellipsis-v" />
+								</ClayButton>
+							}
+						/>
+					</div>
+
+					<div className="mt-1">
+						<span className="text-secondary">
+							{`${Liferay.Language.get('erc')}:`}
+						</span>
+
+						<strong className="ml-2">{selectedModel.erc}</strong>
+
+						<span
+							className="ml-3 text-secondary"
+							title="help message here"
+						>
+							<ClayIcon symbol="question-circle" />
+						</span>
+					</div>
 				</div>
 
-				<ClayButton displayType="secondary">
-					View in Model Builder
+				<ClayButton
+					className="lfr__object-web-view-object-definitions-view-in-model-builder-button"
+					displayType="secondary"
+				>
+					{Liferay.Language.get('view-in-modal-builder')}
 				</ClayButton>
 			</div>
 		);
@@ -228,31 +290,40 @@ export default function ViewObjectDefinitions({
 
 	return (
 		<div className="lfr__object-web-view-object-definitions">
-			<div className="lfr__object-web-view-object-definitions-model-list-container">
-				<div className="lfr__object-web-view-object-definitions-model-list-header">
-					<h4>OBJECTS MODEL</h4>
+			{Liferay.FeatureFlags['LPS-185675'] ? (
+				<>
+					<div className="lfr__object-web-view-object-definitions-model-list-container">
+						<div className="lfr__object-web-view-object-definitions-model-list-header">
+							<h4>OBJECTS MODEL</h4>
 
-					<div className="d-flex">
-						<ClayIcon symbol="plus" />
+							<div className="d-flex">
+								<ClayIcon symbol="plus" />
 
-						<ClayIcon symbol="ellipsis-v" />
+								<ClayIcon symbol="ellipsis-v" />
+							</div>
+						</div>
+
+						<TreeView
+							defaultItems={MOCK_MODELS_LIST}
+							nestedKey="children"
+						>
+							{(item) => (
+								<TreeView.Item>{item.label}</TreeView.Item>
+							)}
+						</TreeView>
 					</div>
-				</div>
 
-				<TreeView
-					defaultItems={[
-						{name: 'Uncategorized'},
-						{name: 'Another model'},
-					]}
-					nestedKey="children"
-				>
-					{(item) => <TreeView.Item>{item.name}</TreeView.Item>}
-				</TreeView>
-			</div>
-
-			<Card header={header()} viewMode="no-header-border">
+					<Card
+						className="lfr__object-web-view-object-definitions-card"
+						header={header()}
+						viewMode="no-header-border"
+					>
+						<FrontendDataSet {...dataSetProps} />
+					</Card>
+				</>
+			) : (
 				<FrontendDataSet {...dataSetProps} />
-			</Card>
+			)}
 		</div>
 	);
 }
