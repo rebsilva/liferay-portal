@@ -16,16 +16,13 @@ import ClayButton from '@clayui/button';
 import {TreeView} from '@clayui/core';
 import {ClayDropDownWithItems} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
-import {
-	DateTimeRenderer,
-	FrontendDataSet,
-} from '@liferay/frontend-data-set-web';
+import {FrontendDataSet} from '@liferay/frontend-data-set-web';
 import {
 	API,
 	Card,
 	getLocalizableLabel,
 } from '@liferay/object-js-components-web';
-import classNames from 'classnames';
+import {createResourceURL} from 'frontend-js-web';
 import React, {useEffect, useState} from 'react';
 
 import {
@@ -34,14 +31,14 @@ import {
 	fdsItem,
 	formatActionURL,
 } from '../../utils/fds';
-
-import './ViewObjectDefinitions.scss';
-
-import {createResourceURL} from 'frontend-js-web';
-
+import objectDefinitionModifiedDateDataRenderer from './FDSDataRenders/ObjectDefinitionModifiedDateDataRenderer';
+import objectDefinitionStatusDataRenderer from './FDSDataRenders/ObjectDefinitionStatusDataRenderer';
+import objectDefinitionSystemDataRenderer from './FDSDataRenders/ObjectDefinitionSystemDataRenderer';
 import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
 import {ModalDeleteObjectDefinition} from './ModalDeleteObjectDefinition';
 import {deleteObjectDefinition} from './objectDefinitionUtil';
+
+import './ViewObjectDefinitions.scss';
 
 interface ViewObjectDefinitionsProps extends IFDSTableProps {
 	baseResourceURL: string;
@@ -100,14 +97,6 @@ export default function ViewObjectDefinitions({
 		setDeletedObjectDefinition,
 	] = useState<DeletedObjectDefinition | null>();
 
-	useEffect(() => {
-		setModelsList(MOCK_MODELS_LIST);
-	}, []);
-
-	useEffect(() => {
-		setSelectedModel(modelsList[0]);
-	}, [modelsList]);
-
 	function objectDefinitionLabelDataRenderer({
 		itemData,
 		value,
@@ -126,53 +115,6 @@ export default function ViewObjectDefinitions({
 				</a>
 			</div>
 		);
-	}
-
-	function objectDefinitionModifiedDateDataRenderer({
-		itemData,
-	}: {
-		itemData: ObjectDefinition;
-	}) {
-		return DateTimeRenderer({
-			options: {
-				format: {
-					day: 'numeric',
-					month: 'short',
-					timeZone: 'UTC',
-					year: 'numeric',
-				},
-			},
-			value: String(itemData.dateModified),
-		});
-	}
-
-	function objectDefinitionStatusDataRenderer({
-		itemData,
-	}: {
-		itemData: ObjectDefinition;
-	}) {
-		return (
-			<strong
-				className={classNames(
-					itemData.status.label === 'approved'
-						? 'label-success'
-						: 'label-info',
-					'label'
-				)}
-			>
-				{itemData.status.label_i18n}
-			</strong>
-		);
-	}
-
-	function objectDefinitionSystemDataRenderer({
-		itemData,
-	}: {
-		itemData: ObjectDefinition;
-	}) {
-		return itemData.system
-			? Liferay.Language.get('yes')
-			: Liferay.Language.get('no');
 	}
 
 	const dataSetProps = {
@@ -294,6 +236,14 @@ export default function ViewObjectDefinitions({
 			},
 		],
 	};
+
+	useEffect(() => {
+		setModelsList(MOCK_MODELS_LIST);
+	}, []);
+
+	useEffect(() => {
+		setSelectedModel(modelsList[0]);
+	}, [modelsList]);
 
 	useEffect(() => {
 		Liferay.on('addObjectDefinition', () =>
