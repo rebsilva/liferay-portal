@@ -17,10 +17,16 @@
 import {IFDSTableProps} from '../../utils/fds';
 import './ViewObjectDefinitions.scss';
 interface ViewObjectDefinitionsProps extends IFDSTableProps {
+	baseResourceURL: string;
 	storages: LabelTypeObject[];
+}
+export interface DeletedObjectDefinition extends ObjectDefinition {
+	hasObjectRelationship: boolean;
+	objectEntriesCount: number;
 }
 export default function ViewObjectDefinitions({
 	apiURL,
+	baseResourceURL,
 	creationMenu,
 	id,
 	items,

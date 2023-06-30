@@ -12,6 +12,9 @@
  * details.
  */
 
+import {API} from '@liferay/object-js-components-web';
+import {sub} from 'frontend-js-web';
+
 import {
 	firstLetterUppercase,
 	removeAllSpecialCharacters,
@@ -25,4 +28,18 @@ export function normalizeName(str: string) {
 	const join = capitalizeFirstLetters.join('');
 
 	return removeAllSpecialCharacters(join);
+}
+
+export async function deleteObjectDefinition(
+	id: number,
+	objectDefinitionName: string
+) {
+	await API.deleteObjectDefinitions(Number(id)).then(() => {
+		Liferay.Util.openToast({
+			message: sub(
+				Liferay.Language.get('x-was-deleted-successfully'),
+				`<strong>${objectDefinitionName}</strong>`
+			),
+		});
+	});
 }
