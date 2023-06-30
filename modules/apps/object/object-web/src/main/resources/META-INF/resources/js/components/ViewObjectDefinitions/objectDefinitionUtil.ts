@@ -12,17 +12,17 @@
  * details.
  */
 
-/// <reference types="react" />
+import {
+	firstLetterUppercase,
+	removeAllSpecialCharacters,
+} from '../../utils/string';
 
-import {IFDSTableProps} from '../utils/fds';
-import './ViewObjectDefinitions.scss';
-export default function ViewObjectDefinitions({
-	apiURL,
-	creationMenu,
-	formName,
-	id,
-	items,
-	sorting,
-	style,
-	url,
-}: IFDSTableProps): JSX.Element;
+export function normalizeName(str: string) {
+	const split = str.split(' ');
+	const capitalizeFirstLetters = split.map((str: string) =>
+		firstLetterUppercase(str)
+	);
+	const join = capitalizeFirstLetters.join('');
+
+	return removeAllSpecialCharacters(join);
+}

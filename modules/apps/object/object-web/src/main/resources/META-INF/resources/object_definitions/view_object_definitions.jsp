@@ -22,14 +22,12 @@ ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewO
 
 <div>
 	<react:component
-		module="js/components/ViewObjectDefinitions"
+		module="js/components/ViewObjectDefinitions/ViewObjectDefinitions"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"apiURL", viewObjectDefinitionsDisplayContext.getAPIURL()
 			).put(
 				"creationMenu", viewObjectDefinitionsDisplayContext.getCreationMenu()
-			).put(
-				"formName", "fm"
 			).put(
 				"id", ObjectDefinitionsFDSNames.OBJECT_DEFINITIONS
 			).put(
@@ -37,22 +35,9 @@ ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewO
 			).put(
 				"sorting", viewObjectDefinitionsDisplayContext.getFDSSortItemList()
 			).put(
-				"style", "fluid"
+				"storages", viewObjectDefinitionsDisplayContext.getStoragesJSONArray()
 			).put(
 				"url", viewObjectDefinitionsDisplayContext.getEditObjectDefinitionURL()
-			).build()
-		%>'
-	/>
-</div>
-
-<div id="<portlet:namespace />addObjectDefinition">
-	<react:component
-		module="js/components/ModalAddObjectDefinition"
-		props='<%=
-			HashMapBuilder.<String, Object>put(
-				"apiURL", viewObjectDefinitionsDisplayContext.getAPIURL()
-			).put(
-				"storages", viewObjectDefinitionsDisplayContext.getStoragesJSONArray()
 			).build()
 		%>'
 	/>
