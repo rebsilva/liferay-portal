@@ -12,18 +12,20 @@
  * details.
  */
 
-import {Observer} from '@clayui/modal/lib/types';
-import React from 'react';
-import './ModalAddObjectDefinition.scss';
-declare type Storage = {
-	label: string;
-	type: string;
-};
-interface IProps extends React.HTMLAttributes<HTMLElement> {
-	apiURL: string;
-	observer: Observer;
-	onClose: () => void;
-	storages: Storage[];
+/// <reference types="react" />
+
+import {IFDSTableProps} from '../../utils/fds';
+import './ViewObjectDefinitions.scss';
+interface ViewObjectDefinitionsProps extends IFDSTableProps {
+	storages: LabelTypeObject[];
 }
-declare const ModalWithProvider: React.FC<IProps>;
-export default ModalWithProvider;
+export default function ViewObjectDefinitions({
+	apiURL,
+	creationMenu,
+	id,
+	items,
+	sorting,
+	storages,
+	url,
+}: ViewObjectDefinitionsProps): JSX.Element;
+export {};

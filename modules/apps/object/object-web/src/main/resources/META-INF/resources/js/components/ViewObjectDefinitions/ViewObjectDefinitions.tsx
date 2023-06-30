@@ -19,9 +19,6 @@ import ClayIcon from '@clayui/icon';
 import {
 	DateTimeRenderer,
 	FrontendDataSet,
-
-	// @ts-ignore
-
 } from '@liferay/frontend-data-set-web';
 import {Card, getLocalizableLabel} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
@@ -32,17 +29,13 @@ import {
 	defaultDataSetProps,
 	fdsItem,
 	formatActionURL,
-} from '../utils/fds';
+} from '../../utils/fds';
 
 import './ViewObjectDefinitions.scss';
+import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
 
-interface ItemData {
-	dateModified: string;
-	defaultLanguageId: string;
-	id: number;
-	required: boolean;
-	status: {label: string; label_i18n: string};
-	system: boolean;
+interface ViewObjectDefinitionsProps extends IFDSTableProps {
+	storages: LabelTypeObject[];
 }
 
 type TModel = {
@@ -63,13 +56,12 @@ const MOCK_MODELS_LIST: TModel[] = [
 export default function ViewObjectDefinitions({
 	apiURL,
 	creationMenu,
-	formName,
 	id,
 	items,
 	sorting,
-	style,
+	storages,
 	url,
-}: IFDSTableProps) {
+}: ViewObjectDefinitionsProps) {
 	const initialValues: TModel = {
 		erc: '',
 		id: '',
@@ -78,6 +70,10 @@ export default function ViewObjectDefinitions({
 	};
 	const [selectedModel, setSelectedModel] = useState<TModel>(initialValues);
 	const [modelsList, setModelsList] = useState<TModel[]>([initialValues]);
+	const [
+		showModalAddObjectDefinition,
+		setShowModalAddObjectDefinition,
+	] = useState(false);
 
 	useEffect(() => {
 		setModelsList(MOCK_MODELS_LIST);
@@ -90,7 +86,7 @@ export default function ViewObjectDefinitions({
 	function objectDefinitionLabelDataRenderer({
 		itemData,
 		value,
-	}: fdsItem<ItemData>) {
+	}: fdsItem<ObjectDefinition>) {
 		const handleEditDefinition = () => {
 			window.location.href = formatActionURL(url, itemData.id);
 		};
@@ -110,7 +106,7 @@ export default function ViewObjectDefinitions({
 	function objectDefinitionModifiedDateDataRenderer({
 		itemData,
 	}: {
-		itemData: ItemData;
+		itemData: ObjectDefinition;
 	}) {
 		return DateTimeRenderer({
 			options: {
@@ -128,7 +124,7 @@ export default function ViewObjectDefinitions({
 	function objectDefinitionStatusDataRenderer({
 		itemData,
 	}: {
-		itemData: ItemData;
+		itemData: ObjectDefinition;
 	}) {
 		return (
 			<strong
@@ -147,7 +143,7 @@ export default function ViewObjectDefinitions({
 	function objectDefinitionSystemDataRenderer({
 		itemData,
 	}: {
-		itemData: ItemData;
+		itemData: ObjectDefinition;
 	}) {
 		return itemData.system
 			? Liferay.Language.get('yes')
@@ -164,7 +160,6 @@ export default function ViewObjectDefinitions({
 			objectDefinitionStatusDataRenderer,
 			objectDefinitionSystemDataRenderer,
 		},
-		formName,
 		id,
 		itemsActions: items,
 		namespace:
@@ -183,7 +178,7 @@ export default function ViewObjectDefinitions({
 		portletId:
 			'com_liferay_object_web_internal_object_definitions_portlet_ObjectDefinitionsPortlet',
 		sorting,
-		style,
+		style: 'fluid' as 'fluid',
 		views: [
 			{
 				contentRenderer: 'table',
@@ -241,6 +236,16 @@ export default function ViewObjectDefinitions({
 		],
 	};
 
+	useEffect(() => {
+		Liferay.on('addObjectDefinition', () =>
+			setShowModalAddObjectDefinition(true)
+		);
+
+		return () => {
+			Liferay.detach('addObjectDefinition');
+		};
+	}, []);
+
 	const header = () => {
 		return (
 			<div className="lfr__object-web-view-object-definitions-card-header">
@@ -289,9 +294,9 @@ export default function ViewObjectDefinitions({
 	};
 
 	return (
-		<div className="lfr__object-web-view-object-definitions">
+		<>
 			{Liferay.FeatureFlags['LPS-185675'] ? (
-				<>
+				<div className="lfr__object-web-view-object-definitions">
 					<div className="lfr__object-web-view-object-definitions-model-list-container">
 						<div className="lfr__object-web-view-object-definitions-model-list-header">
 							<h4>OBJECTS MODEL</h4>
@@ -320,10 +325,18 @@ export default function ViewObjectDefinitions({
 					>
 						<FrontendDataSet {...dataSetProps} />
 					</Card>
-				</>
+				</div>
 			) : (
 				<FrontendDataSet {...dataSetProps} />
 			)}
-		</div>
+
+			{showModalAddObjectDefinition && (
+				<ModalAddObjectDefinition
+					apiURL={apiURL as string}
+					onVisibilityChange={setShowModalAddObjectDefinition}
+					storages={storages}
+				/>
+			)}
+		</>
 	);
 }
