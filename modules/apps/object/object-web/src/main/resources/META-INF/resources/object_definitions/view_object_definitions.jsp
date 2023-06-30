@@ -20,12 +20,16 @@
 ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewObjectDefinitionsDisplayContext)request.getAttribute(WebKeys.PORTLET_DISPLAY_CONTEXT);
 %>
 
+<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="baseResourceURL" />
+
 <div>
 	<react:component
 		module="js/components/ViewObjectDefinitions/ViewObjectDefinitions"
 		props='<%=
 			HashMapBuilder.<String, Object>put(
 				"apiURL", viewObjectDefinitionsDisplayContext.getAPIURL()
+			).put(
+				"baseResourceURL", String.valueOf(baseResourceURL)
 			).put(
 				"creationMenu", viewObjectDefinitionsDisplayContext.getCreationMenu()
 			).put(
@@ -38,19 +42,6 @@ ViewObjectDefinitionsDisplayContext viewObjectDefinitionsDisplayContext = (ViewO
 				"storages", viewObjectDefinitionsDisplayContext.getStoragesJSONArray()
 			).put(
 				"url", viewObjectDefinitionsDisplayContext.getEditObjectDefinitionURL()
-			).build()
-		%>'
-	/>
-</div>
-
-<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="baseResourceURL" />
-
-<div id="<portlet:namespace />deleteObjectDefinition">
-	<react:component
-		module="js/components/ModalDeleteObjectDefinition"
-		props='<%=
-			HashMapBuilder.<String, Object>put(
-				"baseResourceURL", String.valueOf(baseResourceURL)
 			).build()
 		%>'
 	/>

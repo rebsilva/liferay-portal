@@ -13,3 +13,7 @@
  */
 
 export declare function normalizeName(str: string): string;
+export declare function deleteObjectDefinition(
+	id: number,
+	objectDefinitionName: string
+): Promise<void>;

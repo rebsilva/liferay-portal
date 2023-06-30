@@ -20,7 +20,11 @@ import {
 	DateTimeRenderer,
 	FrontendDataSet,
 } from '@liferay/frontend-data-set-web';
-import {Card, getLocalizableLabel} from '@liferay/object-js-components-web';
+import {
+	API,
+	Card,
+	getLocalizableLabel,
+} from '@liferay/object-js-components-web';
 import classNames from 'classnames';
 import React, {useEffect, useState} from 'react';
 
@@ -32,9 +36,15 @@ import {
 } from '../../utils/fds';
 
 import './ViewObjectDefinitions.scss';
+
+import {createResourceURL} from 'frontend-js-web';
+
 import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
+import {ModalDeleteObjectDefinition} from './ModalDeleteObjectDefinition';
+import {deleteObjectDefinition} from './objectDefinitionUtil';
 
 interface ViewObjectDefinitionsProps extends IFDSTableProps {
+	baseResourceURL: string;
 	storages: LabelTypeObject[];
 }
 
@@ -44,6 +54,11 @@ type TModel = {
 	label?: string;
 	name?: string;
 };
+
+export interface DeletedObjectDefinition extends ObjectDefinition {
+	hasObjectRelationship: boolean;
+	objectEntriesCount: number;
+}
 
 const MOCK_MODELS_LIST: TModel[] = [
 	{
@@ -55,6 +70,7 @@ const MOCK_MODELS_LIST: TModel[] = [
 ];
 export default function ViewObjectDefinitions({
 	apiURL,
+	baseResourceURL,
 	creationMenu,
 	id,
 	items,
@@ -74,6 +90,15 @@ export default function ViewObjectDefinitions({
 		showModalAddObjectDefinition,
 		setShowModalAddObjectDefinition,
 	] = useState(false);
+	const [
+		showModalDeleteObjectDefinition,
+		setShowModalDeleteObjectDefinition,
+	] = useState(false);
+
+	const [
+		deletedObjectDefinition,
+		setDeletedObjectDefinition,
+	] = useState<DeletedObjectDefinition | null>();
 
 	useEffect(() => {
 		setModelsList(MOCK_MODELS_LIST);
@@ -169,10 +194,44 @@ export default function ViewObjectDefinitions({
 			itemData,
 		}: {
 			action: {data: {id: string}};
-			itemData: {id: string};
+			itemData: ObjectDefinition;
 		}) {
 			if (action.data.id === 'deleteObjectDefinition') {
-				Liferay.fire('deleteObjectDefinition', {itemData});
+				const getDeleteObjectDefinition = async () => {
+					const url = createResourceURL(baseResourceURL, {
+						objectDefinitionId: itemData.id,
+						p_p_resource_id:
+							'/object_definitions/get_object_definition_delete_info',
+					}).href;
+
+					const {
+						hasObjectRelationship,
+						objectEntriesCount,
+					} = await API.fetchJSON<{
+						hasObjectRelationship: boolean;
+						objectEntriesCount: number;
+					}>(url);
+
+					if (itemData.status.code !== 0) {
+						await deleteObjectDefinition(
+							itemData.id,
+							itemData.name
+						);
+						setTimeout(() => window.location.reload(), 1000);
+
+						return;
+					}
+
+					setDeletedObjectDefinition({
+						...itemData,
+						hasObjectRelationship,
+						objectEntriesCount,
+					});
+
+					setShowModalDeleteObjectDefinition(true);
+				};
+
+				getDeleteObjectDefinition();
 			}
 		},
 		portletId:
@@ -335,6 +394,16 @@ export default function ViewObjectDefinitions({
 					apiURL={apiURL as string}
 					onVisibilityChange={setShowModalAddObjectDefinition}
 					storages={storages}
+				/>
+			)}
+
+			{showModalDeleteObjectDefinition && (
+				<ModalDeleteObjectDefinition
+					objectDefinition={
+						deletedObjectDefinition as DeletedObjectDefinition
+					}
+					onVisibilyChange={setShowModalDeleteObjectDefinition}
+					setDeletedObjectDefinition={setDeletedObjectDefinition}
 				/>
 			)}
 		</>

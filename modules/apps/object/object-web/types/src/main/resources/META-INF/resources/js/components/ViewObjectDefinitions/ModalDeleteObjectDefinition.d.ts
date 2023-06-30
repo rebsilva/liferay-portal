@@ -14,8 +14,15 @@
 
 /// <reference types="react" />
 
-export default function ModalWithProvider({
-	baseResourceURL,
-}: {
-	baseResourceURL: string;
-}): JSX.Element;
+import {DeletedObjectDefinition} from './ViewObjectDefinitions';
+interface ModalDeleteObjectDefinitionProps {
+	objectDefinition: DeletedObjectDefinition;
+	onVisibilyChange: (value: boolean) => void;
+	setDeletedObjectDefinition: (value: DeletedObjectDefinition | null) => void;
+}
+export declare function ModalDeleteObjectDefinition({
+	objectDefinition,
+	onVisibilyChange,
+	setDeletedObjectDefinition,
+}: ModalDeleteObjectDefinitionProps): JSX.Element;
+export {};
