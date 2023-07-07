@@ -12,8 +12,19 @@
  * details.
  */
 
+import {SetStateAction} from 'react';
+import {ViewObjectDefinitionsModals} from './ViewObjectDefinitions';
 export declare function normalizeName(str: string): string;
 export declare function deleteObjectDefinition(
 	id: number,
 	objectDefinitionName: string
 ): Promise<void>;
+export declare function getFolderActions(
+	selectedFolderName: string,
+	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void
+): {
+	id: string;
+	label: string;
+	onClick: () => void;
+	symbolLeft: string;
+}[];

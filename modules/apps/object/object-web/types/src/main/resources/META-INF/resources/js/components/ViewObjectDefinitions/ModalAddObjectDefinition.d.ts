@@ -17,7 +17,7 @@
 import './ModalAddObjectDefinition.scss';
 interface ModalAddObjectDefinitionProps {
 	apiURL: string;
-	onVisibilityChange: (values: boolean) => void;
+	onVisibilityChange: () => void;
 	storages: LabelTypeObject[];
 }
 export declare function ModalAddObjectDefinition({

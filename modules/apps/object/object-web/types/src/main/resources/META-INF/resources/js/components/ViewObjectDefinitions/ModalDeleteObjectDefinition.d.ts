@@ -17,12 +17,12 @@
 import {DeletedObjectDefinition} from './ViewObjectDefinitions';
 interface ModalDeleteObjectDefinitionProps {
 	objectDefinition: DeletedObjectDefinition;
-	onVisibilyChange: (value: boolean) => void;
+	onVisibilityChange: () => void;
 	setDeletedObjectDefinition: (value: DeletedObjectDefinition | null) => void;
 }
 export declare function ModalDeleteObjectDefinition({
 	objectDefinition,
-	onVisibilyChange,
+	onVisibilityChange,
 	setDeletedObjectDefinition,
 }: ModalDeleteObjectDefinitionProps): JSX.Element;
 export {};

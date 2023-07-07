@@ -34,9 +34,10 @@ import {
 import objectDefinitionModifiedDateDataRenderer from './FDSDataRenders/ObjectDefinitionModifiedDateDataRenderer';
 import objectDefinitionStatusDataRenderer from './FDSDataRenders/ObjectDefinitionStatusDataRenderer';
 import objectDefinitionSystemDataRenderer from './FDSDataRenders/ObjectDefinitionSystemDataRenderer';
+import {ModalAddFolder} from './ModalAddFolder';
 import {ModalAddObjectDefinition} from './ModalAddObjectDefinition';
 import {ModalDeleteObjectDefinition} from './ModalDeleteObjectDefinition';
-import {deleteObjectDefinition} from './objectDefinitionUtil';
+import {deleteObjectDefinition, getFolderActions} from './objectDefinitionUtil';
 
 import './ViewObjectDefinitions.scss';
 
@@ -45,9 +46,17 @@ interface ViewObjectDefinitionsProps extends IFDSTableProps {
 	storages: LabelTypeObject[];
 }
 
-type TModel = {
+export type ViewObjectDefinitionsModals = {
+	addFolder: boolean;
+	addObjectDefinition: boolean;
+	deleteFolder: boolean;
+	deleteObjectDefinition: boolean;
+	editFolder: boolean;
+	importObject: boolean;
+};
+
+type folderProps = {
 	erc?: string;
-	id?: string;
 	label?: string;
 	name?: string;
 };
@@ -57,14 +66,19 @@ export interface DeletedObjectDefinition extends ObjectDefinition {
 	objectEntriesCount: number;
 }
 
-const MOCK_MODELS_LIST: TModel[] = [
+const MOCK_FOLDERS_LIST: folderProps[] = [
 	{
 		erc: 'uncategorized',
-		id: 'uncategorized',
 		label: 'Uncategorized',
 		name: 'uncategorized',
 	},
+	{
+		erc: 'ticket',
+		label: 'Ticket',
+		name: 'ticket',
+	},
 ];
+
 export default function ViewObjectDefinitions({
 	apiURL,
 	baseResourceURL,
@@ -75,23 +89,25 @@ export default function ViewObjectDefinitions({
 	storages,
 	url,
 }: ViewObjectDefinitionsProps) {
-	const initialValues: TModel = {
+	const initialValues: folderProps = {
 		erc: '',
-		id: '',
 		label: '',
 		name: '',
 	};
-	const [selectedModel, setSelectedModel] = useState<TModel>(initialValues);
-	const [modelsList, setModelsList] = useState<TModel[]>([initialValues]);
-	const [
-		showModalAddObjectDefinition,
-		setShowModalAddObjectDefinition,
-	] = useState(false);
-	const [
-		showModalDeleteObjectDefinition,
-		setShowModalDeleteObjectDefinition,
-	] = useState(false);
-
+	const [showModal, setShowModal] = useState<ViewObjectDefinitionsModals>({
+		addFolder: false,
+		addObjectDefinition: false,
+		deleteFolder: false,
+		deleteObjectDefinition: false,
+		editFolder: false,
+		importObject: false,
+	});
+	const [selectedFolder, setSelectedFolder] = useState<folderProps>(
+		initialValues
+	);
+	const [foldersList, setfoldersList] = useState<folderProps[]>([
+		initialValues,
+	]);
 	const [
 		deletedObjectDefinition,
 		setDeletedObjectDefinition,
@@ -170,7 +186,12 @@ export default function ViewObjectDefinitions({
 						objectEntriesCount,
 					});
 
-					setShowModalDeleteObjectDefinition(true);
+					setShowModal(
+						(previousState: ViewObjectDefinitionsModals) => ({
+							...previousState,
+							deleteObjectDefinition: true,
+						})
+					);
 				};
 
 				getDeleteObjectDefinition();
@@ -238,16 +259,19 @@ export default function ViewObjectDefinitions({
 	};
 
 	useEffect(() => {
-		setModelsList(MOCK_MODELS_LIST);
+		setfoldersList(MOCK_FOLDERS_LIST);
 	}, []);
 
 	useEffect(() => {
-		setSelectedModel(modelsList[0]);
-	}, [modelsList]);
+		setSelectedFolder(foldersList[0]);
+	}, [foldersList]);
 
 	useEffect(() => {
 		Liferay.on('addObjectDefinition', () =>
-			setShowModalAddObjectDefinition(true)
+			setShowModal((previousState: ViewObjectDefinitionsModals) => ({
+				...previousState,
+				addObjectDefinition: true,
+			}))
 		);
 
 		return () => {
@@ -260,12 +284,19 @@ export default function ViewObjectDefinitions({
 			<div className="lfr__object-web-view-object-definitions-card-header">
 				<div>
 					<div className="d-flex lfr__object-web-view-object-definitions-title-kebab">
-						<h3 className="mb-0">{selectedModel.label}</h3>
+						<h3 className="mb-0">{selectedFolder.label}</h3>
 
 						<ClayDropDownWithItems
-							items={[]}
+							className="lfr__object-web-view-object-definitions-actions"
+							items={getFolderActions(
+								selectedFolder.name ?? '',
+								setShowModal
+							)}
 							trigger={
 								<ClayButton
+									aria-label={Liferay.Language.get(
+										'folder-actions'
+									)}
 									className="component-action"
 									displayType="unstyled"
 									monospaced
@@ -281,11 +312,13 @@ export default function ViewObjectDefinitions({
 							{`${Liferay.Language.get('erc')}:`}
 						</span>
 
-						<strong className="ml-2">{selectedModel.erc}</strong>
+						<strong className="ml-2">{selectedFolder.erc}</strong>
 
 						<span
 							className="ml-3 text-secondary"
-							title="help message here"
+							title={Liferay.Language.get(
+								'unique-key-for-referencing-the-picklist-definition'
+							)}
 						>
 							<ClayIcon symbol="question-circle" />
 						</span>
@@ -293,10 +326,11 @@ export default function ViewObjectDefinitions({
 				</div>
 
 				<ClayButton
+					aria-label={Liferay.Language.get('view-in-model-builder')}
 					className="lfr__object-web-view-object-definitions-view-in-model-builder-button"
 					displayType="secondary"
 				>
-					{Liferay.Language.get('view-in-modal-builder')}
+					{Liferay.Language.get('view-in-model-builder')}
 				</ClayButton>
 			</div>
 		);
@@ -304,25 +338,51 @@ export default function ViewObjectDefinitions({
 
 	return (
 		<>
-			{Liferay.FeatureFlags['LPS-185675'] ? (
+			{Liferay.FeatureFlags['LPS-148856'] ? (
 				<div className="lfr__object-web-view-object-definitions">
-					<div className="lfr__object-web-view-object-definitions-model-list-container">
-						<div className="lfr__object-web-view-object-definitions-model-list-header">
-							<h4>OBJECTS MODEL</h4>
+					<div className="lfr__object-web-view-object-definitions-folder-list-container">
+						<div className="lfr__object-web-view-object-definitions-folder-list-header">
+							<h4 className="lfr__object-web-view-object-definitions-folder-list-title mb-0">
+								{Liferay.Language.get('objects-folders')}
+							</h4>
 
 							<div className="d-flex">
-								<ClayIcon symbol="plus" />
-
-								<ClayIcon symbol="ellipsis-v" />
+								<ClayButton
+									aria-label={Liferay.Language.get(
+										'add-objects-folder'
+									)}
+									className="component-action"
+									displayType="unstyled"
+									monospaced
+									onClick={() =>
+										setShowModal(
+											(
+												previousState: ViewObjectDefinitionsModals
+											) => ({
+												...previousState,
+												addFolder: true,
+											})
+										)
+									}
+								>
+									<ClayIcon symbol="plus" />
+								</ClayButton>
 							</div>
 						</div>
 
 						<TreeView
-							defaultItems={MOCK_MODELS_LIST}
+							defaultItems={MOCK_FOLDERS_LIST}
 							nestedKey="children"
 						>
 							{(item) => (
-								<TreeView.Item>{item.label}</TreeView.Item>
+								<TreeView.Item
+									key={item.name}
+									onClick={() => {
+										setSelectedFolder(item);
+									}}
+								>
+									{item.label}
+								</TreeView.Item>
 							)}
 						</TreeView>
 					</div>
@@ -339,21 +399,49 @@ export default function ViewObjectDefinitions({
 				<FrontendDataSet {...dataSetProps} />
 			)}
 
-			{showModalAddObjectDefinition && (
+			{showModal.addObjectDefinition && (
 				<ModalAddObjectDefinition
 					apiURL={apiURL as string}
-					onVisibilityChange={setShowModalAddObjectDefinition}
+					onVisibilityChange={() => {
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								addObjectDefinition: false,
+							})
+						);
+					}}
 					storages={storages}
 				/>
 			)}
 
-			{showModalDeleteObjectDefinition && (
+			{showModal.deleteObjectDefinition && (
 				<ModalDeleteObjectDefinition
 					objectDefinition={
 						deletedObjectDefinition as DeletedObjectDefinition
 					}
-					onVisibilyChange={setShowModalDeleteObjectDefinition}
+					onVisibilityChange={() => {
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								deleteObjectDefinition: false,
+							})
+						);
+					}}
 					setDeletedObjectDefinition={setDeletedObjectDefinition}
+				/>
+			)}
+
+			{showModal.addFolder && (
+				<ModalAddFolder
+					apiURL={apiURL as string}
+					onVisibilityChange={() => {
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								addFolder: false,
+							})
+						);
+					}}
 				/>
 			)}
 		</>

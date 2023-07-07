@@ -34,7 +34,7 @@ import {normalizeName} from './objectDefinitionUtil';
 
 interface ModalAddObjectDefinitionProps {
 	apiURL: string;
-	onVisibilityChange: (values: boolean) => void;
+	onVisibilityChange: () => void;
 	storages: LabelTypeObject[];
 }
 
@@ -53,7 +53,7 @@ export function ModalAddObjectDefinition({
 	const [error, setError] = useState<string>('');
 
 	const {observer, onClose} = useModal({
-		onClose: () => onVisibilityChange(false),
+		onClose: () => onVisibilityChange(),
 	});
 
 	const storageSortedByLabel = [...storages].sort(

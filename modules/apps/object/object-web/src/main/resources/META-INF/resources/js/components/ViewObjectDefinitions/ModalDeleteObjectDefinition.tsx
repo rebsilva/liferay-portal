@@ -23,19 +23,19 @@ import {deleteObjectDefinition} from './objectDefinitionUtil';
 
 interface ModalDeleteObjectDefinitionProps {
 	objectDefinition: DeletedObjectDefinition;
-	onVisibilyChange: (value: boolean) => void;
+	onVisibilityChange: () => void;
 	setDeletedObjectDefinition: (value: DeletedObjectDefinition | null) => void;
 }
 
 export function ModalDeleteObjectDefinition({
 	objectDefinition,
-	onVisibilyChange,
+	onVisibilityChange,
 	setDeletedObjectDefinition,
 }: ModalDeleteObjectDefinitionProps) {
 	const {observer, onClose} = useModal({
 		onClose: () => {
 			setDeletedObjectDefinition(null);
-			onVisibilyChange(false);
+			onVisibilityChange();
 		},
 	});
 

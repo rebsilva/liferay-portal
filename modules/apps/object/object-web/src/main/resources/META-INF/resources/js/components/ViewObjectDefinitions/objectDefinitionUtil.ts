@@ -14,11 +14,13 @@
 
 import {API} from '@liferay/object-js-components-web';
 import {sub} from 'frontend-js-web';
+import {SetStateAction} from 'react';
 
 import {
 	firstLetterUppercase,
 	removeAllSpecialCharacters,
 } from '../../utils/string';
+import {ViewObjectDefinitionsModals} from './ViewObjectDefinitions';
 
 export function normalizeName(str: string) {
 	const split = str.split(' ');
@@ -42,4 +44,63 @@ export async function deleteObjectDefinition(
 			),
 		});
 	});
+}
+
+export function getFolderActions(
+	selectedFolderName: string,
+	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void
+) {
+	return selectedFolderName === 'uncategorized'
+		? [
+				{
+					id: 'importObject',
+					label: Liferay.Language.get('import-object'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								importObject: true,
+							})
+						),
+					symbolLeft: 'import',
+				},
+		  ]
+		: [
+				{
+					id: 'editFolder',
+					label: Liferay.Language.get('edit-label-and-erc'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								editFolder: true,
+							})
+						),
+					symbolLeft: 'pencil',
+				},
+				{
+					id: 'importObject',
+					label: Liferay.Language.get('import-object'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								importObject: true,
+							})
+						),
+					symbolLeft: 'import',
+				},
+				{
+					id: 'deleteFolder',
+					label: Liferay.Language.get('delete-folder'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								deleteFolder: true,
+							})
+						),
+					symbolLeft: 'trash',
+				},
+		  ];
 }

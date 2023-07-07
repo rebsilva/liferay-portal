@@ -20,6 +20,14 @@ interface ViewObjectDefinitionsProps extends IFDSTableProps {
 	baseResourceURL: string;
 	storages: LabelTypeObject[];
 }
+export declare type ViewObjectDefinitionsModals = {
+	addFolder: boolean;
+	addObjectDefinition: boolean;
+	deleteFolder: boolean;
+	deleteObjectDefinition: boolean;
+	editFolder: boolean;
+	importObject: boolean;
+};
 export interface DeletedObjectDefinition extends ObjectDefinition {
 	hasObjectRelationship: boolean;
 	objectEntriesCount: number;
