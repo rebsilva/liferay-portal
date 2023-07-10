@@ -410,7 +410,7 @@ public class DefaultObjectEntryManagerImplTest {
 
 		_objectDefinition3 =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				_adminUser.getUserId(), false, false,
+				_adminUser.getUserId(), 0, false, false,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
@@ -2746,7 +2746,7 @@ public class DefaultObjectEntryManagerImplTest {
 
 		ObjectDefinition objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				_adminUser.getUserId(), false, true,
+				_adminUser.getUserId(), 0, false, true,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"A" + RandomTestUtil.randomString(), null, null,
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),

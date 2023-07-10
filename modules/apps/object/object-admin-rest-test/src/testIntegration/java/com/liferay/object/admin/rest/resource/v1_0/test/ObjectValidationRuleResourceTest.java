@@ -52,7 +52,7 @@ public class ObjectValidationRuleResourceTest
 
 		_objectDefinition =
 			_objectDefinitionLocalService.addCustomObjectDefinition(
-				TestPropsValues.getUserId(), false, false,
+				TestPropsValues.getUserId(), 0, false, false,
 				LocalizedMapUtil.getLocalizedMap(value), value, null, null,
 				LocalizedMapUtil.getLocalizedMap(value), true,
 				ObjectDefinitionConstants.SCOPE_COMPANY,
