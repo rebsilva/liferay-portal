@@ -178,7 +178,7 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 				objectDefinition =
 					_objectDefinitionLocalService.
 						addOrUpdateSystemObjectDefinition(
-							companyId, systemObjectDefinitionManager);
+							companyId, 0, systemObjectDefinitionManager);
 			}
 
 			_bundleContext.registerService(

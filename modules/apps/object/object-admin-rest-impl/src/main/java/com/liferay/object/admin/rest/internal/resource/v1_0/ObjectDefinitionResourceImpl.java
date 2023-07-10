@@ -267,7 +267,7 @@ public class ObjectDefinitionResourceImpl
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addSystemObjectDefinition(
 					objectDefinition.getExternalReferenceCode(),
-					contextUser.getUserId(),
+					contextUser.getUserId(), 0,
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					LocalizedMapUtil.getLocalizedMap(
 						objectDefinition.getLabel()),
@@ -290,6 +290,7 @@ public class ObjectDefinitionResourceImpl
 		else {
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.addCustomObjectDefinition(
+					0,
 					GetterUtil.getBoolean(objectDefinition.getEnableComments()),
 					GetterUtil.getBoolean(
 						objectDefinition.getEnableLocalization()),
@@ -481,7 +482,7 @@ public class ObjectDefinitionResourceImpl
 			serviceBuilderObjectDefinition =
 				_objectDefinitionService.updateSystemObjectDefinition(
 					objectDefinition.getExternalReferenceCode(),
-					objectDefinitionId, titleObjectFieldId);
+					objectDefinitionId, 0, titleObjectFieldId);
 		}
 		else {
 			serviceBuilderObjectDefinition =
@@ -489,7 +490,7 @@ public class ObjectDefinitionResourceImpl
 					objectDefinition.getExternalReferenceCode(),
 					objectDefinitionId,
 					GetterUtil.getLong(accountEntryRestrictedObjectFieldId), 0,
-					titleObjectFieldId,
+					0, titleObjectFieldId,
 					GetterUtil.getBoolean(
 						objectDefinition.getAccountEntryRestricted()),
 					GetterUtil.getBoolean(
