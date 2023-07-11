@@ -18,9 +18,12 @@ import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectConstants;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFolder;
+import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.base.ObjectDefinitionServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.PortletResourcePermission;
@@ -60,6 +63,8 @@ public class ObjectDefinitionServiceImpl
 			getPermissionChecker(), null,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
 
+		_checkObjectFolderPermission(objectFolderId);
+
 		return objectDefinitionLocalService.addCustomObjectDefinition(
 			getUserId(), objectFolderId, enableComments, enableLocalization,
 			labelMap, name, panelAppOrder, panelCategoryKey, pluralLabelMap,
@@ -75,6 +80,8 @@ public class ObjectDefinitionServiceImpl
 		_portletResourcePermission.check(
 			getPermissionChecker(), null,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
+
+		_checkObjectFolderPermission(objectFolderId);
 
 		return objectDefinitionLocalService.addObjectDefinition(
 			externalReferenceCode, getUserId(), objectFolderId, modifiable,
@@ -93,6 +100,8 @@ public class ObjectDefinitionServiceImpl
 		_portletResourcePermission.check(
 			getPermissionChecker(), null,
 			ObjectActionKeys.ADD_OBJECT_DEFINITION);
+
+		_checkObjectFolderPermission(objectFolderId);
 
 		return objectDefinitionLocalService.addSystemObjectDefinition(
 			externalReferenceCode, userId, objectFolderId, null, null,
@@ -209,6 +218,7 @@ public class ObjectDefinitionServiceImpl
 			getUserId(), objectDefinitionId);
 	}
 
+	@Override
 	public ObjectDefinition updateCustomObjectDefinition(
 			String externalReferenceCode, long objectDefinitionId,
 			long accountEntryRestrictedObjectFieldId,
@@ -223,6 +233,8 @@ public class ObjectDefinitionServiceImpl
 
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
+
+		_checkObjectFolderPermission(objectFolderId);
 
 		return objectDefinitionLocalService.updateCustomObjectDefinition(
 			externalReferenceCode, objectDefinitionId,
@@ -254,6 +266,8 @@ public class ObjectDefinitionServiceImpl
 		_objectDefinitionModelResourcePermission.check(
 			getPermissionChecker(), objectDefinitionId, ActionKeys.UPDATE);
 
+		_checkObjectFolderPermission(objectFolderId);
+
 		return objectDefinitionLocalService.updateSystemObjectDefinition(
 			externalReferenceCode, objectDefinitionId, objectFolderId,
 			titleObjectFieldId);
@@ -271,11 +285,38 @@ public class ObjectDefinitionServiceImpl
 			objectDefinitionId, titleObjectFieldId);
 	}
 
+	private void _checkObjectFolderPermission(long objectFolderId)
+		throws PortalException {
+
+		User user = getUser();
+
+		ObjectFolder objectFolder =
+			_objectFolderLocalService.getObjectFolderByExternalReferenceCode(
+				"uncategorized", user.getCompanyId());
+
+		if ((objectFolderId != 0) &&
+			(objectFolderId != objectFolder.getObjectFolderId())) {
+
+			_objectFolderModelResourcePermission.check(
+				getPermissionChecker(), objectFolderId,
+				ObjectActionKeys.ADD_OBJECT_DEFINITION);
+		}
+	}
+
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
 	)
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
+
+	@Reference
+	private ObjectFolderLocalService _objectFolderLocalService;
+
+	@Reference(
+		target = "(model.class.name=com.liferay.object.model.ObjectFolder)"
+	)
+	private ModelResourcePermission<ObjectFolder>
+		_objectFolderModelResourcePermission;
 
 	@Reference(target = "(resource.name=" + ObjectConstants.RESOURCE_NAME + ")")
 	private PortletResourcePermission _portletResourcePermission;
