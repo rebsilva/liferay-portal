@@ -27,6 +27,7 @@ import com.liferay.object.internal.related.models.SystemObject1toMObjectRelatedM
 import com.liferay.object.internal.related.models.SystemObjectMtoMObjectRelatedModelsProviderImpl;
 import com.liferay.object.internal.rest.context.path.RESTContextPathResolverImpl;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.context.path.RESTContextPathResolver;
@@ -34,6 +35,7 @@ import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
+import com.liferay.object.service.ObjectFolderLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.JaxRsApplicationDescriptor;
 import com.liferay.object.system.SystemObjectDefinitionManager;
@@ -58,6 +60,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterRegistry;
+import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -175,10 +178,24 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 				(objectDefinition.getVersion() !=
 					systemObjectDefinitionManager.getVersion())) {
 
+				ObjectFolder objectFolder =
+					_objectFolderLocalService.
+						fetchObjectFolderByExternalReferenceCode(
+							"uncategorized", companyId);
+
+				if (objectFolder == null) {
+					objectFolder = _objectFolderLocalService.addObjectFolder(
+						"uncategorized",
+						_userLocalService.getGuestUserId(companyId),
+						LocalizedMapUtil.getLocalizedMap("Uncategorized"),
+						"Uncategorized");
+				}
+
 				objectDefinition =
 					_objectDefinitionLocalService.
 						addOrUpdateSystemObjectDefinition(
-							companyId, 0, systemObjectDefinitionManager);
+							companyId, objectFolder.getObjectFolderId(),
+							systemObjectDefinitionManager);
 			}
 
 			_bundleContext.registerService(
@@ -282,6 +299,9 @@ public class SystemObjectDefinitionManagerPortalInstanceLifecycleListener
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;
+
+	@Reference
+	private ObjectFolderLocalService _objectFolderLocalService;
 
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
