@@ -53,6 +53,7 @@ import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
+import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.impl.ObjectDefinitionImpl;
 import com.liferay.object.petra.sql.dsl.DynamicObjectDefinitionLocalizationTable;
@@ -273,6 +274,7 @@ public class ObjectDefinitionLocalServiceImpl
 			return objectDefinition;
 		}
 
+		objectDefinition.setObjectFolderId(objectFolderId);
 		objectDefinition.setVersion(systemObjectDefinitionManager.getVersion());
 
 		objectDefinition = objectDefinitionPersistence.update(objectDefinition);
@@ -871,6 +873,9 @@ public class ObjectDefinitionLocalServiceImpl
 		_validateObjectFieldId(objectDefinition, titleObjectFieldId);
 
 		objectDefinition.setExternalReferenceCode(externalReferenceCode);
+		objectDefinition.setObjectFolderId(
+			_getObjectFolderId(
+				objectDefinition.getCompanyId(), objectFolderId));
 		objectDefinition.setTitleObjectFieldId(titleObjectFieldId);
 
 		return objectDefinitionPersistence.update(objectDefinition);
@@ -978,6 +983,8 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setCompanyId(user.getCompanyId());
 		objectDefinition.setUserId(user.getUserId());
 		objectDefinition.setUserName(user.getFullName());
+		objectDefinition.setObjectFolderId(
+			_getObjectFolderId(user.getCompanyId(), objectFolderId));
 		objectDefinition.setActive(
 			_isUnmodifiableSystemObject(modifiable, system));
 		objectDefinition.setDBTableName(dbTableName);
@@ -1280,6 +1287,24 @@ public class ObjectDefinitionLocalServiceImpl
 		return objectDefinitions;
 	}
 
+	private long _getObjectFolderId(long companyId, long objectFolderId)
+		throws PortalException {
+
+		if (objectFolderId == 0) {
+			ObjectFolder objectFolder =
+				_objectFolderLocalService.
+					getObjectFolderByExternalReferenceCode(
+						"uncategorized", companyId);
+
+			objectFolderId = objectFolder.getObjectFolderId();
+		}
+		else {
+			_objectFolderLocalService.getObjectFolder(objectFolderId);
+		}
+
+		return objectFolderId;
+	}
+
 	private String _getPKObjectFieldDBColumnName(
 		String pkObjectFieldDBColumnName, String pkObjectFieldName,
 		boolean modifiable, boolean system) {
@@ -1483,6 +1508,9 @@ public class ObjectDefinitionLocalServiceImpl
 		objectDefinition.setAccountEntryRestrictedObjectFieldId(
 			accountEntryRestrictedObjectFieldId);
 		objectDefinition.setDescriptionObjectFieldId(descriptionObjectFieldId);
+		objectDefinition.setObjectFolderId(
+			_getObjectFolderId(
+				objectDefinition.getCompanyId(), objectFolderId));
 		objectDefinition.setTitleObjectFieldId(titleObjectFieldId);
 		objectDefinition.setAccountEntryRestricted(accountEntryRestricted);
 		objectDefinition.setActive(active);
