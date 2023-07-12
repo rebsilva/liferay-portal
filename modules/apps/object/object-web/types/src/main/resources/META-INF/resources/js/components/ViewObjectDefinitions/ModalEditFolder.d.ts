@@ -12,19 +12,18 @@
  * details.
  */
 
-import {SetStateAction} from 'react';
-import {ViewObjectDefinitionsModals} from './ViewObjectDefinitions';
-export declare function deleteObjectDefinition(
-	id: number,
-	objectDefinitionName: string
-): Promise<void>;
-export declare function getFolderActions(
-	selectedFolderName: string,
-	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void
-): {
-	label: string;
-	onClick: () => void;
-	symbolLeft: string;
-	value: string;
-}[];
-export declare function normalizeName(str: string): string;
+/// <reference types="react" />
+
+interface ModalAddFolderProps {
+	externalReferenceCode: string;
+	handleOnClose: () => void;
+	initialLabel: LocalizedValue<string>;
+	name: string;
+}
+export declare function ModalEditFolder({
+	externalReferenceCode,
+	handleOnClose,
+	initialLabel,
+	name,
+}: ModalAddFolderProps): JSX.Element;
+export {};
