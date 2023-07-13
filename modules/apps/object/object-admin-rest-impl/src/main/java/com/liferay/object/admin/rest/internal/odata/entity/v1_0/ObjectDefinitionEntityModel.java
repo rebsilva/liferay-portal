@@ -40,6 +40,9 @@ public class ObjectDefinitionEntityModel implements EntityModel {
 				locale -> Field.getSortableFieldName(Field.MODIFIED_DATE),
 				locale -> Field.MODIFIED_DATE),
 			new StringEntityField(
+				"objectFolderExternalReferenceCode",
+				locale -> "objectFolderExternalReferenceCode"),
+			new StringEntityField(
 				"label",
 				locale -> Field.getSortableFieldName(
 					"localized_label_".concat(
