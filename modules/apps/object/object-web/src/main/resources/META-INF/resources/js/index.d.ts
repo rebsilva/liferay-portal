@@ -14,6 +14,12 @@
 
 type LocalizedValue<T> = Liferay.Language.LocalizedValue<T>;
 
+interface Folder {
+	erc: string;
+	label: LocalizedValue<string>;
+	name: string;
+}
+
 type NotificationTemplate = {
 	attachmentObjectFieldIds: string[] | number[];
 	bcc: string;

@@ -14,11 +14,13 @@
 
 import {API} from '@liferay/object-js-components-web';
 import {sub} from 'frontend-js-web';
+import {SetStateAction} from 'react';
 
 import {
 	firstLetterUppercase,
 	removeAllSpecialCharacters,
 } from '../../utils/string';
+import {ViewObjectDefinitionsModals} from './ViewObjectDefinitions';
 
 export async function deleteObjectDefinition(
 	id: number,
@@ -32,6 +34,87 @@ export async function deleteObjectDefinition(
 			),
 		});
 	});
+}
+
+export function getFolderActions(
+	selectedFolderName: string,
+	setShowModal: (value: SetStateAction<ViewObjectDefinitionsModals>) => void
+) {
+	return selectedFolderName === 'uncategorized'
+		? [
+				{
+					label: Liferay.Language.get('import-object'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								importObject: true,
+							})
+						),
+					symbolLeft: 'import',
+					value: 'importObject',
+				},
+		  ]
+		: [
+				{
+					label: Liferay.Language.get('edit-label-and-erc'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								editFolder: true,
+							})
+						),
+					symbolLeft: 'pencil',
+					value: 'editFolder',
+				},
+				{
+					label: Liferay.Language.get('import-object'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								importObject: true,
+							})
+						),
+					symbolLeft: 'import',
+					value: 'importObject',
+				},
+				{
+					label: Liferay.Language.get('delete-folder'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								deleteFolder: true,
+							})
+						),
+					symbolLeft: 'trash',
+					value: 'deleteFolder',
+				},
+				{
+					label: Liferay.Language.get('move'),
+					onClick: () =>
+						setShowModal(
+							(previousState: ViewObjectDefinitionsModals) => ({
+								...previousState,
+								moveObjectDefinition: true,
+							})
+						),
+					symbolLeft: 'heart',
+					value: 'moveObjectDefinition',
+				},
+				{
+					label: Liferay.Language.get('folder-permissions'),
+					onClick: () =>
+
+						// fazer a lógica pra abrir o modal de permissões
+
+						{},
+					symbolLeft: 'users',
+					value: 'folderPermissions',
+				},
+		  ];
 }
 
 export function normalizeName(str: string) {

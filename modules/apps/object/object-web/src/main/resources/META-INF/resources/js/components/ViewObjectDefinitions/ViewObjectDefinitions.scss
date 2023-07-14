@@ -1,0 +1,44 @@
+.lfr__object-web-view-object-definitions {
+	display: flex;
+	justify-content: center;
+
+	&-card-header {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+	}
+
+	&-folder-list-container {
+		margin: 1.5rem;
+		width: 256px;
+	}
+
+	&-folder-list-header {
+		align-items: center;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	&-view-in-model-builder-button {
+		align-items: center;
+		display: flex;
+		max-height: 40px;
+	}
+
+	&-title-kebab {
+		align-items: center;
+		margin-bottom: 16px;
+	}
+
+	&-card {
+		min-width: 900px;
+	}
+}
+
+.dropdown-menu {
+	width: auto;
+}
+
+.treeview-light .treeview-link.active {
+	background-color: #f0f5ff;
+}
