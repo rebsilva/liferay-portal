@@ -252,6 +252,13 @@ public class ObjectDefinitionResourceImpl
 			throw new UnsupportedOperationException();
 		}
 
+		if (Validator.isNotNull(
+				objectDefinition.getObjectFolderExternalReferenceCode()) &&
+			!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+
+			throw new UnsupportedOperationException();
+		}
+
 		if (!Validator.isBlank(objectDefinition.getStorageType()) &&
 			!FeatureFlagManagerUtil.isEnabled("LPS-135430")) {
 
@@ -440,6 +447,13 @@ public class ObjectDefinitionResourceImpl
 
 		if (Validator.isNotNull(objectDefinition.getModifiable()) &&
 			!FeatureFlagManagerUtil.isEnabled("LPS-167253")) {
+
+			throw new UnsupportedOperationException();
+		}
+
+		if (Validator.isNotNull(
+				objectDefinition.getObjectFolderExternalReferenceCode()) &&
+			!FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
 
 			throw new UnsupportedOperationException();
 		}
@@ -1046,14 +1060,18 @@ public class ObjectDefinitionResourceImpl
 
 						return serviceBuilderObjectField.getName();
 					});
-				setObjectFolderExternalReferenceCode(
-					() -> {
-						ObjectFolder objectFolder =
-							_objectFolderLocalService.getObjectFolder(
-								objectDefinition.getObjectFolderId());
 
-						return objectFolder.getExternalReferenceCode();
-					});
+				if (FeatureFlagManagerUtil.isEnabled("LPS-148856")) {
+					setObjectFolderExternalReferenceCode(
+						() -> {
+							ObjectFolder objectFolder =
+								_objectFolderLocalService.getObjectFolder(
+									objectDefinition.getObjectFolderId());
+
+							return objectFolder.getExternalReferenceCode();
+						});
+				}
+
 				setTitleObjectFieldName(
 					() -> {
 						com.liferay.object.model.ObjectField
