@@ -351,6 +351,7 @@ public class ObjectDefinitionResourceTest
 		}
 
 		objectDefinition.setName("O" + objectDefinition.getName());
+		objectDefinition.setObjectFolderExternalReferenceCode("uncategorized");
 		objectDefinition.setPluralLabel(
 			Collections.singletonMap(
 				"en_US", "O" + objectDefinition.getName()));
