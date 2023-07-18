@@ -118,6 +118,10 @@ public class ViewObjectDefinitionsDisplayContext {
 					_objectRequestHelper.getRequest(), "export-as-json"),
 				"get", null, null),
 			new FDSActionDropdownItem(
+				null, "move-folder", "moveObjectDefinition",
+				LanguageUtil.get(_objectRequestHelper.getRequest(), "move"),
+				"update", "update", null),
+			new FDSActionDropdownItem(
 				null, "trash", "deleteObjectDefinition",
 				LanguageUtil.get(_objectRequestHelper.getRequest(), "delete"),
 				"delete", "delete", null),
