@@ -14,17 +14,12 @@
 
 /// <reference types="react" />
 
-import './ModalAddObjectDefinition.scss';
-interface ModalAddObjectDefinitionProps {
-	apiURL: string;
+interface ModalDeleteFolderProps {
+	folder: Folder;
 	handleOnClose: () => void;
-	objectFolderExternalReferenceCode?: string;
-	storages: LabelTypeObject[];
 }
-export declare function ModalAddObjectDefinition({
-	apiURL,
+export declare function ModalDeleteFolder({
+	folder,
 	handleOnClose,
-	objectFolderExternalReferenceCode,
-	storages,
-}: ModalAddObjectDefinitionProps): JSX.Element;
+}: ModalDeleteFolderProps): JSX.Element;
 export {};

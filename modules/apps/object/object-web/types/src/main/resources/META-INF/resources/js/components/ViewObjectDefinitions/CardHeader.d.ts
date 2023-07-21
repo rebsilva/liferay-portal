@@ -14,17 +14,16 @@
 
 /// <reference types="react" />
 
-import './ModalAddObjectDefinition.scss';
-interface ModalAddObjectDefinitionProps {
-	apiURL: string;
-	handleOnClose: () => void;
-	objectFolderExternalReferenceCode?: string;
-	storages: LabelTypeObject[];
+interface CardHeaderProps {
+	externalReferenceCode?: string;
+	items: IItem[];
+	label?: LocalizedValue<string>;
+	name?: string;
 }
-export declare function ModalAddObjectDefinition({
-	apiURL,
-	handleOnClose,
-	objectFolderExternalReferenceCode,
-	storages,
-}: ModalAddObjectDefinitionProps): JSX.Element;
+export default function CardHeader({
+	externalReferenceCode,
+	items,
+	label,
+	name,
+}: CardHeaderProps): JSX.Element;
 export {};

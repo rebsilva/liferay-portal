@@ -22,6 +22,16 @@ interface HTTPMethod {
 	method: string;
 }
 
+interface Folder {
+	actions: [];
+	dateCreated: string;
+	dateModified: string;
+	externalReferenceCode: string;
+	id: number;
+	label: LocalizedValue<string>;
+	name: string;
+}
+
 interface Actions {
 	delete: HTTPMethod;
 	get: HTTPMethod;
@@ -131,6 +141,10 @@ export function deleteObjectDefinitions(id: number) {
 	return deleteItem(`/o/object-admin/v1.0/object-definitions/${id}`);
 }
 
+export function deleteFolder(id: number) {
+	return deleteItem(`/o/object-admin/v1.0/object-folders/${id}`);
+}
+
 export function deleteObjectField(id: number) {
 	return deleteItem(`/o/object-admin/v1.0/object-fields/${id}`);
 }
@@ -155,6 +169,10 @@ export async function fetchJSON<T>(input: RequestInfo, init?: RequestInit) {
 	const result = await fetch(input, {headers, method: 'GET', ...init});
 
 	return (await result.json()) as T;
+}
+
+export async function getAllObjectsFolders() {
+	return await getList<Folder>('/o/object-admin/v1.0/object-folders');
 }
 
 export async function getAllObjectDefinitions() {
@@ -203,6 +221,20 @@ export async function getObjectDefinitionById(objectDefinitionId: number) {
 	return await fetchJSON<ObjectDefinition>(
 		`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}`
 	);
+}
+
+export async function getFDSItems(parameters: string) {
+	return await fetchJSON<ObjectDefinition>(
+		`/o/object-admin/v1.0/object-definitions?${stringToURLParameterFormat(
+			parameters
+		)}`
+	);
+}
+
+export function getFDSObjectDefinitionsURL(parameters: string) {
+	return `/o/object-admin/v1.0/object-definitions?${stringToURLParameterFormat(
+		parameters
+	)}`;
 }
 
 export async function getObjectDefinitions(parameters?: string) {
@@ -302,7 +334,7 @@ export async function putObjectDefinitionByExternalReferenceCode(
 export async function save(
 	url: string,
 	item: unknown,
-	method: 'PUT' | 'POST' = 'PUT'
+	method: 'PUT' | 'POST' | 'PATCH' = 'PUT'
 ) {
 	const isFormData = item instanceof FormData;
 
