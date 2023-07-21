@@ -14,17 +14,18 @@
 
 /// <reference types="react" />
 
-import './ModalAddObjectDefinition.scss';
-interface ModalAddObjectDefinitionProps {
-	apiURL: string;
+interface ModalAddFolderProps {
+	externalReferenceCode: string;
+	folderID: number;
 	handleOnClose: () => void;
-	objectFolderExternalReferenceCode?: string;
-	storages: LabelTypeObject[];
+	initialLabel?: LocalizedValue<string>;
+	name?: string;
 }
-export declare function ModalAddObjectDefinition({
-	apiURL,
+export declare function ModalEditFolder({
+	externalReferenceCode,
+	folderID,
 	handleOnClose,
-	objectFolderExternalReferenceCode,
-	storages,
-}: ModalAddObjectDefinitionProps): JSX.Element;
+	initialLabel,
+	name,
+}: ModalAddFolderProps): JSX.Element;
 export {};

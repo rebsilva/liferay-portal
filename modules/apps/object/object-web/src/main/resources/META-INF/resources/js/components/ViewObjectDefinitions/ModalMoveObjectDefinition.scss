@@ -1,0 +1,17 @@
+.lfr-object__object-web-view-modal-move-object-definition {
+	&-list-item {
+		border: none;
+		padding: 0.5rem;
+	}
+
+	&-list-item-label {
+		padding-left: 8px;
+	}
+
+	&-toolbar {
+		> .container-fluid {
+			padding: 0;
+			margin-bottom: 10px;
+		}
+	}
+}

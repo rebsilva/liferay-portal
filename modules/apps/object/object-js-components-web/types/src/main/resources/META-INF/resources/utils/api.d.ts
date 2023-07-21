@@ -16,6 +16,15 @@ interface HTTPMethod {
 	href: string;
 	method: string;
 }
+interface Folder {
+	actions: [];
+	dateCreated: string;
+	dateModified: string;
+	externalReferenceCode: string;
+	id: number;
+	label: LocalizedValue<string>;
+	name: string;
+}
 interface Actions {
 	delete: HTTPMethod;
 	get: HTTPMethod;
@@ -84,6 +93,7 @@ declare type Recipients = {
 	to: LocalizedValue<string>;
 };
 export declare function deleteObjectDefinitions(id: number): Promise<void>;
+export declare function deleteFolder(id: number): Promise<void>;
 export declare function deleteObjectField(id: number): Promise<void>;
 export declare function deleteObjectRelationships(id: number): Promise<void>;
 export declare function deletePickList(pickListId: number): Promise<void>;
@@ -92,6 +102,7 @@ export declare function fetchJSON<T>(
 	input: RequestInfo,
 	init?: RequestInit
 ): Promise<T>;
+export declare function getAllObjectsFolders(): Promise<Folder[]>;
 export declare function getAllObjectDefinitions(): Promise<ObjectDefinition[]>;
 export declare function getList<T>(url: string): Promise<T[]>;
 export declare function getNotificationTemplateByExternalReferenceCode(
@@ -109,6 +120,10 @@ export declare function getObjectDefinitionByExternalReferenceCode(
 export declare function getObjectDefinitionById(
 	objectDefinitionId: number
 ): Promise<ObjectDefinition>;
+export declare function getFDSItems(
+	parameters: string
+): Promise<ObjectDefinition>;
+export declare function getFDSObjectDefinitionsURL(parameters: string): string;
 export declare function getObjectDefinitions(
 	parameters?: string
 ): Promise<ObjectDefinition[]>;
@@ -144,7 +159,7 @@ export declare function putObjectDefinitionByExternalReferenceCode(
 export declare function save(
 	url: string,
 	item: unknown,
-	method?: 'PUT' | 'POST'
+	method?: 'PUT' | 'POST' | 'PATCH'
 ): Promise<void>;
 export declare function addPickListItem({
 	id,
