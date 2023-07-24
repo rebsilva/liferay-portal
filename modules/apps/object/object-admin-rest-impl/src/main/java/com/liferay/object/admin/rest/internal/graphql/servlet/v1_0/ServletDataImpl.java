@@ -505,6 +505,11 @@ public class ServletDataImpl implements ServletData {
 							ObjectDefinitionResourceImpl.class,
 							"getObjectDefinition"));
 					put(
+						"query#objectFolderByExternalReferenceCodeObjectDefinitions",
+						new ObjectValuePair<>(
+							ObjectDefinitionResourceImpl.class,
+							"getObjectFolderByExternalReferenceCodeObjectDefinitionsPage"));
+					put(
 						"query#objectDefinitionByExternalReferenceCodeObjectFields",
 						new ObjectValuePair<>(
 							ObjectFieldResourceImpl.class,
@@ -591,6 +596,11 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							ObjectViewResourceImpl.class, "getObjectView"));
 
+					put(
+						"query#ObjectDefinition.objectFolderByExternalReferenceCodeObjectDefinitions",
+						new ObjectValuePair<>(
+							ObjectDefinitionResourceImpl.class,
+							"getObjectFolderByExternalReferenceCodeObjectDefinitionsPage"));
 					put(
 						"query#ObjectLayoutTab.objectRelationship",
 						new ObjectValuePair<>(
