@@ -13,6 +13,15 @@ interface Actions {
 	permissions: HTTPMethod;
 	update: HTTPMethod;
 }
+interface Folder {
+	actions: [];
+	dateCreated: string;
+	dateModified: string;
+	externalReferenceCode: string;
+	id: number;
+	label: LocalizedValue<string>;
+	name: string;
+}
 interface PickListItem {
 	externalReferenceCode: string;
 	id: number;
@@ -85,6 +94,10 @@ export declare function fetchJSON<T>(
 	init?: RequestInit
 ): Promise<T>;
 export declare function getAllObjectDefinitions(): Promise<ObjectDefinition[]>;
+export declare function getAllObjectDefinitionsByFolderURL(
+	folderExternalReferenceCode: string
+): string;
+export declare function getAllObjectsFolders(): Promise<Folder[]>;
 export declare function getList<T>(url: string): Promise<T[]>;
 export declare function getNotificationTemplateByExternalReferenceCode(
 	notificationTemplateExternalReferenceCode: string
