@@ -11,7 +11,11 @@ import com.liferay.object.exception.ObjectFolderNameException;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectFolder;
 import com.liferay.object.model.ObjectFolderItem;
+import com.liferay.object.model.ObjectRelationship;
+import com.liferay.object.relationship.util.ObjectRelationshipUtil;
 import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFolderItemLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.base.ObjectFolderLocalServiceBaseImpl;
 import com.liferay.object.service.persistence.ObjectDefinitionPersistence;
 import com.liferay.portal.aop.AopService;
@@ -122,6 +126,10 @@ public class ObjectFolderLocalServiceImpl
 			objectFolder, ResourceConstants.SCOPE_INDIVIDUAL);
 
 		if (PortalInstances.isCurrentCompanyInDeletionProcess()) {
+			_objectFolderItemLocalService.
+				deleteObjectFolderItemByObjectFolderId(
+					objectFolder.getObjectFolderId());
+
 			return objectFolder;
 		}
 
@@ -163,13 +171,21 @@ public class ObjectFolderLocalServiceImpl
 		throws PortalException {
 
 		_validateLabel(labelMap);
+		_validateObjectFolderItems(objectFolderId, objectFolderItems);
 
 		ObjectFolder objectFolder = objectFolderPersistence.findByPrimaryKey(
 			objectFolderId);
 
+		for (ObjectFolderItem objectFolderItem : objectFolderItems) {
+			_objectFolderItemLocalService.updateObjectFolderItem(
+				objectFolderItem.getObjectDefinitionId(),
+				objectFolder.getObjectFolderId(),
+				objectFolderItem.getPositionX(),
+				objectFolderItem.getPositionY());
+		}
+
 		if (objectFolder.isUncategorized()) {
-			throw new UnsupportedOperationException(
-				"Uncategorized cannot be updated");
+			return objectFolder;
 		}
 
 		objectFolder.setExternalReferenceCode(externalReferenceCode);
@@ -228,11 +244,62 @@ public class ObjectFolderLocalServiceImpl
 		}
 	}
 
+	private void _validateObjectFolderItems(
+			long objectFolderId, List<ObjectFolderItem> objectFolderItems)
+		throws PortalException {
+
+		for (ObjectFolderItem objectFolderItem : objectFolderItems) {
+			ObjectDefinition objectDefinition =
+				_objectDefinitionLocalService.getObjectDefinition(
+					objectFolderItem.getObjectDefinitionId());
+
+			if (!objectDefinition.isLinkedToObjectFolder(objectFolderId)) {
+				continue;
+			}
+
+			boolean hasOnlyLinkedDefinition = true;
+
+			for (ObjectRelationship objectRelationship :
+					_objectRelationshipLocalService.getAllObjectRelationships(
+						objectDefinition.getObjectDefinitionId())) {
+
+				if (objectRelationship.isSelf()) {
+					continue;
+				}
+
+				ObjectDefinition relatedObjectDefinition =
+					ObjectRelationshipUtil.getRelatedObjectDefinition(
+						objectDefinition, objectRelationship);
+
+				if (!relatedObjectDefinition.isLinkedToObjectFolder(
+						objectFolderId)) {
+
+					hasOnlyLinkedDefinition = false;
+
+					break;
+				}
+			}
+
+			if (hasOnlyLinkedDefinition) {
+				throw new UnsupportedOperationException(
+					"Object definition " +
+						objectDefinition.getObjectDefinitionId() +
+							" cannot be add in object folder");
+			}
+		}
+	}
+
 	@Reference
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
 	private ObjectDefinitionPersistence _objectDefinitionPersistence;
+
+	@Reference
+	private ObjectFolderItemLocalService _objectFolderItemLocalService;
+
+	@Reference
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
 
 	@Reference
 	private ResourceLocalService _resourceLocalService;
