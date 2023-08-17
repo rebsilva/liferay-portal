@@ -35,6 +35,7 @@ export declare function deleteObjectDefinition(
 	setDeletedObjectDefinition: (value: DeletedObjectDefinition) => void,
 	handleShowDeleteModal: () => void
 ): Promise<void>;
+export declare function deleteRelationship(id: number): Promise<void>;
 export declare function getDefinitionNodeActions(
 	baseResourceURL: string,
 	objectDefinitionId: number,
