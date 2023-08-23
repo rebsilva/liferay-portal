@@ -5,6 +5,7 @@
 
 package com.liferay.object.service.impl;
 
+import com.liferay.object.internal.folder.item.util.ObjectFolderItemUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectFolderItem;
 import com.liferay.object.relationship.util.ObjectRelationshipUtil;
@@ -80,20 +81,11 @@ public class ObjectFolderItemLocalServiceImpl
 				objectFolderItem.getObjectDefinitionId());
 
 		if (!objectDefinition.isLinkedToObjectFolder(
-				objectFolderItem.getObjectFolderId())) {
+				objectFolderItem.getObjectFolderId()) ||
+			!ObjectFolderItemUtil.hasOnlyLinkedRelatedObjectDefinition(
+				objectDefinition, objectFolderItem.getObjectFolderId())) {
 
 			return objectFolderItem;
-		}
-
-		for (ObjectDefinition relatedObjectDefinition :
-				ObjectRelationshipUtil.getRelatedObjectDefinitions(
-					objectDefinition)) {
-
-			if (!relatedObjectDefinition.isLinkedToObjectFolder(
-					objectFolderItem.getObjectFolderId())) {
-
-				return objectFolderItem;
-			}
 		}
 
 		return objectFolderItemPersistence.remove(objectFolderItem);
