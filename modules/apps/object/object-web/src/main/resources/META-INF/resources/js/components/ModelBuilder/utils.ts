@@ -53,14 +53,14 @@ function getNodeIntersection(
 
 	const intersectionPointX =
 		nodeHalfWidth *
-		(normalizedSourceToTargetXDifference +
-			normalizedSourceToTargetYDifference +
-			sourceCoordinateX);
+			(normalizedSourceToTargetXDifference +
+				normalizedSourceToTargetYDifference) +
+		sourceCoordinateX;
 	const intersectionPointY =
 		nodeHalfHeight *
-		(-normalizedSourceToTargetXDifference +
-			normalizedSourceToTargetYDifference +
-			sourceCoordinateY);
+			(-normalizedSourceToTargetXDifference +
+				normalizedSourceToTargetYDifference) +
+		sourceCoordinateY;
 
 	return {x: intersectionPointX, y: intersectionPointY};
 }
