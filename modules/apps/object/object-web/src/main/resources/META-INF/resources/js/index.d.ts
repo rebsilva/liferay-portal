@@ -342,6 +342,13 @@ interface ObjectFolder {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
+	objectFolderItems: ObjectFolderItem[];
+}
+interface ObjectFolderItem {
+	linkedDefinition: boolean;
+	objectDefinitionExternalReferenceCode: string;
+	positionX: number;
+	positionY: number;
 }
 
 interface PickList {

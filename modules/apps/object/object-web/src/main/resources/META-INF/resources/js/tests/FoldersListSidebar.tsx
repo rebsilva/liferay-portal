@@ -36,6 +36,7 @@ const uncategorizedFolder = {
 	id: 1010,
 	label: {en_US: 'Uncategorized'},
 	name: 'Uncategorized',
+	objectFolderItems: [],
 };
 
 const ticketFolder = {
@@ -46,6 +47,7 @@ const ticketFolder = {
 	id: 2020,
 	label: {en_US: 'Ticket System'},
 	name: 'TicketName',
+	objectFolderItems: [],
 };
 
 describe('The FoldersListSidebar component should', () => {
