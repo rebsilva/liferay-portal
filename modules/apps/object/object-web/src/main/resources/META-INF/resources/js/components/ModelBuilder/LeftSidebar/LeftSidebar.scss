@@ -6,6 +6,11 @@
 	padding: 1rem;
 	position: inherit;
 
+	&-item-linked.treeview-link {
+		background-color: transparent;
+		color: rgba(107, 108, 126, 0.5);
+	}
+
 	&-current-folder-container {
 		align-items: center;
 		display: flex;

@@ -32,7 +32,7 @@ interface ObjectFolder {
 }
 
 interface ObjectFolderItem {
-	linkedDefinition: boolean;
+	linkedObjectDefinition: boolean;
 	objectDefinitionExternalReferenceCode: string;
 	positionX: number;
 	positionY: number;
