@@ -22,6 +22,21 @@ type NotificationTemplate = {
 	type: 'email' | 'userNotification';
 };
 
+interface ViewObjectDefinitionsModals {
+	addFolder: boolean;
+	addObjectDefinition: boolean;
+	deleteFolder: boolean;
+	deleteObjectDefinition: boolean;
+	editFolder: boolean;
+	moveObjectDefinition: boolean;
+}
+
+interface ModelBuilderModals extends ViewObjectDefinitionsModals {
+	addRelationship: boolean;
+	editERC: boolean;
+	redirectEditObjectDefinition: boolean;
+}
+
 interface ObjectAction {
 	active: boolean;
 	conditionExpression?: string;

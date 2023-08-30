@@ -5,10 +5,7 @@
 
 import {SetStateAction} from 'react';
 import {DropDownItems} from '../ModelBuilder/types';
-import {
-	DeletedObjectDefinition,
-	ViewObjectDefinitionsModals,
-} from './ViewObjectDefinitions';
+import {DeletedObjectDefinition} from './ViewObjectDefinitions';
 declare type folderAction = {
 	href: string;
 	method: string;

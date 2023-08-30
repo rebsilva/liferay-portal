@@ -10,7 +10,6 @@ import {KeyValuePair} from '../ObjectDetails/EditObjectDetails';
 import {TDeletionType} from '../ObjectRelationship/EditRelationship';
 import {ModalAddObjectDefinition} from '../ViewObjectDefinitions/ModalAddObjectDefinition';
 import {ModalEditFolder} from '../ViewObjectDefinitions/ModalEditFolder';
-import {ViewObjectDefinitionsModals} from '../ViewObjectDefinitions/ViewObjectDefinitions';
 import Diagram from './Diagram/Diagram';
 import Header from './Header/Header';
 import LeftSidebar from './LeftSidebar/LeftSidebar';
@@ -35,7 +34,7 @@ export default function EditObjectFolder({
 		dispatch,
 	] = useFolderContext();
 
-	const [showModal, setShowModal] = useState<ViewObjectDefinitionsModals>({
+	const [showModal, setShowModal] = useState<ModelBuilderModals>({
 		addFolder: false,
 		addObjectDefinition: false,
 		deleteFolder: false,
@@ -172,12 +171,10 @@ export default function EditObjectFolder({
 				<ModalAddObjectDefinition
 					apiURL={viewApiURL}
 					handleOnClose={() =>
-						setShowModal(
-							(previousState: ViewObjectDefinitionsModals) => ({
-								...previousState,
-								addObjectDefinition: false,
-							})
-						)
+						setShowModal((previousState: ModelBuilderModals) => ({
+							...previousState,
+							addObjectDefinition: false,
+						}))
 					}
 					objectFolderExternalReferenceCode={
 						selectedFolder.externalReferenceCode
@@ -201,12 +198,10 @@ export default function EditObjectFolder({
 					externalReferenceCode={selectedFolder.externalReferenceCode}
 					folderID={selectedFolder.id}
 					handleOnClose={() => {
-						setShowModal(
-							(previousState: ViewObjectDefinitionsModals) => ({
-								...previousState,
-								editFolder: false,
-							})
-						);
+						setShowModal((previousState: ModelBuilderModals) => ({
+							...previousState,
+							editFolder: false,
+						}));
 					}}
 					initialLabel={selectedFolder.label}
 					name={selectedFolder.name}
