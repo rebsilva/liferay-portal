@@ -22,6 +22,7 @@ import {
 } from '@liferay/object-js-components-web';
 
 import {formatActionURL} from '../../../utils/fds';
+import {ModalAddObjectRelationship} from '../../ObjectRelationship/ModalAddObjectRelationship';
 import {ModalDeleteObjectDefinition} from '../../ViewObjectDefinitions/ModalDeleteObjectDefinition';
 import {DeletedObjectDefinition} from '../../ViewObjectDefinitions/ViewObjectDefinitions';
 import {getDefinitionNodeActions} from '../../ViewObjectDefinitions/objectDefinitionUtil';
@@ -57,12 +58,19 @@ export function DefinitionNode({
 }: NodeProps<ObjectDefinitionNodeData>) {
 	const [showAllFields, setShowAllFields] = useState<boolean>(false);
 	const [
-		{editObjectDefinitionURL, elements, objectDefinitionPermissionsURL},
+		{
+			editObjectDefinitionURL,
+			elements,
+			objectDefinitionPermissionsURL,
+			selectedDefinitionNode,
+			selectedFolder
+		},
 		dispatch,
 	] = useFolderContext();
 	const store = useStore();
 
 	const [showModal, setShowModal] = useState<Partial<ModelBuilderModals>>({
+		addRelationship: false,
 		deleteObjectDefinition: false,
 		editERC: false,
 	});
@@ -149,6 +157,7 @@ export function DefinitionNode({
 				<NodeFooter
 					isLinkedNode={linkedDefinition}
 					setShowAllFields={setShowAllFields}
+					setShowModal={setShowModal}
 					showAllFields={showAllFields}
 				/>
 
@@ -195,12 +204,46 @@ export function DefinitionNode({
 				)}
 			</div>
 
+			{showModal.addRelationship && (
+				<ModalAddObjectRelationship
+					baseResourceURL={baseResourceURL}
+					handleOnClose={() => {
+						setShowModal(
+							(previousState: Partial<ModelBuilderModals>) => ({
+								...previousState,
+								addRelationship: false,
+							})
+						);
+					}}
+					objectDefinitionExternalReferenceCode={
+						selectedDefinitionNode?.data
+							?.externalReferenceCode as string
+					}
+					onAfterSubmit={
+							(newObjectRelationship) => {
+							dispatch({
+								payload: {
+									newObjectRelationship,
+									selectedFolderName: selectedFolder.name,
+								},
+								type: TYPES.ADD_NEW_EDGE,
+							});
+						}
+
+					}
+					parameterRequired={false} // mudar depois
+				/>
+			)}
+
 			{showModal.deleteObjectDefinition && (
 				<ModalDeleteObjectDefinition
 					handleOnClose={() => {
-						setShowModal({
-							deleteObjectDefinition: false,
-						});
+						setShowModal(
+							(previousState: Partial<ModelBuilderModals>) => ({
+								...previousState,
+								deleteObjectDefinition: false,
+							})
+						);
 					}}
 					objectDefinition={
 						deletedObjectDefinition as DeletedObjectDefinition
@@ -212,9 +255,12 @@ export function DefinitionNode({
 			{showModal.redirectEditObjectDefinition && (
 				<RedirectModal
 					handleOnClose={() => {
-						setShowModal({
-							redirectEditObjectDefinition: false,
-						});
+						setShowModal(
+							(previousState: Partial<ModelBuilderModals>) => ({
+								...previousState,
+								redirectEditObjectDefinition: false,
+							})
+						);
 					}}
 					viewDetailsUrl={viewDetailsUrl}
 				/>

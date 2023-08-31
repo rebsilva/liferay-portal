@@ -26,6 +26,32 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 	const store = useStore();
 
 	switch (action.type) {
+
+		// case TYPES.ADD_NEW_EDGE: {
+		// 	const {newObjectRelationship, selectedFolderName} = action.payload;
+		// 	const {edges, nodes} = store.getState();
+		// 	const {elements, leftSidebarItems} = state;
+
+		// 	const objectDefinitionERC1 = newObjectRelationship.objectDefinitionExternalReferenceCode1;
+		// 	const objectDefinitionERC2 = newObjectRelationship.objectDefinitionExternalReferenceCode2;
+
+		// 	let objectDefinition1FolderERC = '';
+		// 	let objectDefinition2FolderERC = '';
+
+		// 	nodes.forEach((node: Node<ObjectDefinitionNodeData>) => {
+		// 		if (objectDefinitionERC1 === node.data?.externalReferenceCode) {
+		// 			objectDefinition1FolderERC = node.data.objectFolderExternalReferenceCode;
+		// 		}
+
+		// 		if (objectDefinitionERC2 === node.data?.externalReferenceCode) {
+		// 			objectDefinition2FolderERC = node.data.objectFolderExternalReferenceCode;
+		// 		}
+		// 	});
+
+
+		// 	break;
+		// }
+
 		case TYPES.ADD_NEW_NODE_TO_FOLDER: {
 			const {newObjectDefinition, selectedFolderName} = action.payload;
 			const {nodes} = store.getState();
@@ -213,7 +239,11 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 		case TYPES.BULK_CHANGE_NODE_VIEW: {
 			const {hiddenFolderNodes, leftSidebarItem} = action.payload;
 			const {edges, nodes} = store.getState();
-			const {leftSidebarItems} = state;
+			const {leftSidebarItems, objectDefinitions} = state;
+
+			console.log(edges, 'edges');
+			console.log(nodes, 'nodes');
+			console.log(leftSidebarItem, 'leftSidebarItem');
 
 			const updatedNodes = nodes.map(
 				(node: Node<ObjectDefinitionNodeData>) => {
@@ -598,14 +628,31 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 
 			const {leftSidebarItems} = state;
 
-			const newObjectDefinitionNodes = nodes.map((definitionNode) => ({
-				...definitionNode,
-				data: {
-					...definitionNode.data,
-					nodeSelected:
-						definitionNode.id === selectedObjectDefinitionId,
-				},
-			}));
+			let selectedNode: Node<ObjectDefinitionNodeData> | null = null;
+
+			const newObjectDefinitionNodes = nodes.map((definitionNode) => {
+				if (
+					definitionNode.id === selectedObjectDefinitionId.toString()
+				) {
+					selectedNode = {
+						...definitionNode,
+						data: {
+							...definitionNode.data,
+							nodeSelected: true,
+						},
+					} as Node<ObjectDefinitionNodeData>;
+
+					return selectedNode;
+				}
+
+				return {
+					...definitionNode,
+					data: {
+						...definitionNode.data,
+						nodeSelected: false,
+					},
+				};
+			});
 
 			const newLeftSidebarItems = leftSidebarItems.map((sidebarItem) => {
 				const newLeftSidebarDefinitions = sidebarItem.objectDefinitions?.map(
@@ -647,6 +694,7 @@ export function ObjectFolderReducer(state: TState, action: TAction) {
 				],
 				leftSidebarItems: newLeftSidebarItems,
 				rightSidebarType: 'objectDefinitionDetails' as RightSidebarType,
+				selectedDefinitionNode: selectedNode,
 			};
 		}
 

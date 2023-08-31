@@ -7,19 +7,21 @@ import ClayButton from '@clayui/button';
 import DropDown from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import {sub} from 'frontend-js-web';
-import React from 'react';
+import React, {SetStateAction} from 'react';
 
 import './NodeFooter.scss';
 
 interface NodeFooterProps {
 	isLinkedNode: boolean;
 	setShowAllFields: (value: boolean) => void;
+	setShowModal: (value: SetStateAction<Partial<ModelBuilderModals>>) => void;
 	showAllFields: boolean;
 }
 
 export default function NodeFooter({
 	isLinkedNode,
 	setShowAllFields,
+	setShowModal,
 	showAllFields,
 }: NodeFooterProps) {
 	return (
@@ -29,7 +31,10 @@ export default function NodeFooter({
 					<DropDown
 						alignmentPosition={4}
 						trigger={
-							<ClayButton displayType="secondary">
+							<ClayButton
+								displayType="secondary"
+								onClick={(event) => event.stopPropagation()}
+							>
 								<span>
 									{sub(
 										Liferay.Language.get('x-or-x'),
@@ -50,7 +55,20 @@ export default function NodeFooter({
 								{Liferay.Language.get('add-field')}
 							</DropDown.Item>
 
-							<DropDown.Item>
+							<DropDown.Item
+								onClick={() => {
+									setShowModal(
+										(
+											previousState: Partial<
+												ModelBuilderModals
+											>
+										) => ({
+											...previousState,
+											addRelationship: true,
+										})
+									);
+								}}
+							>
 								<ClayIcon
 									className="c-mr-3 text-4"
 									symbol="nodes"

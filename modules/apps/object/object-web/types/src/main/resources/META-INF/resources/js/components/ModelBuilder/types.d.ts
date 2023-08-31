@@ -33,6 +33,13 @@ export declare type DropDownItems = {
 export declare type TAction =
 	| {
 			payload: {
+				newObjectRelationship: ObjectRelationship;
+				selectedFolderName: string;
+			};
+			type: TYPES.ADD_NEW_EDGE;
+	  }
+	| {
+			payload: {
 				newObjectDefinition: ObjectDefinition;
 				selectedFolderName: string;
 			};
@@ -112,7 +119,7 @@ export declare type TState = {
 	objectDefinitions: ObjectDefinition[];
 	objectFolders: ObjectFolder[];
 	rightSidebarType: RightSidebarType;
-	selectedDefinitionNode: Node<ObjectDefinitionNodeData>;
+	selectedDefinitionNode: Node<ObjectDefinitionNodeData> | null;
 	selectedFolder: ObjectFolder;
 	selectedObjectRelationship: ObjectRelationship;
 	showChangesSaved: boolean;

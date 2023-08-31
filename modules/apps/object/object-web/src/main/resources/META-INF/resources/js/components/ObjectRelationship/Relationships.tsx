@@ -211,6 +211,7 @@ export default function Relationships({
 						objectDefinitionExternalReferenceCode
 					}
 					parameterRequired={parameterRequired}
+					reload={true}
 				/>
 			)}
 
