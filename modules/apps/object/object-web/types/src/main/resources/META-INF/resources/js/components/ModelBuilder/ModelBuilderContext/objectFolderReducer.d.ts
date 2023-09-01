@@ -17,7 +17,7 @@ export declare function ObjectFolderReducer(
 	objectDefinitions: ObjectDefinition[];
 	objectFolders: ObjectFolder[];
 	rightSidebarType: RightSidebarType;
-	selectedDefinitionNode: Node<ObjectDefinitionNodeData>;
+	selectedDefinitionNode: Node<ObjectDefinitionNodeData> | null;
 	selectedFolder: ObjectFolder;
 	selectedObjectRelationship: ObjectRelationship;
 	showChangesSaved: boolean;
