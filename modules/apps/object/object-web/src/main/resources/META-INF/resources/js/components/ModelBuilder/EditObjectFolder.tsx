@@ -37,6 +37,7 @@ export default function EditObjectFolder({
 	const [showModal, setShowModal] = useState<ModelBuilderModals>({
 		addFolder: false,
 		addObjectDefinition: false,
+		addRelationship: false,
 		deleteFolder: false,
 		deleteObjectDefinition: false,
 		editERC: false,

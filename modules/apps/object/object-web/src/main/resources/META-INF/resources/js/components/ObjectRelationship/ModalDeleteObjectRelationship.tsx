@@ -14,7 +14,7 @@ import WarningModal from '../WarningModal';
 interface ModalDeleteObjectRelationshipProps {
 	handleOnClose: () => void;
 	objectRelationship: ObjectRelationship;
-	setObjectRelationship: (value: ObjectRelationship | null) => void;
+	setObjectRelationship?: (value: ObjectRelationship | null) => void;
 }
 
 export function ModalDeleteObjectRelationship({
@@ -24,10 +24,14 @@ export function ModalDeleteObjectRelationship({
 }: ModalDeleteObjectRelationshipProps) {
 	const {observer, onClose} = useModal({
 		onClose: () => {
-			setObjectRelationship(null);
+			if (setObjectRelationship) {
+				setObjectRelationship(null);
+			}
 			handleOnClose();
 		},
 	});
+
+	console.log(objectRelationship);
 
 	return (
 		<ClayModalProvider>

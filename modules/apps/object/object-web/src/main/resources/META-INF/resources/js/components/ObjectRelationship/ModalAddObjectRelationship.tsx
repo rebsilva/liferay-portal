@@ -25,14 +25,18 @@ interface ModalAddObjectRelationshipProps {
 	baseResourceURL: string;
 	handleOnClose: () => void;
 	objectDefinitionExternalReferenceCode: string;
+	onAfterSubmit?: (value: ObjectRelationship) => void;
 	parameterRequired: boolean;
+	reload?: boolean;
 }
 
 export function ModalAddObjectRelationship({
 	baseResourceURL,
 	handleOnClose,
 	objectDefinitionExternalReferenceCode,
+	onAfterSubmit,
 	parameterRequired,
+	reload,
 }: ModalAddObjectRelationshipProps) {
 	const {observer, onClose} = useModal({
 		onClose: () => {
@@ -52,20 +56,28 @@ export function ModalAddObjectRelationship({
 		objectDefinitionExternalReferenceCode1,
 		...others
 	}: ObjectRelationship) => {
+		const relationship: ObjectRelationship = {
+			objectDefinitionExternalReferenceCode1,
+			...others,
+			label,
+			name: name ?? toCamelCase(label[defaultLanguageId]!, true),
+		};
 		try {
-			await API.save(
+			const newObjectRelationship = ((await API.save(
 				`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${objectDefinitionExternalReferenceCode1}/object-relationships`,
-				{
-					objectDefinitionExternalReferenceCode1,
-					...others,
-					label,
-					name: name ?? toCamelCase(label[defaultLanguageId]!, true),
-				},
+				relationship,
 				'POST'
-			);
+			)) as unknown) as ObjectRelationship;
 
 			onClose();
-			window.location.reload();
+
+			if (onAfterSubmit) {
+				onAfterSubmit(newObjectRelationship);
+			}
+
+			if (reload) {
+				setTimeout(() => window.location.reload(), 1000);
+			}
 		}
 		catch (error: unknown) {
 			const {message} = error as Error;
