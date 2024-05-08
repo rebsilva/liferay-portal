@@ -62,6 +62,12 @@ type ExcludesFilterOperator = {
 	};
 };
 
+type FDSEmptyState = {
+	description?: string;
+	image?: string;
+	title?: string;
+};
+
 interface HTTPMethod {
 	href: string;
 	method: string;

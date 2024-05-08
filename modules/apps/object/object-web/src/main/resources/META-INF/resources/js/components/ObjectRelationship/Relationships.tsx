@@ -91,6 +91,8 @@ export default function Relationships({
 		Liferay.Language.Locale
 	>();
 
+	const [emptyState, setEmptyState] = useState<FDSEmptyState | undefined>();
+
 	const [
 		objectRelationship,
 		setObjectRelationship,
@@ -115,6 +117,23 @@ export default function Relationships({
 			);
 
 			setCreationLanguageId(objectDefinition.defaultLanguageId);
+
+			const objectRelationships = await API.getObjectDefinitionByExternalReferenceCodeObjectRelationships(
+				objectDefinitionExternalReferenceCode
+			);
+
+			if (objectRelationships?.length === 0) {
+				setEmptyState({
+					description: Liferay.Language.get(
+						'relationships-are-connections-between-object-definitions-that-are-used-to-link-their-entries'
+					),
+					image: '/states/empty_state.svg',
+					title: Liferay.Language.get('no-relationship-created-yet'),
+				});
+			}
+			else {
+				setEmptyState(undefined);
+			}
 		};
 
 		makeFetch();
@@ -146,6 +165,7 @@ export default function Relationships({
 			ObjectFieldLabelDataRenderer,
 			ObjectRelationshipSourceDataRenderer,
 		},
+		emptyState,
 		formName,
 		id,
 		itemsActions: items,
