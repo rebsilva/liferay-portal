@@ -97,6 +97,8 @@ export default function ViewObjectDefinitions({
 		setDeletedObjectDefinition,
 	] = useState<DeletedObjectDefinition | null>();
 
+	const [emptyState, setEmptyState] = useState<FDSEmptyState | undefined>();
+
 	const [loading, setLoading] = useState(true);
 
 	const [modalImportProperties, setModalImportProperties] = useState<
@@ -179,6 +181,30 @@ export default function ViewObjectDefinitions({
 		return url;
 	};
 
+	const updateEmptyState = async () => {
+		if (selectedObjectFolder.externalReferenceCode === 'default') {
+			setEmptyState(undefined);
+		}
+		else {
+			const currentObjectFolderObjectDefinitions = await API.getObjectDefinitions(
+				`filter=objectFolderExternalReferenceCode eq '${selectedObjectFolder?.externalReferenceCode}'`
+			);
+
+			if (currentObjectFolderObjectDefinitions?.length === 0) {
+				setEmptyState({
+					description: Liferay.Language.get(
+						'create-your-first-object-or-import-an-existing-one-to-start-working-with-object-folders'
+					),
+					image: '/states/empty_state.svg',
+					title: Liferay.Language.get('no-objects-created-yet'),
+				});
+			}
+			else {
+				setEmptyState(undefined);
+			}
+		}
+	};
+
 	useEffect(() => {
 		if (objectFoldersRequestInfo?.items.length > 1) {
 			const itemsActions = [...objectDefinitionsFDSActionDropdownItems];
@@ -209,13 +235,7 @@ export default function ViewObjectDefinitions({
 			objectDefinitionSystemDataRenderer,
 			statusDataRenderer,
 		},
-		emptyState: {
-			description: Liferay.Language.get(
-				'create-your-first-object-or-import-an-existing-one-to-start-working-with-object-folders'
-			),
-			image: '/states/empty_state.svg',
-			title: Liferay.Language.get('no-objects-created-yet'),
-		},
+		emptyState,
 		id: objectDefinitionsFDSName,
 		itemsActions: updatedFDSItemsActions,
 		namespace:
@@ -391,7 +411,13 @@ export default function ViewObjectDefinitions({
 		if (reloadFDS) {
 			setTimeout(() => setReloadFDS(false), 200);
 		}
-	}, [reloadFDS]);
+
+		if (!loading || selectedObjectFolder) {
+			updateEmptyState();
+		}
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [loading, reloadFDS, selectedObjectFolder]);
 
 	return (
 		<>
