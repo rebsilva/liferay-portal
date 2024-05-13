@@ -64,6 +64,13 @@ export default function Layouts({
 			objectLayoutDefaultDataRenderer,
 			objectLayoutLabelDataRenderer,
 		},
+		emptyState: {
+			description: Liferay.Language.get(
+				'layouts-define-how-fields-and-relationships-appear-when-creating-or-editing-an-entry'
+			),
+			image: '/states/empty_state.svg',
+			title: Liferay.Language.get('no-layout-created-yet'),
+		},
 		formName,
 		id,
 		itemsActions: items,
