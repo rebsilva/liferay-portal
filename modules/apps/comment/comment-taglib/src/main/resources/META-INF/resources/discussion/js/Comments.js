@@ -352,7 +352,7 @@ export default function Comments({
 		hideEl(formId);
 	};
 
-	window[`${randomNamespace}postReply`] = function (i) {
+	window[`${randomNamespace}postReply`] = function (i, reload = false) {
 		const editorInstance =
 			window[`${namespace}${randomNamespace}postReplyBody${i}`];
 
@@ -387,6 +387,10 @@ export default function Comments({
 			sendMessage(form);
 
 			editorInstance.dispose();
+		}
+
+		if (reload) {
+			window.location.reload();
 		}
 	};
 
