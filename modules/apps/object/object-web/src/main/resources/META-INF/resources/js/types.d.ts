@@ -219,6 +219,7 @@ interface ObjectDefinition {
 	portlet: boolean;
 	restContextPath: string;
 	rootObjectDefinitionExternalReferenceCode: string;
+	rootLevel: number;
 	scope: string;
 	status: {
 		code: number;

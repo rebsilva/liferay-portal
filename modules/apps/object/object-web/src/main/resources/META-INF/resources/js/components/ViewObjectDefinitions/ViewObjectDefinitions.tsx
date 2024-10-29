@@ -146,6 +146,7 @@ export default function ViewObjectDefinitions({
 			<ViewObjectDefinitionsLabelRenderer
 				url={formatActionURL(editObjectDefinitionURL, itemData.id)}
 				value={value}
+				rootLevel={itemData?.rootLevel}
 			/>
 		);
 	}
@@ -380,6 +381,8 @@ export default function ViewObjectDefinitions({
 								<>
 									<FrontendDataSet
 										{...defaultFDSDataSetProps}
+										nestedItemsKey={"rootNestedItems"}
+										nestedItemsReferenceKey={"rootReferenceNestedItems"}
 										apiURL={
 											selectedObjectFolder
 												? getURL(

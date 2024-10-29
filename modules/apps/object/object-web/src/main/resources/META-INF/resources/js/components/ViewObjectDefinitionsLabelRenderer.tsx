@@ -9,14 +9,16 @@ import React from 'react';
 interface IProps {
 	url: string;
 	value: LocalizedValue<string>;
+	rootLevel?: number;
 }
 
 export default function ViewObjectDefinitionsLabelRenderer({
 	url,
 	value,
+	rootLevel,
 }: IProps) {
 	return (
-		<div className="table-list-title">
+		<div className="table-list-title" style={{paddingLeft: rootLevel ? `${rootLevel}rem`: '0px'}}>
 			<a href={url}>
 				{Object.keys(value).length !== 0 ? (
 					value
