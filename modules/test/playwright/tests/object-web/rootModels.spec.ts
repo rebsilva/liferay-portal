@@ -15,6 +15,8 @@ import {loginTest} from '../../fixtures/loginTest';
 import {objectPagesTest} from '../../fixtures/objectPagesTest';
 import {getRandomInt} from '../../utils/getRandomInt';
 import {pushToApiHelpersData} from '../../utils/pushToApiHelpersData';
+import { ApiHelpers } from '../../helpers/ApiHelpers';
+import getRandomString from '../../utils/getRandomString';
 
 export const test = mergeTests(
 	dataApiHelpersTest,
@@ -24,6 +26,159 @@ export const test = mergeTests(
 	loginTest(),
 	objectPagesTest
 );
+
+test.describe('Manage object entry permission in root model context', () => {
+	test('account restricted object entry', async ({
+		apiHelpers,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
+		const companyId = await page.evaluate(() => {
+			return Liferay.ThemeDisplay.getCompanyId();
+		});
+
+		const objectRelationships: ObjectRelationship[] = [];
+
+
+		// Create an role to users view and add object entries by control panel
+
+		const role = await apiHelpers.headlessAdminUser.postRole({
+			name: 'Object entry manager ' + getRandomString(),
+			rolePermissions: [
+				{
+					actionIds: [
+						'MANAGE_ORGANIZATIONS',
+						'MANAGE_USERS',
+						'MANAGE_CHANNEL_DEFAULTS',
+						'UPDATE',
+					],
+					primaryKey: companyId,
+					resourceName: 'com.liferay.account.model.AccountEntry',
+					scope: 1,
+				},
+				{
+					actionIds: ['VIEW'],
+					primaryKey: companyId,
+					resourceName: 'com.liferay.account.model.AccountRole',
+					scope: 1,
+				},
+
+				/// ...
+			],
+		});
+
+		const account1 = await apiHelpers.headlessAdminUser.postAccount();
+
+		apiHelpers.data.push({id: account1.id, type: 'account'});
+	
+		const account2 = await apiHelpers.headlessAdminUser.postAccount();
+
+		apiHelpers.data.push({id: account2.id, type: 'account'});
+
+		const user1 = await apiHelpers.headlessAdminUser.postUserAccount();
+
+		apiHelpers.data.push({
+			id: user1.id,
+			type: 'userAccount',
+		});
+
+		const user2 = await apiHelpers.headlessAdminUser.postUserAccount();
+
+		apiHelpers.data.push({
+			id: user2.id,
+			type: 'userAccount',
+		});
+
+		await apiHelpers.headlessAdminUser.assignUserToAccountByEmailAddress(
+			account1.id,
+			[user1.emailAddress]
+		);
+
+		await apiHelpers.headlessAdminUser.assignUserToAccountByEmailAddress(
+			account1.id,
+			[user2.emailAddress]
+		);
+
+		// Create two custom objects 
+
+		const objectDefinition1 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFolderExternalReferenceCode: 'default',
+					status: {code: 0},
+				});
+
+			const objectDefinition2 =
+				await apiHelpers.objectAdmin.postRandomObjectDefinition({
+					objectFolderExternalReferenceCode: 'default',
+					status: {code: 0},
+				});
+
+			apiHelpers.data.push({
+				id: objectDefinition1.id,
+				type: 'objectDefinition',
+			});
+			apiHelpers.data.push({
+				id: objectDefinition2.id,
+				type: 'objectDefinition',
+			});
+
+		// Create an object relationship (one to many) Account -> custom object 1 in model builder
+
+		const objectRelationshipLabel =
+				'objectRelationshipLabel' + getRandomInt();
+			const objectRelationshipName =
+				'objectRelationshipName' + Math.floor(Math.random() * 99);
+
+			const objectRelationshipApiClient =
+				await apiHelpers.buildRestClient(ObjectRelationshipApi);
+
+			const {body: objectRelationship} =
+				await objectRelationshipApiClient.postObjectDefinitionByExternalReferenceCodeObjectRelationship(
+					'L_ACCOUNT',
+					{
+						edge: false,
+						label: {
+							en_US: objectRelationshipLabel,
+						},
+						name: objectRelationshipName,
+						objectDefinitionExternalReferenceCode1:
+							'L_ACCOUNT',
+						objectDefinitionExternalReferenceCode2:
+							objectDefinition1.externalReferenceCode,
+						objectDefinitionId1: 32183,
+						objectDefinitionId2: objectDefinition1.id,
+						objectDefinitionName2: objectDefinition1.name,
+						type: ObjectRelationship.TypeEnum.OneToMany,
+					}
+				);
+
+			objectRelationships.push(objectRelationship);
+
+			apiHelpers.data.push({
+				id: objectRelationship.id,
+				type: 'objectRelationship',
+			});
+
+		// Enable the toggle related to account restricted in custom object 1
+
+		await viewObjectDefinitionsPage.goto();
+
+		await viewObjectDefinitionsPage.actionsButton.first().waitFor();
+
+		await viewObjectDefinitionsPage.clickEditObjectDefinitionLink(objectDefinition1.name);
+
+		// Create an inheritance relationship between custom object 1 and custom object 2
+
+		// Add entries related to account 1 
+
+		// Add entries related to account 2 
+
+		// Log in using the user 1, check for view and edit entries related to account1
+
+		// Log in using the user 2, check for view and edit entries related to account2
+	})
+
+});
 
 test.describe('Manage root models elements through Objects Admin', () => {
 	test('cannot delete an object definition with inheritance enabled on its relationship', async ({

@@ -62,6 +62,8 @@ export class ObjectAdminApiHelper {
 
 		const requestBody: ObjectDefinition = {
 			active: true,
+			accountEntryRestricted: false,
+  			accountEntryRestrictedObjectFieldName: "",
 			externalReferenceCode: objectDefinitionExternalReferenceCode,
 			label: {
 				en_US: objectDefinitionExternalReferenceCode,
