@@ -47,6 +47,9 @@ public class NumericDDMFormFieldTemplateContextContributor
 				ddmFormField, ddmFormFieldRenderingContext, "dataType"));
 		Locale locale = ddmFormFieldRenderingContext.getLocale();
 
+		boolean localizedObjectField = GetterUtil.getBoolean(
+			ddmFormField.getProperty("localizedObjectField"));
+
 		return HashMapBuilder.<String, Object>put(
 			"confirmationErrorMessage",
 			DDMFormFieldTypeUtil.getPropertyValue(
@@ -66,6 +69,8 @@ public class NumericDDMFormFieldTemplateContextContributor
 			"htmlAutocompleteAttribute",
 			GetterUtil.getString(
 				ddmFormField.getProperty("htmlAutocompleteAttribute"))
+		).put(
+			"localizedObjectField", localizedObjectField
 		).put(
 			"placeholder",
 			DDMFormFieldTypeUtil.getPropertyValue(
