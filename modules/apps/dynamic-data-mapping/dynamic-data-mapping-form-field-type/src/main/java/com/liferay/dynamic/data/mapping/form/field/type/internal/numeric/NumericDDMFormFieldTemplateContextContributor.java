@@ -7,8 +7,11 @@ package com.liferay.dynamic.data.mapping.form.field.type.internal.numeric;
 
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldTemplateContextContributor;
 import com.liferay.dynamic.data.mapping.form.field.type.constants.DDMFormFieldTypeConstants;
+import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTemplateContextContributorUtil;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldTypeUtil;
+import com.liferay.dynamic.data.mapping.form.field.type.internal.util.DDMFormFieldValueUtil;
 import com.liferay.dynamic.data.mapping.form.field.type.internal.util.NumericDDMFormFieldTypeUtil;
+import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
 import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.dynamic.data.mapping.util.NumericDDMFormFieldUtil;
@@ -45,6 +48,9 @@ public class NumericDDMFormFieldTemplateContextContributor
 		String dataType = GetterUtil.getString(
 			DDMFormFieldTypeUtil.getChangedPropertyValue(
 				ddmFormField, ddmFormFieldRenderingContext, "dataType"));
+
+		DDMForm ddmForm = ddmFormField.getDDMForm();
+
 		Locale locale = ddmFormFieldRenderingContext.getLocale();
 
 		boolean localizedObjectField = GetterUtil.getBoolean(
@@ -93,6 +99,11 @@ public class NumericDDMFormFieldTemplateContextContributor
 		).put(
 			"value",
 			() -> {
+				if (localizedObjectField) {
+					return DDMFormFieldValueUtil.getValueJSONObject(
+						ddmFormFieldRenderingContext);
+				}
+
 				String value = _htmlParser.extractText(
 					ddmFormFieldRenderingContext.getValue());
 
@@ -106,6 +117,9 @@ public class NumericDDMFormFieldTemplateContextContributor
 		).putAll(
 			NumericDDMFormFieldTypeUtil.getParameters(
 				dataType, ddmFormField, ddmFormFieldRenderingContext)
+		).putAll(
+			DDMFormFieldTemplateContextContributorUtil.getLocaleMap(
+				ddmForm.getDefaultLocale())
 		).build();
 	}
 
