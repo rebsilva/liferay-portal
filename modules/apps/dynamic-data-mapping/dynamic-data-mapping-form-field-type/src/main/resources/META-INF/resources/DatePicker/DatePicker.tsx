@@ -39,6 +39,7 @@ export default function DatePicker({
 			<Component
 				{...otherProps}
 				displayErrors={displayErrors}
+				localizedObjectField={localizedObjectField}
 				errorMessage={errorMessage}
 				setValidField={setValidField}
 				valid={valid}

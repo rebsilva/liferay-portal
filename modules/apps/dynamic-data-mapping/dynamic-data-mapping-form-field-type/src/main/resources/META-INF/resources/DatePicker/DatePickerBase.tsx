@@ -31,6 +31,7 @@ export interface DatePickerBaseProps {
 	locale: Locale;
 	localizable: boolean;
 	localizedValue?: LocalizedValue<string>;
+	localizedObjectField: boolean;
 	months: string[];
 	name: string;
 	onBlur: any;
@@ -48,7 +49,7 @@ export interface DatePickerBaseProps {
 	>;
 	type: 'date' | 'date_time';
 	valid: boolean;
-	value: string;
+	value: string | LocalizedValue<string>;
 	weekdaysShort: string[];
 }
 
@@ -103,6 +104,7 @@ export default function DatePickerBase({
 	locale,
 	localizable,
 	localizedValue,
+	localizedObjectField,
 	months,
 	name,
 	onBlur,
@@ -139,16 +141,24 @@ export default function DatePickerBase({
 		return dateMaskParameters;
 	}, [defaultLanguageId, locale, type]);
 
+	const getRawDate = () => {
+		if (localizable) {
+			return (localizedValue?.[locale] ??
+			localizedValue?.[defaultLanguageId]) ?? predefinedValue ?? '';
+		} else if (localizedObjectField && typeof value !== "string") {
+			return (value?.[locale] ?? //mudar para o currentEditingLanguage ou mandar o locale como o currentEditingLanguage
+			value?.[defaultLanguageId]) ?? predefinedValue ?? ''; 
+		} else {
+			return value as string ?? predefinedValue ?? '';
+		}
+	};
+
 	const date: Date = useMemo(() => {
 		let formattedDate = '';
 		let year = moment().year();
-		const rawDate =
-			(localizable
-				? localizedValue?.[locale] ??
-					localizedValue?.[defaultLanguageId]
-				: value) ??
-			predefinedValue ??
-			'';
+		const rawDate = getRawDate();
+
+		console.log(rawDate, 'rawdate');
 
 		if (rawDate !== '') {
 			const date = moment(rawDate, serverFormat, true);
