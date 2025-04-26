@@ -23,6 +23,8 @@ import {TYPES} from '../ModelBuilderContext/typesEnum';
 import {nonRelationshipObjectFieldsInfo} from '../types';
 
 import './RightSidebarObjectDefinitionDetails.scss';
+import {getObjectDefinitionInfo} from '../../ViewObjectDefinitions/objectDefinitionUtil';
+import WorkflowContainer from '../../WorkflowContainer';
 
 interface RightSidebarObjectDefinitionDetailsProps {
 	companies: Scope[];
@@ -60,8 +62,12 @@ export function RightSidebarObjectDefinitionDetails({
 		setNonRelationshipObjectFieldsInfo,
 	] = useState<nonRelationshipObjectFieldsInfo[]>();
 
-	const [{selectedObjectDefinitionNode, selectedObjectFolder}, dispatch] =
-		useObjectFolderContext();
+	const [workflowLabel, setWorkflowLabel] = useState('');
+
+	const [
+		{baseResourceURL, selectedObjectDefinitionNode, selectedObjectFolder},
+		dispatch,
+	] = useObjectFolderContext();
 
 	const store = useStore();
 
@@ -104,10 +110,20 @@ export function RightSidebarObjectDefinitionDetails({
 							name: objectField.name,
 						})) as nonRelationshipObjectFieldsInfo[];
 
+				const objectDefinitionInfo = await getObjectDefinitionInfo({
+					baseResourceURL,
+					objectDefinitionId: selectedObjectDefinitionNode.data
+						?.id as number,
+				} as {
+					baseResourceURL: string;
+					objectDefinitionId: number;
+				});
+
 				setNonRelationshipObjectFieldsInfo(
 					newNonRelationshipObjectFieldsInfo
 				);
 				setValues(selectedObjectDefinition);
+				setWorkflowLabel(objectDefinitionInfo.workflowDefinitionLabel);
 			}
 		};
 
@@ -244,6 +260,20 @@ export function RightSidebarObjectDefinitionDetails({
 					values={values as ObjectDefinition}
 				/>
 			</div>
+			{selectedObjectDefinitionNode?.data?.scope === 'company' &&
+				selectedObjectDefinitionNode?.data?.status.label ===
+					'approved' && (
+					<div className="lfr-objects__model-builder-right-sidebar-object-definition-node-content">
+						<WorkflowContainer
+							baseResourceURL={baseResourceURL}
+							className="lfr-objects__model-builder-right-sidebar"
+							objectDefinitionId={
+								selectedObjectDefinitionNode?.data?.id as number
+							}
+							workflowLabel={workflowLabel}
+						/>
+					</div>
+				)}
 			{values?.modifiable && (
 				<div className="lfr-objects__model-builder-right-sidebar-object-definition-node-content">
 					<AccountRestrictionContainer

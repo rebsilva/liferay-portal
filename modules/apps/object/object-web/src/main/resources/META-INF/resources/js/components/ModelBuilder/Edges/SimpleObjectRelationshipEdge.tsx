@@ -91,6 +91,9 @@ export function SimpleObjectRelationshipEdge({
 						});
 					}}
 					ref={buttonRef}
+
+					// talvez usar esse style aqui
+
 					style={{
 						backgroundColor: labelBgStyle.fill,
 						...labelBgStyle,
