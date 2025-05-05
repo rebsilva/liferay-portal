@@ -37,7 +37,9 @@ export function ObjectRelationshipInheritanceCheckbox({
 			<div className="form-group lfr__object-relationship-inheritance-container">
 				<ClayCheckbox
 					checked={!!values.edge}
-					label={Liferay.Language.get('enable-inheritance')}
+					label={Liferay.Language.get(
+						'enable-inheritance,-including-shared-permissions,-workflows-and-grouped-apis'
+					)}
 					onChange={onChange}
 				/>
 
@@ -76,7 +78,7 @@ export function ObjectRelationshipInheritanceCheckbox({
 				title={`${Liferay.Language.get('info')}:`}
 			>
 				{Liferay.Language.get(
-					'when-enabled,-permissions-are-inherited,-all-api-endpoints-are-grouped-under-the-parent,-and-the-relationship-field-is-always-mandatory'
+					'when-enabled,-permissions-are-inherited,-all-api-endpoints-are-grouped-under-the-parent,-the-relationship-field-is-always-mandatory,-and-the-child-entries-will-be-under-the-workflow-assigned-to-the-parent'
 				)}
 			</ClayAlert>
 		</>
