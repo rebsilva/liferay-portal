@@ -72,6 +72,7 @@ public class FriendlyURLSeparatorCompanyConfigurationDisplayContext {
 				getFriendlyURLResolversAsCollection(),
 			friendlyURLResolver -> {
 				if (!friendlyURLResolver.isURLSeparatorConfigurable() ||
+					!friendlyURLResolver.isVisible() ||
 					Validator.isNull(friendlyURLResolver.getKey())) {
 
 					return null;
