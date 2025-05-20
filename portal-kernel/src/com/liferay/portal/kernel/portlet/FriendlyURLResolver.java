@@ -66,4 +66,8 @@ public interface FriendlyURLResolver {
 		return false;
 	}
 
+	public default boolean isVisible() {
+		return true;
+	}
+
 }

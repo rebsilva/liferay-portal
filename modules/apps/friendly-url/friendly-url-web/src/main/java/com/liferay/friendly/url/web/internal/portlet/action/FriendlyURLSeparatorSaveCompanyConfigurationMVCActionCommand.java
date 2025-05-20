@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.FriendlyURLNormalizer;
 import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.service.impl.LayoutLocalServiceHelper;
@@ -120,6 +121,12 @@ public class FriendlyURLSeparatorSaveCompanyConfigurationMVCActionCommand
 				() -> {
 					String friendlyURLSeparator = ParamUtil.getString(
 						actionRequest, friendlyURLResolver.getKey());
+
+					if (!friendlyURLResolver.isVisible()) {
+						friendlyURLSeparator = StringUtil.removeSubstring(
+							friendlyURLResolver.getURLSeparator(),
+							StringPool.SLASH);
+					}
 
 					if (Validator.isNull(friendlyURLSeparator)) {
 						fieldsValidationErrorsJSONObject.put(
