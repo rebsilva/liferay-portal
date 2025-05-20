@@ -10,6 +10,7 @@ import com.liferay.account.service.AccountEntryOrganizationRelLocalService;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.fragment.cache.FragmentEntryLinkCache;
 import com.liferay.fragment.model.FragmentEntryLink;
+import com.liferay.friendly.url.separator.util.FriendlyURLSeparatorUtil;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
@@ -33,6 +34,7 @@ import com.liferay.object.exception.ObjectDefinitionEnableLocalizationException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryHistoryException;
 import com.liferay.object.exception.ObjectDefinitionEnableObjectEntryVersioningException;
 import com.liferay.object.exception.ObjectDefinitionExternalReferenceCodeException;
+import com.liferay.object.exception.ObjectDefinitionFriendlyURLSeparatorException;
 import com.liferay.object.exception.ObjectDefinitionLabelException;
 import com.liferay.object.exception.ObjectDefinitionModifiableException;
 import com.liferay.object.exception.ObjectDefinitionNameException;
@@ -98,6 +100,7 @@ import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.lang.SafeCloseable;
 import com.liferay.petra.sql.dsl.Column;
 import com.liferay.petra.sql.dsl.Table;
+import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
@@ -167,6 +170,7 @@ import com.liferay.portal.language.override.service.PLOEntryLocalService;
 import com.liferay.portal.search.batch.DynamicQueryBatchIndexingActionableFactory;
 import com.liferay.portal.search.localization.SearchLocalizationHelper;
 import com.liferay.portal.search.spi.model.query.contributor.ModelPreFilterContributor;
+import com.liferay.portal.service.impl.LayoutLocalServiceHelper;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.vulcan.util.LocalizedMapUtil;
 import com.liferay.sharing.security.permission.resource.SharingModelResourcePermissionConfigurator;
@@ -174,6 +178,7 @@ import com.liferay.sharing.service.SharingEntryLocalService;
 
 import java.sql.PreparedStatement;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -2133,6 +2138,8 @@ public class ObjectDefinitionLocalServiceImpl
 						"fields");
 		}
 
+		_validateFriendlyURLSeparator(objectDefinition);
+
 		if (!ListUtil.exists(
 				objectFields, objectField -> !objectField.isMetadata())) {
 
@@ -2505,6 +2512,8 @@ public class ObjectDefinitionLocalServiceImpl
 					objectDefinition);
 			}
 			else if (active) {
+				_validateFriendlyURLSeparator(objectDefinition);
+
 				objectDefinitionLocalService.deployObjectDefinition(
 					objectDefinition);
 			}
@@ -2866,6 +2875,64 @@ public class ObjectDefinitionLocalServiceImpl
 		}
 	}
 
+	private void _validateFriendlyURLSeparator(
+			ObjectDefinition objectDefinition)
+		throws PortalException {
+
+		if (!FeatureFlagManagerUtil.isEnabled("LPD-21926") ||
+			Validator.isNull(objectDefinition.getFriendlyURLSeparator())) {
+
+			return;
+		}
+
+		FriendlyURLResolver objectEntryFriendlyURLResolver =
+			FriendlyURLResolverRegistryUtil.
+				getFriendlyURLResolverByDefaultURLSeparator(
+					FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY);
+
+		if ((objectEntryFriendlyURLResolver != null) &&
+			StringUtil.equals(
+				StringUtil.removeSubstring(
+					objectEntryFriendlyURLResolver.getURLSeparator(),
+					StringPool.SLASH),
+				objectDefinition.getFriendlyURLSeparator())) {
+
+			return;
+		}
+
+		List<String> friendlyURLSeparators = new ArrayList<>();
+
+		String friendlyURLResolverKey = StringUtil.replace(
+			objectDefinition.getClassName(), CharPool.POUND, CharPool.PERIOD);
+
+		for (FriendlyURLResolver friendlyURLResolver :
+				FriendlyURLResolverRegistryUtil.
+					getFriendlyURLResolversAsCollection()) {
+
+			if ((friendlyURLResolver == null) ||
+				!friendlyURLResolver.isURLSeparatorConfigurable() ||
+				StringUtil.equals(
+					friendlyURLResolver.getKey(), friendlyURLResolverKey)) {
+
+				continue;
+			}
+
+			friendlyURLSeparators.add(friendlyURLResolver.getURLSeparator());
+		}
+
+		String errorMessage = FriendlyURLSeparatorUtil.validate(
+			objectDefinition.getCompanyId(), _friendlyURLNormalizer,
+			friendlyURLResolverKey, objectDefinition.getFriendlyURLSeparator(),
+			friendlyURLSeparators, _layoutLocalServiceHelper,
+			LocaleUtil.getSiteDefault());
+
+		if (errorMessage == null) {
+			return;
+		}
+
+		throw new ObjectDefinitionFriendlyURLSeparatorException(errorMessage);
+	}
+
 	private void _validateLabel(Map<Locale, String> labelMap)
 		throws PortalException {
 
@@ -3173,6 +3240,9 @@ public class ObjectDefinitionLocalServiceImpl
 	@Reference
 	private LayoutClassedModelUsageLocalService
 		_layoutClassedModelUsageLocalService;
+
+	@Reference
+	private LayoutLocalServiceHelper _layoutLocalServiceHelper;
 
 	@Reference
 	private ListTypeLocalService _listTypeLocalService;
