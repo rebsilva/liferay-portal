@@ -288,6 +288,7 @@ export function RightSidebarObjectDefinitionDetails({
 			{Liferay.FeatureFlags['LPD-21926'] && (
 				<div className="lfr-objects__model-builder-right-sidebar-object-definition-node-content">
 					<SeoContainer
+						errors={{}} // ver como isso vai ficar no model builder depois
 						onSubmit={onSubmit}
 						setValues={setValues}
 						values={values}

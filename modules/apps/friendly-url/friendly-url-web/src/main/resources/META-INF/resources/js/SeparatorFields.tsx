@@ -26,9 +26,11 @@ type FieldsProps = {
 	errors: Errors;
 	fields: Field[];
 	url: string;
+	hideReset?: boolean;
+	handleChange?: (value: string) => void;
 };
 
-export default function SeparatorFields({errors, fields, url}: FieldsProps) {
+export default function SeparatorFields({errors, fields, url, hideReset, handleChange}: FieldsProps) {
 	return (
 		<>
 			{fields.map((field) => (
@@ -37,6 +39,8 @@ export default function SeparatorFields({errors, fields, url}: FieldsProps) {
 					field={field}
 					key={field.name}
 					url={url}
+					hideReset={hideReset}
+					handleChange={handleChange}
 				/>
 			))}
 		</>
@@ -47,9 +51,11 @@ type FieldProps = {
 	errors: Errors;
 	field: Field;
 	url: string;
+	hideReset?: boolean;
+	handleChange?: (value: string) => void;
 };
 
-function Field({errors, field, url}: FieldProps) {
+function Field({errors, field, url, hideReset, handleChange}: FieldProps) {
 	const descriptionId = useId();
 	const ref = useRef<HTMLInputElement>(null);
 
@@ -90,13 +96,21 @@ function Field({errors, field, url}: FieldProps) {
 						aria-describedby={descriptionId}
 						id={name}
 						name={name}
-						onChange={(event) => setValue(event.target.value)}
+						onChange={(event) =>  {
+							setValue(event.target.value)
+
+							if (handleChange) {
+								handleChange(event.target.value);
+							}
+						}
+
+						}
 						ref={ref}
 						value={value}
 					/>
 				</ClayInput.GroupItem>
 
-				{value !== defaultValue ? (
+				{value !== defaultValue && !hideReset ? (
 					<ClayInput.GroupItem shrink>
 						<ClayButtonWithIcon
 							aria-label={Liferay.Language.get(

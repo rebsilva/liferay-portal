@@ -5,33 +5,34 @@
 
 import {Text} from '@clayui/core';
 import ClayForm, {ClayCheckbox} from '@clayui/form';
+import {FormError} from '@liferay/object-js-components-web';
 import React from 'react';
 
+import {SeparatorContainer} from './SeparatorContainer';
+
 interface SeoContainerProps {
+	errors: FormError<ObjectDefinition>;
 	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
 }
 
-export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
-	const disabled =
-		(Liferay.FeatureFlags['LPS-135430'] &&
-			values.storageType !== 'default') ||
-		(!values.modifiable && values.system);
-
+export function SeoContainer({
+	errors,
+	onSubmit,
+	setValues,
+	values,
+}: SeoContainerProps) {
 	return (
 		<ClayForm.Group>
-			<div className="c-mb-sm-4">
-				<Text color="secondary" size={3}>
-					{Liferay.Language.get(
-						"when-enabled,-users-can-override-an-entry's-friendly-url"
-					)}
-				</Text>
-			</div>
+			<SeparatorContainer
+				errors={errors}
+				setValues={setValues}
+				values={values}
+			/>
 
 			<ClayCheckbox
 				checked={!!values.enableFriendlyURLCustomization}
-				disabled={disabled}
 				label={Liferay.Language.get(
 					"allow-overriding-an-entry's-friendly-url"
 				)}
@@ -48,6 +49,14 @@ export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
 					});
 				}}
 			/>
+
+			<div className="c-mb-sm-4">
+				<Text color="secondary" size={3}>
+					{Liferay.Language.get(
+						"when-enabled,-users-can-override-an-entry's-friendly-url"
+					)}
+				</Text>
+			</div>
 		</ClayForm.Group>
 	);
 }
