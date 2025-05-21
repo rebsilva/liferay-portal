@@ -586,16 +586,21 @@ public class ObjectEntryDisplayContextImpl
 			sb.append(group.getFriendlyURL());
 		}
 
+		ObjectDefinition objectDefinition = getObjectDefinition1();
+
+		String friendlyURLSeparator = StringUtil.quote(
+			objectDefinition.getFriendlyURLSeparator(), StringPool.SLASH);
+
 		FriendlyURLResolver friendlyURLResolver =
 			FriendlyURLResolverRegistryUtil.
 				getFriendlyURLResolverByDefaultURLSeparator(
-					FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY);
+					friendlyURLSeparator);
 
 		if (friendlyURLResolver == null) {
 			sb.append(FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY);
 		}
 		else {
-			sb.append(friendlyURLResolver.getURLSeparator());
+			sb.append(friendlyURLSeparator);
 		}
 
 		return sb.toString();

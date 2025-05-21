@@ -8,6 +8,7 @@ package com.liferay.portal.kernel.portlet;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +63,9 @@ public class FriendlyURLResolverRegistryUtil {
 		List<String> urlSeparators = new ArrayList<>();
 
 		for (FriendlyURLResolver friendlyURLResolver : _serviceTrackerList) {
-			if (friendlyURLResolver != null) {
+			if ((friendlyURLResolver != null) &&
+				Validator.isNotNull(friendlyURLResolver.getURLSeparator())) {
+
 				urlSeparators.add(friendlyURLResolver.getURLSeparator());
 			}
 		}

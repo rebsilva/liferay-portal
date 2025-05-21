@@ -6,32 +6,49 @@
 package com.liferay.object.web.internal.asset.display.page.portlet;
 
 import com.liferay.asset.display.page.portlet.BaseAssetDisplayPageFriendlyURLResolver;
-import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectDefinition;
+import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.feature.flag.FeatureFlagManagerUtil;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolver;
-import com.liferay.portal.kernel.portlet.constants.FriendlyURLResolverConstants;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
 /**
- * @author Guilherme Camacho
+ * @author Carolina Barbosa
  */
-@Component(service = FriendlyURLResolver.class)
+@Component(scope = ServiceScope.PROTOTYPE, service = FriendlyURLResolver.class)
 public class ObjectEntryDisplayPageFriendlyURLResolver
 	extends BaseAssetDisplayPageFriendlyURLResolver {
 
 	@Override
 	public String getDefaultURLSeparator() {
-		return FriendlyURLResolverConstants.URL_SEPARATOR_OBJECT_ENTRY;
+		if (_objectDefinition == null) {
+			return StringPool.BLANK;
+		}
+
+		return StringUtil.quote(
+			_objectDefinition.getFriendlyURLSeparator(), CharPool.SLASH);
 	}
 
 	@Override
 	public String getKey() {
-		return ObjectEntry.class.getName();
+		if (_objectDefinition == null) {
+			return StringPool.BLANK;
+		}
+
+		return StringUtil.replace(
+			_objectDefinition.getClassName(), CharPool.POUND, CharPool.PERIOD);
 	}
 
 	@Override
 	public boolean isURLSeparatorConfigurable() {
+		if (_objectDefinition == null) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -43,5 +60,11 @@ public class ObjectEntryDisplayPageFriendlyURLResolver
 
 		return true;
 	}
+
+	public void setObjectDefinition(ObjectDefinition objectDefinition) {
+		_objectDefinition = objectDefinition;
+	}
+
+	private ObjectDefinition _objectDefinition;
 
 }
