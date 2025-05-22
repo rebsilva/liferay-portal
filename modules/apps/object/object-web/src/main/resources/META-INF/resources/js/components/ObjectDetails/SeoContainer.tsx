@@ -1,13 +1,13 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2025 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {Text} from '@clayui/core';
-import ClayForm, {ClayCheckbox} from '@clayui/form';
+import ClayForm from '@clayui/form';
 import {FormError} from '@liferay/object-js-components-web';
 import React from 'react';
 
+import {AllowFriendlyURLContainer} from './AllowFriendlyURLContainer';
 import {SeparatorContainer} from './SeparatorContainer';
 
 interface SeoContainerProps {
@@ -31,32 +31,11 @@ export function SeoContainer({
 				values={values}
 			/>
 
-			<ClayCheckbox
-				checked={!!values.enableFriendlyURLCustomization}
-				label={Liferay.Language.get(
-					"allow-overriding-an-entry's-friendly-url"
-				)}
-				onBlur={(event) => {
-					event.stopPropagation();
-
-					if (onSubmit) {
-						onSubmit();
-					}
-				}}
-				onChange={({target: {checked}}) => {
-					setValues({
-						enableFriendlyURLCustomization: checked,
-					});
-				}}
+			<AllowFriendlyURLContainer
+				onSubmit={onSubmit}
+				setValues={setValues}
+				values={values}
 			/>
-
-			<div className="c-mb-sm-4">
-				<Text color="secondary" size={3}>
-					{Liferay.Language.get(
-						"when-enabled,-users-can-override-an-entry's-friendly-url"
-					)}
-				</Text>
-			</div>
 		</ClayForm.Group>
 	);
 }
