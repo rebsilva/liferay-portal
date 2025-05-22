@@ -23,6 +23,7 @@ export function SeoContainer({
 	setValues,
 	values,
 }: SeoContainerProps) {
+	console.log(values);
 	return (
 		<ClayForm.Group>
 			<SeparatorContainer

@@ -30,7 +30,7 @@ type FieldsProps = {
 	handleChange?: (value: string) => void;
 };
 
-export default function SeparatorFields({errors, fields, url, hideReset, handleChange}: FieldsProps) {
+export default function SeparatorFields({errors, fields, handleChange, hideReset, url}: FieldsProps) {
 	return (
 		<>
 			{fields.map((field) => (

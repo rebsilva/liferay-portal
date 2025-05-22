@@ -21,6 +21,7 @@ import {useObjectDetailsForm} from './useObjectDetailsForm';
 import './ObjectDetails.scss';
 import {Error, handleErrors} from '../../utils/errors';
 import {SeoContainer} from './SeoContainer';
+import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 export type Scope = {
 	items: LabelValueObject[];
@@ -186,13 +187,13 @@ export default function EditObjectDetails({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [objectDefinitionId]);
 
-	const showSeoSection =
-		Liferay.FeatureFlags['LPD-21926'] &&
-		!(
-			(Liferay.FeatureFlags['LPS-135430'] &&
-				values.storageType !== 'default') ||
-			(!values.modifiable && values.system)
-		);
+	// const showSeoSection =
+	// 	Liferay.FeatureFlags['LPD-21926'] &&
+	// 	!(
+	// 		(Liferay.FeatureFlags['LPS-135430'] &&
+	// 			values.storageType !== 'default') ||
+	// 		(!values.modifiable && values.system)
+	// 	);
 
 	return (
 		<>
@@ -368,22 +369,27 @@ export default function EditObjectDetails({
 						</ClayPanel.Body>
 					</ClayPanel>
 
-					{showSeoSection && (
-						<ClayPanel
-							collapsable
-							defaultExpanded
-							displayTitle={Liferay.Language.get('seo')}
-							displayType="unstyled"
-						>
-							<ClayPanel.Body>
-								<SeoContainer
-									errors={backEndErrors}
-									setValues={setValues}
-									values={values}
-								/>
-							</ClayPanel.Body>
-						</ClayPanel>
-					)}
+					{Liferay.FeatureFlags['LPD-21926'] && values.friendlyURLSeparator !== undefined &&
+						!(
+							(Liferay.FeatureFlags['LPS-135430'] &&
+								values.storageType !== 'default') ||
+							(!values.modifiable && values.system)
+						) && (
+							<ClayPanel
+								collapsable
+								defaultExpanded
+								displayTitle={Liferay.Language.get('seo')}
+								displayType="unstyled"
+							>
+								<ClayPanel.Body>
+									<SeoContainer
+										errors={backEndErrors}
+										setValues={setValues}
+										values={values}
+									/>
+								</ClayPanel.Body>
+							</ClayPanel>
+						)}
 				</Sheet>
 			</div>
 		</>

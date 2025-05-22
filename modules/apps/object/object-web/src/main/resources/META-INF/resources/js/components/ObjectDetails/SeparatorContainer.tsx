@@ -35,6 +35,8 @@ export function SeparatorContainer({
 		setValues({friendlyURLSeparator: value});
 	};
 
+	console.log(values);
+
 	return (
 		<>
 			<SeparatorFields
@@ -44,15 +46,13 @@ export function SeparatorContainer({
 						defaultValue: values.name as string,
 						label,
 						name: 'friendlyURLSeparator',
-						value: values.name as string,
 
-						// value: values.friendlyURLSeparator as string,
+						// value: values.name as string,
 
+						value: values.friendlyURLSeparator as string,
 					},
 				]}
-
-				// handleChange={handleChange}
-
+				handleChange={handleChange}
 				hideReset={true}
 				url={url}
 			/>
