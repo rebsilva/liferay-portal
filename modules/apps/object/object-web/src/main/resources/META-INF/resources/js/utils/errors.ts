@@ -27,8 +27,7 @@ export function parseError(details: ErrorMessage[], errors: Error) {
 	});
 }
 
-export function getErrorMessage(errors: Error) {
-	const errorMessages = new Set<string>();
+export function getErrorMessage(errors: Error, errorMessages: Set<string>) {
 	Object.values(errors).forEach((value) => {
 		if (typeof value === 'string') {
 			if (!errorMessages.has(value)) {
@@ -36,11 +35,9 @@ export function getErrorMessage(errors: Error) {
 			}
 		}
 		else {
-			getErrorMessage(value);
+			getErrorMessage(value, errorMessages);
 		}
 	});
-
-	return errorMessages;
 }
 
 export function handleErrors(
@@ -61,8 +58,10 @@ export function handleErrors(
 
 		setErrors(newErrors);
 
+		const errorMessages = new Set<string>();
+
 		if (newErrors) {
-			const errorMessages = getErrorMessage(newErrors);
+			getErrorMessage(newErrors, errorMessages);
 			errorMessages.forEach((message) => {
 				openToast({
 					message,

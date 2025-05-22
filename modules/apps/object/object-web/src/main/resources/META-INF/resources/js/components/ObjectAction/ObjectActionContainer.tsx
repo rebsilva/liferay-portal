@@ -101,8 +101,10 @@ export function ObjectActionContainer({
 
 			setBackEndErrors(newErrors);
 
+			const errorMessages = new Set<string>();
+
 			if (newErrors) {
-				const errorMessages = getErrorMessage(newErrors);
+				getErrorMessage(newErrors, errorMessages);
 				errorMessages.forEach((message) => {
 					openToast({
 						message,
