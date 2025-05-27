@@ -8,10 +8,13 @@ import {SeparatorFields} from '@liferay/friendly-url-web';
 import {FormError} from '@liferay/object-js-components-web';
 import React from 'react';
 
+import {Error} from '../../utils/errors';
+
 interface SeparatorContainerProps {
 	errors: FormError<ObjectDefinition>;
-	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void; // para model builder
+	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
+	setErrors?: (errors: Error) => void;
 	values: Partial<ObjectDefinition>;
 }
 
@@ -20,12 +23,13 @@ const SEPARATOR_TEXT = {
 		'please-note-that-modifying-this-value-could-impact-existing-urls-and-seo'
 	),
 	label: Liferay.Language.get('object-entry-url-separator'),
-	url: 'http://www.liferay.com',
+	url: 'http://localhost:8080',
 };
 
 export function SeparatorContainer({
 	errors,
 	onSubmit,
+	setErrors,
 	setValues,
 	values,
 }: SeparatorContainerProps) {
@@ -35,7 +39,19 @@ export function SeparatorContainer({
 		setValues({friendlyURLSeparator: value});
 	};
 
-	console.log(values);
+	const handleOnBlur = (
+		event: React.FocusEvent<HTMLInputElement, Element>
+	) => {
+		event.stopPropagation();
+
+		if (setErrors) {
+			setErrors({});
+		}
+
+		if (onSubmit) {
+			onSubmit();
+		}
+	};
 
 	return (
 		<>
@@ -46,13 +62,11 @@ export function SeparatorContainer({
 						defaultValue: values.name as string,
 						label,
 						name: 'friendlyURLSeparator',
-
-						// value: values.name as string,
-
 						value: values.friendlyURLSeparator as string,
 					},
 				]}
 				handleChange={handleChange}
+				handleOnBlur={handleOnBlur}
 				hideReset={true}
 				url={url}
 			/>

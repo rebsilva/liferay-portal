@@ -21,7 +21,6 @@ import {useObjectDetailsForm} from './useObjectDetailsForm';
 import './ObjectDetails.scss';
 import {Error, handleErrors} from '../../utils/errors';
 import {SeoContainer} from './SeoContainer';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 export type Scope = {
 	items: LabelValueObject[];
@@ -369,7 +368,8 @@ export default function EditObjectDetails({
 						</ClayPanel.Body>
 					</ClayPanel>
 
-					{Liferay.FeatureFlags['LPD-21926'] && values.friendlyURLSeparator !== undefined &&
+					{Liferay.FeatureFlags['LPD-21926'] &&
+						values.friendlyURLSeparator !== undefined &&
 						!(
 							(Liferay.FeatureFlags['LPS-135430'] &&
 								values.storageType !== 'default') ||

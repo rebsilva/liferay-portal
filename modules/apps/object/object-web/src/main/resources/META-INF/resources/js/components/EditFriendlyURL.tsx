@@ -7,21 +7,22 @@ import ClayAlert from '@clayui/alert';
 import ClayButton from '@clayui/button';
 import ClayForm from '@clayui/form';
 import ClayModal, {useModal} from '@clayui/modal';
-import { openToast } from 'frontend-js-components-web';
+import {API} from '@liferay/object-js-components-web';
+import {openToast} from 'frontend-js-components-web';
 import React, {useState} from 'react';
-import { SeparatorContainer } from './ObjectDetails/SeparatorContainer';
-import { API } from '@liferay/object-js-components-web';
-import { Error, handleErrors } from '../utils/errors';
+
+import {Error, handleErrors} from '../utils/errors';
+import {SeparatorContainer} from './ObjectDetails/SeparatorContainer';
 
 interface ModalEditObjectDefinitionExternalReferenceCodeProps {
 	handleOnClose: () => void;
-    setValues: (values: Partial<ObjectDefinition>) => void;
+	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
 }
 
 export function ModalEditObjectDefinitionExternalReferenceCode({
 	handleOnClose,
-    setValues,
+	setValues,
 	values,
 }: ModalEditObjectDefinitionExternalReferenceCodeProps) {
 	const [errors, setErrors] = useState<Error>({});
@@ -32,34 +33,32 @@ export function ModalEditObjectDefinitionExternalReferenceCode({
 	});
 
 	const onSubmit = async () => {
-
-        let objectDefinition = values;
+		const objectDefinition = values;
 
 		const saveResponse =
-                        await API.putObjectDefinitionByExternalReferenceCode(objectDefinition);
-        
-                    if (!saveResponse.ok) {
-                        const {detail, title} = (await saveResponse.json()) as Error;
-        
-                        handleErrors({detail, title}, setErrors);
-                        return;
-                    }
+			await API.putObjectDefinitionByExternalReferenceCode(
+				objectDefinition
+			);
 
-                    onClose();
+		if (!saveResponse.ok) {
+			const {detail, title} = (await saveResponse.json()) as Error;
 
-                    openToast({
-                                    message: Liferay.Language.get(
-                                        'the-object-was-saved-successfully'
-                                    ),
-                                    type: 'success',
-                    });
-		
-		
+			handleErrors({detail, title}, setErrors);
+
+			return;
+		}
+
+		onClose();
+
+		openToast({
+			message: Liferay.Language.get('the-object-was-saved-successfully'),
+			type: 'success',
+		});
 	};
 
 	return (
 		<ClayModal center observer={observer}>
-			<ClayForm >
+			<ClayForm>
 				<ClayModal.Header>
 					{Liferay.Util.sub(
 						Liferay.Language.get('edit-x'),
@@ -68,8 +67,11 @@ export function ModalEditObjectDefinitionExternalReferenceCode({
 				</ClayModal.Header>
 
 				<ClayModal.Body>
-					<SeparatorContainer errors={errors} values={values} setValues={setValues} ></SeparatorContainer>
-					
+					<SeparatorContainer
+						errors={errors}
+						setValues={setValues}
+						values={values}
+					></SeparatorContainer>
 				</ClayModal.Body>
 
 				<ClayModal.Footer
@@ -82,7 +84,11 @@ export function ModalEditObjectDefinitionExternalReferenceCode({
 								{Liferay.Language.get('cancel')}
 							</ClayButton>
 
-							<ClayButton displayType="primary" onClick={onSubmit} type="submit">
+							<ClayButton
+								displayType="primary"
+								onClick={onSubmit}
+								type="submit"
+							>
 								{Liferay.Language.get('save')}
 							</ClayButton>
 						</ClayButton.Group>

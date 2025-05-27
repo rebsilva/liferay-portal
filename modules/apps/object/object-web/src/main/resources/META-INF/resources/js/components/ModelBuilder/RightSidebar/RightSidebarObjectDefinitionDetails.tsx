@@ -15,7 +15,6 @@ import {Scope} from '../../ObjectDetails/EditObjectDetails';
 import {EntryDisplayContainer} from '../../ObjectDetails/EntryDisplayContainer';
 import {ObjectDataContainer} from '../../ObjectDetails/ObjectDataContainer';
 import {ScopeContainer} from '../../ObjectDetails/ScopeContainer';
-import {SeoContainer} from '../../ObjectDetails/SeoContainer';
 import {TranslationsContainer} from '../../ObjectDetails/TranslationsContainer';
 import {useObjectDetailsForm} from '../../ObjectDetails/useObjectDetailsForm';
 import {useObjectFolderContext} from '../ModelBuilderContext/objectFolderContext';
@@ -23,6 +22,8 @@ import {TYPES} from '../ModelBuilderContext/typesEnum';
 import {nonRelationshipObjectFieldsInfo} from '../types';
 
 import './RightSidebarObjectDefinitionDetails.scss';
+import {Error, handleErrors} from '../../../utils/errors';
+import {SeoContainer} from '../../ObjectDetails/SeoContainer';
 
 interface RightSidebarObjectDefinitionDetailsProps {
 	companies: Scope[];
@@ -62,6 +63,8 @@ export function RightSidebarObjectDefinitionDetails({
 
 	const [{selectedObjectDefinitionNode, selectedObjectFolder}, dispatch] =
 		useObjectFolderContext();
+
+	const [backEndErrors, setBackEndErrors] = useState<Error>({});
 
 	const store = useStore();
 
@@ -124,7 +127,7 @@ export function RightSidebarObjectDefinitionDetails({
 		);
 
 		if (!Object.keys(validationErrors).length) {
-			let objectDefinition = editedObjectDefinition ?? values;
+			let objectDefinition = editedObjectDefinition ?? {...values};
 
 			delete objectDefinition.objectRelationships;
 			delete objectDefinition.objectActions;
@@ -136,37 +139,39 @@ export function RightSidebarObjectDefinitionDetails({
 					setAccountRelationshipFieldMandatory(objectDefinition);
 			}
 
-			try {
-				const updatedObjectDefinitionResponse =
-					await API.patchObjectDefinitionById(objectDefinition);
+			const updatedObjectDefinitionResponse =
+				await API.patchObjectDefinitionById(objectDefinition);
 
-				const updatedObjectDefinition =
-					(await updatedObjectDefinitionResponse.json()) as ObjectDefinition;
+			if (!updatedObjectDefinitionResponse.ok) {
+				const {detail, title} =
+					(await updatedObjectDefinitionResponse.json()) as Error;
 
-				const {edges, nodes} = store.getState();
+				handleErrors({detail, title}, setBackEndErrors);
 
-				dispatch({
-					payload: {
-						currentObjectFolderName: selectedObjectFolder.name,
-						objectDefinitionNodes: nodes,
-						objectDefinitionRelationshipEdges: edges,
-						updatedObjectDefinition,
-					},
-					type: TYPES.UPDATE_OBJECT_DEFINITION_NODE,
-				});
-
-				dispatch({
-					payload: {
-						updatedShowChangesSaved: true,
-					},
-					type: TYPES.SET_SHOW_CHANGES_SAVED,
-				});
+				return;
 			}
-			catch (error: unknown) {
-				const {message} = error as Error;
 
-				openToast({autoClose: 15000, message, type: 'danger'});
-			}
+			const updatedObjectDefinition =
+				(await updatedObjectDefinitionResponse.json()) as ObjectDefinition;
+
+			const {edges, nodes} = store.getState();
+
+			dispatch({
+				payload: {
+					currentObjectFolderName: selectedObjectFolder.name,
+					objectDefinitionNodes: nodes,
+					objectDefinitionRelationshipEdges: edges,
+					updatedObjectDefinition,
+				},
+				type: TYPES.UPDATE_OBJECT_DEFINITION_NODE,
+			});
+
+			dispatch({
+				payload: {
+					updatedShowChangesSaved: true,
+				},
+				type: TYPES.SET_SHOW_CHANGES_SAVED,
+			});
 		}
 	};
 
@@ -179,6 +184,15 @@ export function RightSidebarObjectDefinitionDetails({
 			labels: values?.label,
 		})
 	);
+
+	const showSeoSection =
+		Liferay.FeatureFlags['LPD-21926'] &&
+		values.friendlyURLSeparator !== undefined &&
+		!(
+			(Liferay.FeatureFlags['LPS-135430'] &&
+				values.storageType !== 'default') ||
+			(!values.modifiable && values.system)
+		);
 
 	return (
 		<>
@@ -285,11 +299,12 @@ export function RightSidebarObjectDefinitionDetails({
 					values={values}
 				/>
 			</div>
-			{Liferay.FeatureFlags['LPD-21926'] && (
+			{showSeoSection && (
 				<div className="lfr-objects__model-builder-right-sidebar-object-definition-node-content">
 					<SeoContainer
-						errors={{}} // ver como isso vai ficar no model builder depois
+						errors={backEndErrors}
 						onSubmit={onSubmit}
+						setErrors={setBackEndErrors}
 						setValues={setValues}
 						values={values}
 					/>

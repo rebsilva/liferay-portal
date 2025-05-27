@@ -97,7 +97,7 @@ export function ObjectActionContainer({
 			const details = JSON.parse(detail as string);
 			const newErrors: Error = {};
 
-			parseError(details, newErrors);
+			parseError(details, newErrors); // ver se dá para colocar o handle errors aqui
 
 			setBackEndErrors(newErrors);
 

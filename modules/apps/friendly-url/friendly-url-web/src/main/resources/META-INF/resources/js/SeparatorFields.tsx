@@ -28,19 +28,28 @@ type FieldsProps = {
 	url: string;
 	hideReset?: boolean;
 	handleChange?: (value: string) => void;
+	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
 };
 
-export default function SeparatorFields({errors, fields, handleChange, hideReset, url}: FieldsProps) {
+export default function SeparatorFields({
+	errors,
+	fields,
+	handleChange,
+	handleOnBlur,
+	hideReset,
+	url,
+}: FieldsProps) {
 	return (
 		<>
 			{fields.map((field) => (
 				<Field
 					errors={errors}
 					field={field}
+					handleChange={handleChange}
+					handleOnBlur={handleOnBlur}
+					hideReset={hideReset}
 					key={field.name}
 					url={url}
-					hideReset={hideReset}
-					handleChange={handleChange}
 				/>
 			))}
 		</>
@@ -53,9 +62,17 @@ type FieldProps = {
 	url: string;
 	hideReset?: boolean;
 	handleChange?: (value: string) => void;
+	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
 };
 
-function Field({errors, field, url, hideReset, handleChange}: FieldProps) {
+function Field({
+	errors,
+	field,
+	handleChange,
+	handleOnBlur,
+	hideReset,
+	url,
+}: FieldProps) {
 	const descriptionId = useId();
 	const ref = useRef<HTMLInputElement>(null);
 
@@ -96,15 +113,18 @@ function Field({errors, field, url, hideReset, handleChange}: FieldProps) {
 						aria-describedby={descriptionId}
 						id={name}
 						name={name}
-						onChange={(event) =>  {
-							setValue(event.target.value)
+						onBlur={(event) => {
+							if (handleOnBlur) {
+								handleOnBlur(event);
+							}
+						}}
+						onChange={(event) => {
+							setValue(event.target.value);
 
 							if (handleChange) {
 								handleChange(event.target.value);
 							}
-						}
-
-						}
+						}}
 						ref={ref}
 						value={value}
 					/>

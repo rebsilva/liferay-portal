@@ -21,7 +21,6 @@ interface SeoContainerProps {
 }
 
 export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
-
 	const [{modelBuilderModals}, dispatch] = useObjectFolderContext();
 
 	const [visibleModal, setVisibleModal] = useState(false);
@@ -34,7 +33,7 @@ export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
 
 	return (
 		<ClayForm.Group>
-			<div className='lfr-objects__model-builder-seo-container-header'>
+			<div className="lfr-objects__model-builder-seo-container-header">
 				<label className="mb-0">
 					{Liferay.Language.get('object-entry-url-separator')}
 				</label>
@@ -46,11 +45,14 @@ export function SeoContainer({onSubmit, setValues, values}: SeoContainerProps) {
 
 			<ClayButton
 				aria-label={Liferay.Language.get('show-actions')}
-				className= 'lfr-objects__model-builder-seo-container-edit-url-button'
+				className="lfr-objects__model-builder-seo-container-edit-url-button"
 				displayType="secondary"
 				onClick={() => setVisibleModal(true)}
 			>
-				<ClayIcon className='lfr-objects__model-builder-seo-container-button-icon' symbol="link" />
+				<ClayIcon
+					className="lfr-objects__model-builder-seo-container-button-icon"
+					symbol="link"
+				/>
 
 				{Liferay.Language.get('edit-entry-url-separator')}
 			</ClayButton>

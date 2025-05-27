@@ -7,6 +7,8 @@ import {Text} from '@clayui/core';
 import {ClayCheckbox} from '@clayui/form';
 import React from 'react';
 
+import './AllowFriendlyURLContainer.scss';
+
 interface AllowFriendlyURLContainerProps {
 	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
@@ -39,7 +41,7 @@ export function AllowFriendlyURLContainer({
 				}}
 			/>
 
-			<div className="c-mb-sm-4">
+			<div className="c-mb-sm-4 lfr-objects__seo-container-help-text">
 				<Text color="secondary" size={3}>
 					{Liferay.Language.get(
 						"when-enabled,-users-can-override-an-entry's-friendly-url"

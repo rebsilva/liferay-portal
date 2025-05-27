@@ -7,12 +7,14 @@ import ClayForm from '@clayui/form';
 import {FormError} from '@liferay/object-js-components-web';
 import React from 'react';
 
+import {Error} from '../../utils/errors';
 import {AllowFriendlyURLContainer} from './AllowFriendlyURLContainer';
 import {SeparatorContainer} from './SeparatorContainer';
 
 interface SeoContainerProps {
 	errors: FormError<ObjectDefinition>;
 	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
+	setErrors?: (errors: Error) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
 }
@@ -20,14 +22,16 @@ interface SeoContainerProps {
 export function SeoContainer({
 	errors,
 	onSubmit,
+	setErrors,
 	setValues,
 	values,
 }: SeoContainerProps) {
-	console.log(values);
 	return (
 		<ClayForm.Group>
 			<SeparatorContainer
 				errors={errors}
+				onSubmit={onSubmit}
+				setErrors={setErrors}
 				setValues={setValues}
 				values={values}
 			/>
