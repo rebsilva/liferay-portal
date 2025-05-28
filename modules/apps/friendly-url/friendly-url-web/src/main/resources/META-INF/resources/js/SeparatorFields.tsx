@@ -25,16 +25,29 @@ type Field = {
 type FieldsProps = {
 	errors: Errors;
 	fields: Field[];
+	handleChange?: (value: string) => void;
+	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
+	hideReset?: boolean;
 	url: string;
 };
 
-export default function SeparatorFields({errors, fields, url}: FieldsProps) {
+export default function SeparatorFields({
+	errors,
+	fields,
+	handleChange,
+	handleOnBlur,
+	hideReset,
+	url,
+}: FieldsProps) {
 	return (
 		<>
 			{fields.map((field) => (
 				<Field
 					errors={errors}
 					field={field}
+					handleChange={handleChange}
+					handleOnBlur={handleOnBlur}
+					hideReset={hideReset}
 					key={field.name}
 					url={url}
 				/>
@@ -46,10 +59,20 @@ export default function SeparatorFields({errors, fields, url}: FieldsProps) {
 type FieldProps = {
 	errors: Errors;
 	field: Field;
+	handleChange?: (value: string) => void;
+	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
+	hideReset?: boolean;
 	url: string;
 };
 
-function Field({errors, field, url}: FieldProps) {
+function Field({
+	errors,
+	field,
+	handleChange,
+	handleOnBlur,
+	hideReset,
+	url,
+}: FieldProps) {
 	const descriptionId = useId();
 	const ref = useRef<HTMLInputElement>(null);
 
@@ -90,13 +113,24 @@ function Field({errors, field, url}: FieldProps) {
 						aria-describedby={descriptionId}
 						id={name}
 						name={name}
-						onChange={(event) => setValue(event.target.value)}
+						onBlur={(event) => {
+							if (handleOnBlur) {
+								handleOnBlur(event);
+							}
+						}}
+						onChange={(event) => {
+							setValue(event.target.value);
+
+							if (handleChange) {
+								handleChange(event.target.value);
+							}
+						}}
 						ref={ref}
 						value={value}
 					/>
 				</ClayInput.GroupItem>
 
-				{value !== defaultValue ? (
+				{value !== defaultValue && !hideReset ? (
 					<ClayInput.GroupItem shrink>
 						<ClayButtonWithIcon
 							aria-label={Liferay.Language.get(
