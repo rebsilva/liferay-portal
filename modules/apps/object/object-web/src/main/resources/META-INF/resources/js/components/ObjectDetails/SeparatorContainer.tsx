@@ -6,17 +6,20 @@
 import {Text} from '@clayui/core';
 import {SeparatorFields} from '@liferay/friendly-url-web';
 import {FormError} from '@liferay/object-js-components-web';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Error} from '../../utils/errors';
 
 interface SeparatorContainerProps {
 	errors: FormError<ObjectDefinition>;
 	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
+	setDisableCheckbox: (value: boolean) => void;
 	setErrors?: (errors: Error) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
 }
+
+const LOWERCASE_L_REGEX = /\bl\b/;
 
 const SEPARATOR_TEXT = {
 	helpText: Liferay.Language.get(
@@ -29,6 +32,7 @@ const SEPARATOR_TEXT = {
 export function SeparatorContainer({
 	errors,
 	onSubmit,
+	setDisableCheckbox,
 	setErrors,
 	setValues,
 	values,
@@ -37,6 +41,18 @@ export function SeparatorContainer({
 
 	const handleChange = (value: string) => {
 		setValues({friendlyURLSeparator: value});
+
+		if (LOWERCASE_L_REGEX.test(value)) {
+			setDisableCheckbox(true);
+			setValues({
+				enableFriendlyURLCustomization: false, // confirmar isso aqui
+			});
+
+			// precisar montar a mensagem de warning aqui
+		}
+		else {
+			setDisableCheckbox(false);
+		}
 	};
 
 	const handleOnBlur = (
@@ -60,9 +76,10 @@ export function SeparatorContainer({
 				fields={[
 					{
 						defaultValue: values.name as string,
+						helpText,
 						label,
 						name: 'friendlyURLSeparator',
-						value: values.friendlyURLSeparator as string,
+						value: values.friendlyURLSeparator as string, // precisa fazer a validacao se é um l antes de mandar também mesmo que não tenha alteração no input em si
 					},
 				]}
 				handleChange={handleChange}
@@ -70,11 +87,12 @@ export function SeparatorContainer({
 				hideReset={true}
 				url={url}
 			/>
-			<div className="c-mb-sm-4">
+
+			{/* <div className="c-mb-sm-4">
 				<Text color="secondary" size={3}>
 					{helpText}
 				</Text>
-			</div>
+			</div> */}
 		</>
 	);
 }

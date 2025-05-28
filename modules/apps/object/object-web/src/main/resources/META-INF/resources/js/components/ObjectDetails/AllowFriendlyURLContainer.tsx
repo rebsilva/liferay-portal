@@ -5,41 +5,63 @@
 
 import {Text} from '@clayui/core';
 import {ClayCheckbox} from '@clayui/form';
+import ClayIcon from '@clayui/icon';
 import React from 'react';
 
 import './AllowFriendlyURLContainer.scss';
 
+import {ClayTooltipProvider} from '@clayui/tooltip';
+
 interface AllowFriendlyURLContainerProps {
+	disabled: boolean;
 	onSubmit?: (editedObjectDefinition?: Partial<ObjectDefinition>) => void;
 	setValues: (values: Partial<ObjectDefinition>) => void;
 	values: Partial<ObjectDefinition>;
 }
 
 export function AllowFriendlyURLContainer({
+	disabled,
 	onSubmit,
 	setValues,
 	values,
 }: AllowFriendlyURLContainerProps) {
 	return (
 		<>
-			<ClayCheckbox
-				checked={!!values.enableFriendlyURLCustomization}
-				label={Liferay.Language.get(
-					"allow-overriding-an-entry's-friendly-url"
-				)}
-				onBlur={(event) => {
-					event.stopPropagation();
+			<div className="lfr-objects__seo-container-allow-friendly-url-container">
+				<ClayCheckbox
+					checked={!!values.enableFriendlyURLCustomization}
+					className="lfr-objects__seo-container-checkbox"
+					disabled={disabled}
+					label={Liferay.Language.get(
+						"allow-overriding-an-entry's-friendly-url"
+					)}
+					onBlur={(event) => {
+						event.stopPropagation();
 
-					if (onSubmit) {
-						onSubmit();
-					}
-				}}
-				onChange={({target: {checked}}) => {
-					setValues({
-						enableFriendlyURLCustomization: checked,
-					});
-				}}
-			/>
+						if (onSubmit) {
+							onSubmit();
+						}
+					}}
+					onChange={({target: {checked}}) => {
+						setValues({
+							enableFriendlyURLCustomization: checked,
+						});
+					}}
+				/>
+
+				<ClayTooltipProvider>
+					<span
+						title={Liferay.Language.get(
+							'unique-key-for-referencing-the-object-folder'
+						)}
+					>
+						<ClayIcon
+							className="lfr-objects__seo-container-tooltip-icon"
+							symbol="question-circle-full"
+						/>
+					</span>
+				</ClayTooltipProvider>
+			</div>
 
 			<div className="c-mb-sm-4 lfr-objects__seo-container-help-text">
 				<Text color="secondary" size={3}>

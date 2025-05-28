@@ -6,29 +6,31 @@
 import {ClayButtonWithIcon} from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
 import classNames from 'classnames';
-import {useId} from 'frontend-js-components-web';
+import {FieldFeedback, useId} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 import React, {useRef, useState} from 'react';
 
-type Errors = {
-	errorMessage?: string;
+type Feedback = {
 	fields?: Record<string, string>;
+	message?: string;
 };
 
 type Field = {
 	defaultValue: string;
+	helpText?: string;
 	label: string;
 	name: string;
 	value: string;
 };
 
 type FieldsProps = {
-	errors: Errors;
+	errors?: Feedback;
 	fields: Field[];
 	handleChange?: (value: string) => void;
 	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
 	hideReset?: boolean;
 	url: string;
+	warnings?: Feedback;
 };
 
 export default function SeparatorFields({
@@ -38,6 +40,7 @@ export default function SeparatorFields({
 	handleOnBlur,
 	hideReset,
 	url,
+	warnings,
 }: FieldsProps) {
 	return (
 		<>
@@ -50,6 +53,7 @@ export default function SeparatorFields({
 					hideReset={hideReset}
 					key={field.name}
 					url={url}
+					warnings={warnings}
 				/>
 			))}
 		</>
@@ -57,12 +61,13 @@ export default function SeparatorFields({
 }
 
 type FieldProps = {
-	errors: Errors;
+	errors?: Feedback;
 	field: Field;
 	handleChange?: (value: string) => void;
 	handleOnBlur?: (event: React.FocusEvent<HTMLInputElement, Element>) => void;
 	hideReset?: boolean;
 	url: string;
+	warnings?: Feedback;
 };
 
 function Field({
@@ -72,12 +77,15 @@ function Field({
 	handleOnBlur,
 	hideReset,
 	url,
+	warnings,
 }: FieldProps) {
 	const descriptionId = useId();
 	const ref = useRef<HTMLInputElement>(null);
 
-	const {defaultValue, label, name} = field;
-	const error = errors.fields?.[name];
+	const {defaultValue, helpText, label, name} = field;
+
+	const error = errors?.fields?.[name];
+	const warning = warnings?.fields?.[name];
 
 	const [value, setValue] = useState(field.value);
 
@@ -85,6 +93,7 @@ function Field({
 		<ClayForm.Group
 			className={classNames({
 				'has-error': error,
+				'has-warning': warning && !error,
 			})}
 			key={name}
 		>
@@ -151,15 +160,22 @@ function Field({
 				) : null}
 			</ClayInput.Group>
 
-			{error ? (
+			<FieldFeedback
+				errorMessage={error}
+				helpMessage={helpText}
+				id={`${name}_fieldFeedback`}
+				warningMessage={warning}
+			/>
+
+			{/* {error ? (
 				<ClayForm.FeedbackGroup>
 					<ClayForm.FeedbackItem>
-						<ClayForm.FeedbackIndicator symbol="exclamation-full" />
+						<ClayForm.FeedbackIndicator symbol="info-circle" />
 
 						{error}
 					</ClayForm.FeedbackItem>
 				</ClayForm.FeedbackGroup>
-			) : null}
+			) : null} */}
 		</ClayForm.Group>
 	);
 }

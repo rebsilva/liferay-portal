@@ -5,7 +5,7 @@
 
 import ClayForm from '@clayui/form';
 import {FormError} from '@liferay/object-js-components-web';
-import React from 'react';
+import React, {useState} from 'react';
 
 import {Error} from '../../utils/errors';
 import {AllowFriendlyURLContainer} from './AllowFriendlyURLContainer';
@@ -26,17 +26,21 @@ export function SeoContainer({
 	setValues,
 	values,
 }: SeoContainerProps) {
+	const [disableCheckbox, setDisableCheckbox] = useState(false);
+
 	return (
 		<ClayForm.Group>
 			<SeparatorContainer
 				errors={errors}
 				onSubmit={onSubmit}
+				setDisableCheckbox={setDisableCheckbox}
 				setErrors={setErrors}
 				setValues={setValues}
 				values={values}
 			/>
 
 			<AllowFriendlyURLContainer
+				disabled={disableCheckbox}
 				onSubmit={onSubmit}
 				setValues={setValues}
 				values={values}
