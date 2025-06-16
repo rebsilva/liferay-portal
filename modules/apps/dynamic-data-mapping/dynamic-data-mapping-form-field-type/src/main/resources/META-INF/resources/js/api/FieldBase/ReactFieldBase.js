@@ -15,13 +15,14 @@ import {
 	PagesVisitor,
 	useConfig,
 	useForm,
-	useFormState,
+	useFormState
 } from 'data-engine-js-components-web';
 import {FieldFeedback} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
 import './FieldBase.scss';
+import {getAllFieldsetsFromName} from '../../../../../../../../../../data-engine/data-engine-js-components-web/src/main/resources/META-INF/resources/js/utils/repeatable.es';
 
 export function updateFieldNameLocale(editingLanguageId, locale, name) {
 	return name.replace(new RegExp(`${editingLanguageId}$`), locale);
@@ -372,46 +373,135 @@ export default function FieldBase({
 		}, 1000);
 	};
 
+	const testFunction = () => {
+		const pageVisitor = new PagesVisitor(pages);
+
+		// translated
+
+		return pageVisitor.mapColumns((column) => {
+					//let showFieldset = false;
+					//let treeLevel = 0;
+					const fieldsets = new Set();
+
+					// fazer a ideia do hash map
+
+							const showTranslatedFields = (fields) => {
+								let newFields = [...fields];
+								
+								return newFields.map((field) => {
+									if (field.nestedFields) {
+
+
+										//treeLevel++;
+
+										let newNestedFields = showTranslatedFields(
+											field.nestedFields
+										);
+
+										const visible = fieldsets.has(field.fieldName);
+
+										// if (treeLevel === 1) {
+										// 	showFieldset = false;
+										// }
+
+										// treeLevel--;
+
+										return {
+											...field,
+											nestedFields: newNestedFields,
+											disabled: !visible,
+											hidden: !visible,
+											visible: visible,
+										};
+									}
+
+									if (!field.localizable) {
+										return {
+											...field,
+											disabled: true,
+											hidden: true,
+											visible: false,
+										};
+									}
+
+									if (
+										field.localizedValueEdited?.[
+											editingLanguageId
+										]
+									) {
+										let parsedName = getAllFieldsetsFromName(field.name);
+
+										if (parsedName) {
+											parsedName.forEach((fieldset) => fieldsets.add(fieldset));
+										}
+
+										return {
+											...field,
+											disabled: false,
+											hidden: false,
+											visible: true,
+										};
+									}
+									else {
+										return {
+											...field,
+											disabled: true,
+											hidden: true,
+											visible: false,
+										};
+									}
+									
+								});
+							};
+		
+							return {
+								...column,
+								fields: showTranslatedFields(column.fields),
+							};
+						})
+				}
+
 	const translationFilterChange = useCallback(
 		(event) => {
 			const pagesVisitor = new PagesVisitor(pages);
 			switch (event.option) {
 				case 'translated':
 					dispatch({
-						payload: pagesVisitor.mapFields(
-							(field) => {
-								if (!field.localizable) {
-									return {
-										...field,
-										disabled: true,
-										hidden: true,
-										visible: false,
-									};
-								}
-								if (
-									field.localizedValueEdited?.[
-										editingLanguageId
-									]
-								) {
-									return {
-										...field,
-										disabled: false,
-										hidden: false,
-										visible: true,
-									};
-								}
-								else {
-									return {
-										...field,
-										disabled: true,
-										hidden: true,
-										visible: false,
-									};
-								}
-							},
-							false,
-							true
-						),
+						// payload: pagesVisitor.mapFields(
+						// 	(field) => {
+						// 		if (!field.localizable) {
+						// 			return {
+						// 				...field,
+						// 				disabled: true,
+						// 				hidden: true,
+						// 				visible: false,
+						// 			};
+						// 		}
+						// 		if (
+						// 			field.localizedValueEdited?.[
+						// 				editingLanguageId
+						// 			]
+						// 		) {
+						// 			return {
+						// 				...field,
+						// 				disabled: false,
+						// 				hidden: false,
+						// 				visible: true,
+						// 			};
+						// 		}
+						// 		else {
+						// 			return {
+						// 				...field,
+						// 				disabled: true,
+						// 				hidden: true,
+						// 				visible: false,
+						// 			};
+						// 		}
+						// 	},
+						// 	false,
+						// 	true
+						// ),
+						payload: testFunction(),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 

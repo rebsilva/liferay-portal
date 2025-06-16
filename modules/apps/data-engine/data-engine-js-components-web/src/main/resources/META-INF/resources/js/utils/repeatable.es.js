@@ -124,3 +124,13 @@ export function getRepeatedIndex(name) {
 
 	return parsedName.repeatedIndex;
 }
+
+export function getAllFieldsetsFromName(name) {
+	// Returns all the fieldsets occurences inside a nested field name
+
+	// The 'match' method with the 'g' flag will directly return an array of all matches.
+	// If no matches are found, it returns null, so we use || [] to ensure an empty array.
+
+	const pattern = /Fieldset\d+/g;
+	return name.match(pattern) || [];
+  }
