@@ -409,9 +409,10 @@ export default function FieldBase({
 					}
 
 					if (field.localizedValueEdited?.[editingLanguageId]) {
-
 						if (filter === 'translated') {
-							const parsedName = getAllFieldsetsFromName(field.name);
+							const parsedName = getAllFieldsetsFromName(
+								field.name
+							);
 
 							if (parsedName) {
 								parsedName.forEach((fieldset) =>
@@ -425,7 +426,6 @@ export default function FieldBase({
 								hidden: false,
 								visible: true,
 							};
-
 						}
 
 						if (filter === 'untranslated') {
@@ -435,9 +435,7 @@ export default function FieldBase({
 								hidden: true,
 								visible: false,
 							};
-
 						}
-						
 					}
 					else {
 						if (filter === 'translated') {
@@ -449,8 +447,10 @@ export default function FieldBase({
 							};
 						}
 
-						if (filter === 'untranslated') { 
-							const parsedName = getAllFieldsetsFromName(field.name);
+						if (filter === 'untranslated') {
+							const parsedName = getAllFieldsetsFromName(
+								field.name
+							);
 
 							if (parsedName) {
 								parsedName.forEach((fieldset) =>
@@ -465,7 +465,6 @@ export default function FieldBase({
 								visible: true,
 							};
 						}
-						
 					}
 				});
 			};
@@ -490,40 +489,41 @@ export default function FieldBase({
 					break;
 				case 'untranslated':
 					dispatch({
-						payload: pagesVisitor.mapFields(
-							(field) => {
-								if (!field.localizable) {
-									return {
-										...field,
-										disabled: true,
-										hidden: true,
-										visible: false,
-									};
-								}
-								if (
-									field.localizedValueEdited?.[
-										editingLanguageId
-									]
-								) {
-									return {
-										...field,
-										disabled: true,
-										hidden: true,
-										visible: false,
-									};
-								}
-								else {
-									return {
-										...field,
-										disabled: false,
-										hidden: false,
-										visible: true,
-									};
-								}
-							},
-							false,
-							true
-						),
+						// payload: pagesVisitor.mapFields(
+						// 	(field) => {
+						// 		if (!field.localizable) {
+						// 			return {
+						// 				...field,
+						// 				disabled: true,
+						// 				hidden: true,
+						// 				visible: false,
+						// 			};
+						// 		}
+						// 		if (
+						// 			field.localizedValueEdited?.[
+						// 				editingLanguageId
+						// 			]
+						// 		) {
+						// 			return {
+						// 				...field,
+						// 				disabled: true,
+						// 				hidden: true,
+						// 				visible: false,
+						// 			};
+						// 		}
+						// 		else {
+						// 			return {
+						// 				...field,
+						// 				disabled: false,
+						// 				hidden: false,
+						// 				visible: true,
+						// 			};
+						// 		}
+						// 	},
+						// 	false,
+						// 	true
+						// ),
+						payload: getTranslatedFields('untranslated'),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 					break;
