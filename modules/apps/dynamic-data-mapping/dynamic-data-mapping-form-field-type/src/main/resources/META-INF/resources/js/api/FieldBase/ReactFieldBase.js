@@ -373,7 +373,7 @@ export default function FieldBase({
 		}, 1000);
 	};
 
-	const getTranslatedFields = () => {
+	const getTranslatedFields = (filter) => {
 		const pageVisitor = new PagesVisitor(pages);
 
 		return pageVisitor.mapColumns((column) => {
@@ -409,28 +409,63 @@ export default function FieldBase({
 					}
 
 					if (field.localizedValueEdited?.[editingLanguageId]) {
-						const parsedName = getAllFieldsetsFromName(field.name);
 
-						if (parsedName) {
-							parsedName.forEach((fieldset) =>
-								fieldsets.add(fieldset)
-							);
+						if (filter === 'translated') {
+							const parsedName = getAllFieldsetsFromName(field.name);
+
+							if (parsedName) {
+								parsedName.forEach((fieldset) =>
+									fieldsets.add(fieldset)
+								);
+							}
+
+							return {
+								...field,
+								disabled: false,
+								hidden: false,
+								visible: true,
+							};
+
 						}
 
-						return {
-							...field,
-							disabled: false,
-							hidden: false,
-							visible: true,
-						};
+						if (filter === 'untranslated') {
+							return {
+								...field,
+								disabled: true,
+								hidden: true,
+								visible: false,
+							};
+
+						}
+						
 					}
 					else {
-						return {
-							...field,
-							disabled: true,
-							hidden: true,
-							visible: false,
-						};
+						if (filter === 'translated') {
+							return {
+								...field,
+								disabled: true,
+								hidden: true,
+								visible: false,
+							};
+						}
+
+						if (filter === 'untranslated') { 
+							const parsedName = getAllFieldsetsFromName(field.name);
+
+							if (parsedName) {
+								parsedName.forEach((fieldset) =>
+									fieldsets.add(fieldset)
+								);
+							}
+
+							return {
+								...field,
+								disabled: false,
+								hidden: false,
+								visible: true,
+							};
+						}
+						
 					}
 				});
 			};
@@ -448,7 +483,7 @@ export default function FieldBase({
 			switch (event.option) {
 				case 'translated':
 					dispatch({
-						payload: getTranslatedFields(),
+						payload: getTranslatedFields('translated'),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 
