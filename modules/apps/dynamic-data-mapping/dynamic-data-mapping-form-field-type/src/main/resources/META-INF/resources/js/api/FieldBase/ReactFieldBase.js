@@ -15,7 +15,7 @@ import {
 	PagesVisitor,
 	useConfig,
 	useForm,
-	useFormState
+	useFormState,
 } from 'data-engine-js-components-web';
 import {FieldFeedback} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
@@ -373,93 +373,74 @@ export default function FieldBase({
 		}, 1000);
 	};
 
-	const testFunction = () => {
+	const getTranslatedFields = () => {
 		const pageVisitor = new PagesVisitor(pages);
 
-		// translated
-
 		return pageVisitor.mapColumns((column) => {
-					//let showFieldset = false;
-					//let treeLevel = 0;
-					const fieldsets = new Set();
+			const fieldsets = new Set();
 
-					// fazer a ideia do hash map
+			const showTranslatedFields = (fields) => {
+				const newFields = [...fields];
 
-							const showTranslatedFields = (fields) => {
-								let newFields = [...fields];
-								
-								return newFields.map((field) => {
-									if (field.nestedFields) {
+				return newFields.map((field) => {
+					if (field.nestedFields) {
+						const newNestedFields = showTranslatedFields(
+							field.nestedFields
+						);
 
+						const visible = fieldsets.has(field.fieldName);
 
-										//treeLevel++;
+						return {
+							...field,
+							disabled: !visible,
+							hidden: !visible,
+							nestedFields: newNestedFields,
+							visible,
+						};
+					}
 
-										let newNestedFields = showTranslatedFields(
-											field.nestedFields
-										);
+					if (!field.localizable) {
+						return {
+							...field,
+							disabled: true,
+							hidden: true,
+							visible: false,
+						};
+					}
 
-										const visible = fieldsets.has(field.fieldName);
+					if (field.localizedValueEdited?.[editingLanguageId]) {
+						const parsedName = getAllFieldsetsFromName(field.name);
 
-										// if (treeLevel === 1) {
-										// 	showFieldset = false;
-										// }
+						if (parsedName) {
+							parsedName.forEach((fieldset) =>
+								fieldsets.add(fieldset)
+							);
+						}
 
-										// treeLevel--;
+						return {
+							...field,
+							disabled: false,
+							hidden: false,
+							visible: true,
+						};
+					}
+					else {
+						return {
+							...field,
+							disabled: true,
+							hidden: true,
+							visible: false,
+						};
+					}
+				});
+			};
 
-										return {
-											...field,
-											nestedFields: newNestedFields,
-											disabled: !visible,
-											hidden: !visible,
-											visible: visible,
-										};
-									}
-
-									if (!field.localizable) {
-										return {
-											...field,
-											disabled: true,
-											hidden: true,
-											visible: false,
-										};
-									}
-
-									if (
-										field.localizedValueEdited?.[
-											editingLanguageId
-										]
-									) {
-										let parsedName = getAllFieldsetsFromName(field.name);
-
-										if (parsedName) {
-											parsedName.forEach((fieldset) => fieldsets.add(fieldset));
-										}
-
-										return {
-											...field,
-											disabled: false,
-											hidden: false,
-											visible: true,
-										};
-									}
-									else {
-										return {
-											...field,
-											disabled: true,
-											hidden: true,
-											visible: false,
-										};
-									}
-									
-								});
-							};
-		
-							return {
-								...column,
-								fields: showTranslatedFields(column.fields),
-							};
-						})
-				}
+			return {
+				...column,
+				fields: showTranslatedFields(column.fields),
+			};
+		});
+	};
 
 	const translationFilterChange = useCallback(
 		(event) => {
@@ -467,41 +448,7 @@ export default function FieldBase({
 			switch (event.option) {
 				case 'translated':
 					dispatch({
-						// payload: pagesVisitor.mapFields(
-						// 	(field) => {
-						// 		if (!field.localizable) {
-						// 			return {
-						// 				...field,
-						// 				disabled: true,
-						// 				hidden: true,
-						// 				visible: false,
-						// 			};
-						// 		}
-						// 		if (
-						// 			field.localizedValueEdited?.[
-						// 				editingLanguageId
-						// 			]
-						// 		) {
-						// 			return {
-						// 				...field,
-						// 				disabled: false,
-						// 				hidden: false,
-						// 				visible: true,
-						// 			};
-						// 		}
-						// 		else {
-						// 			return {
-						// 				...field,
-						// 				disabled: true,
-						// 				hidden: true,
-						// 				visible: false,
-						// 			};
-						// 		}
-						// 	},
-						// 	false,
-						// 	true
-						// ),
-						payload: testFunction(),
+						payload: getTranslatedFields(),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 
