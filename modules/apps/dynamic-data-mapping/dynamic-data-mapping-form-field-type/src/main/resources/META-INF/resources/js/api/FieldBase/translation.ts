@@ -15,18 +15,6 @@ interface WebContentField extends Field {
 	name?: string;
 }
 
-const hideFieldProps = {
-	disabled: true,
-	hidden: true,
-	visible: false,
-};
-
-const showFieldProps = {
-	disabled: false,
-	hidden: false,
-	visible: true,
-};
-
 export function showField({
 	editingLanguageId,
 	field,
@@ -37,10 +25,11 @@ export function showField({
 	filter: string;
 }) {
 	return !!(
-		(field.localizedValueEdited?.[editingLanguageId] &&
+		field.localizable &&
+		((field.localizedValueEdited?.[editingLanguageId] &&
 			filter === 'translated') ||
-		(!field.localizedValueEdited?.[editingLanguageId] &&
-			filter === 'untranslated')
+			(!field.localizedValueEdited?.[editingLanguageId] &&
+				filter === 'untranslated'))
 	);
 }
 
@@ -75,13 +64,6 @@ export function getFilteredPage({
 					};
 				}
 
-				if (!field.localizable) {
-					return {
-						...field,
-						...hideFieldProps,
-					};
-				}
-
 				if (showField({editingLanguageId, field, filter})) {
 					const parsedName = getAllFieldsetsFromName(field.name);
 
@@ -93,13 +75,17 @@ export function getFilteredPage({
 
 					return {
 						...field,
-						...showFieldProps,
+						disabled: false,
+						hidden: false,
+						visible: true,
 					};
 				}
 				else {
 					return {
 						...field,
-						...hideFieldProps,
+						disabled: true,
+						hidden: true,
+						visible: false,
 					};
 				}
 			});

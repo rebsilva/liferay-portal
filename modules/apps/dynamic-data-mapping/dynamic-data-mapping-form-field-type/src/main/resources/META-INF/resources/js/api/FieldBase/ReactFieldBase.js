@@ -21,7 +21,7 @@ import {FieldFeedback} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import {getFilteredPage} from '../../util/localizable/translation';
+import {getFilteredPage} from './translation';
 
 import './FieldBase.scss';
 
@@ -373,79 +373,6 @@ export default function FieldBase({
 			setDisabledRepeatableButton(false);
 		}, 1000);
 	};
-
-	// const getFilteredPage = (filter, pagesVisitor) => {
-	// 	return pagesVisitor.mapColumns((column) => {
-	// 		const fieldsets = new Set();
-	// 		console.log('mudei de novo');
-
-	// 		const showFilteredFields = (fields) => {
-	// 			const newFields = [...fields];
-
-	// 			return newFields.map((field) => {
-	// 				if (field.nestedFields) {
-	// 					const newNestedFields = showFilteredFields(
-	// 						field.nestedFields
-	// 					);
-
-	// 					const visible = fieldsets.has(field.fieldName);
-
-	// 					return {
-	// 						...field,
-	// 						disabled: !visible,
-	// 						hidden: !visible,
-	// 						nestedFields: newNestedFields,
-	// 						visible,
-	// 					};
-	// 				}
-
-	// 				if (!field.localizable) {
-	// 					return {
-	// 						...field,
-	// 						disabled: true,
-	// 						hidden: true,
-	// 						visible: false,
-	// 					};
-	// 				}
-
-	// 				if (
-	// 					(field.localizedValueEdited?.[editingLanguageId] &&
-	// 						filter === 'translated') ||
-	// 					(!field.localizedValueEdited?.[editingLanguageId] &&
-	// 						filter === 'untranslated')
-	// 				) {
-	// 					const parsedName = getAllFieldsetsFromName(field.name);
-
-	// 					if (parsedName) {
-	// 						parsedName.forEach((fieldset) =>
-	// 							fieldsets.add(fieldset)
-	// 						);
-	// 					}
-
-	// 					return {
-	// 						...field,
-	// 						disabled: false,
-	// 						hidden: false,
-	// 						visible: true,
-	// 					};
-	// 				}
-	// 				else {
-	// 					return {
-	// 						...field,
-	// 						disabled: true,
-	// 						hidden: true,
-	// 						visible: false,
-	// 					};
-	// 				}
-	// 			});
-	// 		};
-
-	// 		return {
-	// 			...column,
-	// 			fields: showFilteredFields(column.fields),
-	// 		};
-	// 	});
-	// };
 
 	const translationFilterChange = useCallback(
 		(event) => {
