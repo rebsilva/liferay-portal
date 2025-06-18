@@ -96,7 +96,12 @@ export {
 
 export {parseProps} from './utils/parseProps.es';
 
-export {generateName, getRepeatedIndex, parseName} from './utils/repeatable.es';
+export {
+	generateName,
+	getAllFieldsetsFromName,
+	getRepeatedIndex,
+	parseName,
+} from './utils/repeatable.es';
 export {default as setDataRecord} from './utils/setDataRecord.es';
 
 export {capitalize} from './utils/strings';

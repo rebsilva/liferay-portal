@@ -21,8 +21,9 @@ import {FieldFeedback} from 'frontend-js-components-web';
 import {sub} from 'frontend-js-web';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
+import {getFilteredPage} from '../../util/localizable/translation';
+
 import './FieldBase.scss';
-import {getAllFieldsetsFromName} from '../../../../../../../../../../data-engine/data-engine-js-components-web/src/main/resources/META-INF/resources/js/utils/repeatable.es';
 
 export function updateFieldNameLocale(editingLanguageId, locale, name) {
 	return name.replace(new RegExp(`${editingLanguageId}$`), locale);
@@ -373,108 +374,78 @@ export default function FieldBase({
 		}, 1000);
 	};
 
-	const getTranslatedFields = (filter) => {
-		const pageVisitor = new PagesVisitor(pages);
+	// const getFilteredPage = (filter, pagesVisitor) => {
+	// 	return pagesVisitor.mapColumns((column) => {
+	// 		const fieldsets = new Set();
+	// 		console.log('mudei de novo');
 
-		return pageVisitor.mapColumns((column) => {
-			const fieldsets = new Set();
+	// 		const showFilteredFields = (fields) => {
+	// 			const newFields = [...fields];
 
-			const showTranslatedFields = (fields) => {
-				const newFields = [...fields];
+	// 			return newFields.map((field) => {
+	// 				if (field.nestedFields) {
+	// 					const newNestedFields = showFilteredFields(
+	// 						field.nestedFields
+	// 					);
 
-				return newFields.map((field) => {
-					if (field.nestedFields) {
-						const newNestedFields = showTranslatedFields(
-							field.nestedFields
-						);
+	// 					const visible = fieldsets.has(field.fieldName);
 
-						const visible = fieldsets.has(field.fieldName);
+	// 					return {
+	// 						...field,
+	// 						disabled: !visible,
+	// 						hidden: !visible,
+	// 						nestedFields: newNestedFields,
+	// 						visible,
+	// 					};
+	// 				}
 
-						return {
-							...field,
-							disabled: !visible,
-							hidden: !visible,
-							nestedFields: newNestedFields,
-							visible,
-						};
-					}
+	// 				if (!field.localizable) {
+	// 					return {
+	// 						...field,
+	// 						disabled: true,
+	// 						hidden: true,
+	// 						visible: false,
+	// 					};
+	// 				}
 
-					if (!field.localizable) {
-						return {
-							...field,
-							disabled: true,
-							hidden: true,
-							visible: false,
-						};
-					}
+	// 				if (
+	// 					(field.localizedValueEdited?.[editingLanguageId] &&
+	// 						filter === 'translated') ||
+	// 					(!field.localizedValueEdited?.[editingLanguageId] &&
+	// 						filter === 'untranslated')
+	// 				) {
+	// 					const parsedName = getAllFieldsetsFromName(field.name);
 
-					if (field.localizedValueEdited?.[editingLanguageId]) {
-						if (filter === 'translated') {
-							const parsedName = getAllFieldsetsFromName(
-								field.name
-							);
+	// 					if (parsedName) {
+	// 						parsedName.forEach((fieldset) =>
+	// 							fieldsets.add(fieldset)
+	// 						);
+	// 					}
 
-							if (parsedName) {
-								parsedName.forEach((fieldset) =>
-									fieldsets.add(fieldset)
-								);
-							}
+	// 					return {
+	// 						...field,
+	// 						disabled: false,
+	// 						hidden: false,
+	// 						visible: true,
+	// 					};
+	// 				}
+	// 				else {
+	// 					return {
+	// 						...field,
+	// 						disabled: true,
+	// 						hidden: true,
+	// 						visible: false,
+	// 					};
+	// 				}
+	// 			});
+	// 		};
 
-							return {
-								...field,
-								disabled: false,
-								hidden: false,
-								visible: true,
-							};
-						}
-
-						if (filter === 'untranslated') {
-							return {
-								...field,
-								disabled: true,
-								hidden: true,
-								visible: false,
-							};
-						}
-					}
-					else {
-						if (filter === 'translated') {
-							return {
-								...field,
-								disabled: true,
-								hidden: true,
-								visible: false,
-							};
-						}
-
-						if (filter === 'untranslated') {
-							const parsedName = getAllFieldsetsFromName(
-								field.name
-							);
-
-							if (parsedName) {
-								parsedName.forEach((fieldset) =>
-									fieldsets.add(fieldset)
-								);
-							}
-
-							return {
-								...field,
-								disabled: false,
-								hidden: false,
-								visible: true,
-							};
-						}
-					}
-				});
-			};
-
-			return {
-				...column,
-				fields: showTranslatedFields(column.fields),
-			};
-		});
-	};
+	// 		return {
+	// 			...column,
+	// 			fields: showFilteredFields(column.fields),
+	// 		};
+	// 	});
+	// };
 
 	const translationFilterChange = useCallback(
 		(event) => {
@@ -482,48 +453,22 @@ export default function FieldBase({
 			switch (event.option) {
 				case 'translated':
 					dispatch({
-						payload: getTranslatedFields('translated'),
+						payload: getFilteredPage({
+							editingLanguageId,
+							filter: 'translated',
+							pagesVisitor,
+						}),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 
 					break;
 				case 'untranslated':
 					dispatch({
-						// payload: pagesVisitor.mapFields(
-						// 	(field) => {
-						// 		if (!field.localizable) {
-						// 			return {
-						// 				...field,
-						// 				disabled: true,
-						// 				hidden: true,
-						// 				visible: false,
-						// 			};
-						// 		}
-						// 		if (
-						// 			field.localizedValueEdited?.[
-						// 				editingLanguageId
-						// 			]
-						// 		) {
-						// 			return {
-						// 				...field,
-						// 				disabled: true,
-						// 				hidden: true,
-						// 				visible: false,
-						// 			};
-						// 		}
-						// 		else {
-						// 			return {
-						// 				...field,
-						// 				disabled: false,
-						// 				hidden: false,
-						// 				visible: true,
-						// 			};
-						// 		}
-						// 	},
-						// 	false,
-						// 	true
-						// ),
-						payload: getTranslatedFields('untranslated'),
+						payload: getFilteredPage({
+							editingLanguageId,
+							filter: 'untranslated',
+							pagesVisitor,
+						}),
 						type: CORE_EVENT_TYPES.PAGE.UPDATE,
 					});
 					break;
