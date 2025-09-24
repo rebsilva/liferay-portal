@@ -44,10 +44,16 @@ if (Liferay.FeatureFlags['LPD-50091']) {
 	});
 }
 
-const SUBSCRIBERS_OPTION = {
-	label: Liferay.Language.get('subscribers'),
-	value: 'subscribers',
-} as LabelValueObject;
+const DEFINITION_OF_TERMS_OPTIONS = [
+	{
+		label: Liferay.Language.get('definition-of-terms'),
+		value: 'definition-of-terms',
+	},
+	{
+		label: Liferay.Language.get('subscribers'),
+		value: 'subscribers',
+	},
+] as LabelValueObject[];
 
 export function EmailNotificationSettings({
 	baseResourceURL,
@@ -99,7 +105,10 @@ export function EmailNotificationSettings({
 						learnResources={learnResources}
 						recipientOptions={
 							Liferay.FeatureFlags['LPD-17564']
-								? [...RECIPIENT_OPTIONS, SUBSCRIBERS_OPTION]
+								? [
+										...RECIPIENT_OPTIONS,
+										...DEFINITION_OF_TERMS_OPTIONS,
+									]
 								: RECIPIENT_OPTIONS
 						}
 						roles={roles}
@@ -118,7 +127,14 @@ export function EmailNotificationSettings({
 				<ClayPanel.Body>
 					<SecondaryRecipient
 						learnResources={learnResources}
-						recipientOptions={RECIPIENT_OPTIONS}
+						recipientOptions={
+							Liferay.FeatureFlags['LPD-17564']
+								? [
+										...RECIPIENT_OPTIONS,
+										...DEFINITION_OF_TERMS_OPTIONS,
+									]
+								: RECIPIENT_OPTIONS
+						}
 						roles={roles}
 						selectedLocale={selectedLocale}
 						setValues={setValues}
