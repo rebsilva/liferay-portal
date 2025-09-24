@@ -76,6 +76,7 @@ export function validate(values: NotificationTemplate) {
 			errors.fromName = constantsUtils.REQUIRED_MSG;
 		}
 
+		// if (recipient.toType !== 'subscribers' && recipient.toType !== 'definition-of-terms') {
 		if (recipient.toType !== 'subscribers') {
 			if (
 				!Array.isArray(recipient.to) &&
