@@ -12,12 +12,12 @@
 <tbody>
 <tr>
 	<td>BODY</td>
-	<td>//body[contains(@class,'editable')]</td>
+	<td>//div[contains(@class, 'ck-editor__editable')]//p</td>
 	<td></td>
 </tr>
 <tr>
 	<td>BODY_FIELD_FORM_IFRAME</td>
-	<td>//label[contains(.,'${key_fieldLabel}')]//following-sibling::div//div[contains(@id,'cke')]/iframe</td>
+	<td>//label[contains(.,'${key_fieldLabel}')]//following-sibling::div//div[contains(@class, 'ck')]/p</td>
 	<td></td>
 </tr>
 <tr>
@@ -177,12 +177,12 @@
 </tr>
 <tr>
 	<td>SOURCE_FORM_BUTTON</td>
-	<td>//span[@id='cke_29_label']</td>
+	<td>//button[contains(@class,'ck-button') and contains(@class,'source')]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>SOURCE_FORM_EDITOR</td>
-	<td>//div[contains(@class,'CodeMirror cm-s-default')]</td>
+	<td>//div[contains(@class,'ck-source')]/textarea</td>
 	<td></td>
 </tr>
 <tr>
