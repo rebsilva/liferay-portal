@@ -52,10 +52,10 @@ definition {
 	@summary = "Default summary"
 	macro addTableInBodyParagraph() {
 		Click.clickNoMouseOver(
-			key_titleName = "Table",
+			key_titleName = "Insert table",
 			locator1 = "FormFields#TOOLBAR_ANY_ITEM_BUTTON");
 
-		Click(locator1 = "CKEditor#OK_BUTTON");
+		Click(locator1 = "CKEditor#ADD_TABLE");
 	}
 
 	@summary = "Default summary"
