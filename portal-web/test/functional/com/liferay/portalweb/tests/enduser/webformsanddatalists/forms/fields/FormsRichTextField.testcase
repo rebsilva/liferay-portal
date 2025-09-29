@@ -336,7 +336,7 @@ definition {
 
 		Click(locator1 = "Form#SOURCE_FORM_BUTTON");
 
-		Type.typeCodeMirrorEditorNoError(
+		Type(
 			locator1 = "Form#SOURCE_FORM_EDITOR",
 			value1 = "<strong> Test </strong>");
 

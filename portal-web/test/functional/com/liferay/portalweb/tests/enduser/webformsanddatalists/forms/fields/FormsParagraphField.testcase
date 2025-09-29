@@ -511,7 +511,7 @@ definition {
 			fieldPositionNumber = 0,
 			fieldType = "Paragraph");
 
-		FormFields.addParagraphLinkToAURL(paragraphLink = "www.liferay.com");
+		FormFields.addParagraphLinkToAURL(paragraphLink = "http://www.liferay.com");
 
 		Form.save();
 
@@ -547,7 +547,7 @@ definition {
 		SelectFrame(value1 = "relative=top");
 
 		Click(
-			key_titleName = "Insert/Remove Bulleted List",
+			key_titleName = "Bulleted List",
 			locator1 = "FormFields#TOOLBAR_ANY_ITEM_BUTTON");
 
 		Form.save();
@@ -667,7 +667,7 @@ definition {
 		SelectFrame(value1 = "relative=top");
 
 		Click(
-			key_titleName = "Insert/Remove Numbered List",
+			key_titleName = "Numbered List",
 			locator1 = "FormFields#TOOLBAR_ANY_ITEM_BUTTON");
 
 		Form.save();
@@ -709,10 +709,10 @@ definition {
 			fieldType = "Paragraph");
 
 		Click(
-			key_titleName = "Table",
+			key_titleName = "Insert table",
 			locator1 = "FormFields#TOOLBAR_ANY_ITEM_BUTTON");
 
-		Click(locator1 = "CKEditor#OK_BUTTON");
+		Click(locator1 = "CKEditor#ADD_TABLE");
 
 		Form.save();
 
