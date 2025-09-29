@@ -3830,8 +3830,6 @@ definition {
 			webContentContent = "WC WebContent Content zh-CN",
 			webContentTitle = "WC WebContent Title zh-CN");
 
-		PortletEntry.changeLocale(locale = "pt-BR");
-
 		PortletEntry.changeLocale(
 			locale = "pt-BR",
 			translated = "true");
