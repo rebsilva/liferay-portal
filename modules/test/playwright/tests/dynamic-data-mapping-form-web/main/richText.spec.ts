@@ -48,23 +48,21 @@ baseTest(
 	{tag: ['@LPD-55278']},
 	async ({formBuilderPage, formBuilderSidePanelPage, formFieldsPage}) => {
 
-		// Create and enter a new form
+		await baseTest.step('Create a form and add a Rich Text field', async () => {
+			await formBuilderPage.goToNew();
+			
+			await formBuilderSidePanelPage.addFieldByDoubleClick('Rich Text');
+		});
 
-		await formBuilderPage.goToNew();
+		await baseTest.step('Check if Rich Text field is disabled while on Form Builder', async () => {
+			await expect(formFieldsPage.richTextToolbar).toBeVisible();
 
-		// Add a rich text field
+			await expect(formFieldsPage.richTextSourceButton).toBeDisabled();
 
-		await formBuilderSidePanelPage.addFieldByDoubleClick('Rich Text');
-
-		// Rich Text Field Source Button Not Visible nor Editable
-
-		await expect(formFieldsPage.richTextToolbar).toBeVisible();
-
-		await expect(formFieldsPage.richTextSourceButton).toBeHidden();
-
-		await expect(
-			formFieldsPage.richTextFrame.locator('body')
-		).toHaveAttribute('contenteditable', 'false');
+			await expect(
+				formFieldsPage.richTextFrame
+			).toHaveAttribute('contenteditable', 'false');
+			});
 	}
 );
 

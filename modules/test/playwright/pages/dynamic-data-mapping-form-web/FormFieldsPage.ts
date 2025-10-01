@@ -9,7 +9,7 @@ export class FormFieldsPage {
 	readonly page: Page;
 	readonly repeatFieldButton: Locator;
 	readonly richTextAddImageButton: Locator;
-	readonly richTextFrame: FrameLocator;
+	readonly richTextFrame: Locator;
 	readonly richTextSourceButton: Locator;
 	readonly richTextToolbar: Locator;
 
@@ -19,15 +19,9 @@ export class FormFieldsPage {
 		this.richTextAddImageButton = page
 			.getByLabel('Rich Text')
 			.getByTitle('Image');
-		this.richTextFrame = page.frameLocator(
-			'.ddm-field-container iframe[title="editor"]'
-		);
-		this.richTextSourceButton = page.locator(
-			'span.cke_toolbar.cke_toolbar_last [title="Source"]'
-		);
-		this.richTextToolbar = page.locator(
-			'.ddm-field-container .ddm-field span.cke_top.cke_reset_all'
-		);
+		this.richTextFrame = page.getByRole('textbox', { name: 'Rich Text Editor. Editing'}).first();
+		this.richTextSourceButton = page.getByRole('button', { name: 'Source' });
+		this.richTextToolbar = page.getByRole('toolbar', { name: 'Editor toolbar' });
 	}
 
 	async addSelectItem(optionName: string, nth?: number) {
