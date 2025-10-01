@@ -60,7 +60,7 @@ baseTest(
 			await expect(formFieldsPage.richTextSourceButton).toBeDisabled();
 
 			await expect(
-				formFieldsPage.richTextFrame
+				formFieldsPage.richTextFrame.nth(1)
 			).toHaveAttribute('contenteditable', 'false');
 			});
 	}
