@@ -56,9 +56,9 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 
 		return {
 			...nestedField,
-			...(nestedField.editorConfig && {
-				editorConfig: updateEditorConfigFilebrowsersURL(
-					nestedField.editorConfig,
+			...(nestedField.config && {
+				config: updateEditorConfigFilebrowsersURL(
+					nestedField.config,
 					newNestedFieldName,
 					nestedField.fieldName
 				),
@@ -273,10 +273,10 @@ export default function fieldReducer(state, action) {
 
 									return {
 										...currentField,
-										...(currentField.editorConfig && {
-											editorConfig:
+										...(currentField.config && {
+											config:
 												updateEditorConfigFilebrowsersURL(
-													currentField.editorConfig,
+													currentField.config,
 													name,
 													currentField.fieldName
 												),

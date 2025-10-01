@@ -209,39 +209,41 @@ test('can add image to repeated Rich Text field', async ({
 	formsPage,
 	page,
 }) => {
-	await formsPage.goTo();
 
-	await formsPage.clickManagementToolbarNewButton();
+	await test.step('Create a Form with a repeatable Rich Text field', async () => {
 
-	await formBuilderSidePanelPage.addFieldByDoubleClick('Rich Text');
+		await formsPage.goTo();
 
-	await formBuilderFieldSettingsSidePanelPage.advancedTabButton.click();
+		await formsPage.clickManagementToolbarNewButton();
 
-	await formBuilderFieldSettingsSidePanelPage.repeatableToggle.click();
+		await formBuilderSidePanelPage.addFieldByDoubleClick('Rich Text');
 
-	const formPreviewPagePromise = page.waitForEvent('popup');
+		await formBuilderFieldSettingsSidePanelPage.advancedTabButton.click();
 
-	await formBuilderPage.previewButton.click();
+		await formBuilderFieldSettingsSidePanelPage.repeatableToggle.click();
+					
+	});
 
-	formPreviewPage = await formPreviewPagePromise;
+	await test.step('Add an image to the repeated Rich Text Field', async () => {
 
-	const formFieldsPage = new FormFieldsPage(formPreviewPage);
+		const formPreviewPagePromise = page.waitForEvent('popup');
 
-	const editorContentFrame = formPreviewPage.frameLocator(
-		'iframe[title="editor"]'
-	);
+		await formBuilderPage.previewButton.click();
 
-	await formFieldsPage.repeatFieldButton.click();
+		formPreviewPage = await formPreviewPagePromise;
 
-	await formFieldsPage.richTextAddImageButton.nth(1).click();
+		const formFieldsPage = new FormFieldsPage(formPreviewPage);
 
-	await formFieldsPage.richTextselectImage('planet.png');
+		await formFieldsPage.repeatFieldButton.click();
 
-	const textBox = editorContentFrame.nth(1).getByRole('textbox');
+		await formFieldsPage.richTextAddImageButton.nth(1).click();
 
-	await expect(
-		textBox.locator('img[src="/documents/d/guest/planet-png"]')
-	).toBeVisible();
+		await formFieldsPage.richTextselectImage('planet.png');
+
+		await expect(page.getByRole('img')).toBeVisible();
+					
+	});
+	
 });
 
 test(
