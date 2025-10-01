@@ -17,7 +17,7 @@ export class FormFieldsPage {
 		this.page = page;
 		this.repeatFieldButton = page.getByTitle('Duplicate');
 		this.richTextAddImageButton = page.getByRole('button', { name: 'Image' });
-		this.richTextFrame = page.getByRole('textbox', { name: 'Rich Text Editor. Editing'}).first();
+		this.richTextFrame = page.getByRole('textbox', { name: 'Rich Text Editor. Editing'});
 		this.richTextSourceButton = page.getByRole('button', { name: 'Source' });
 		this.richTextToolbar = page.getByRole('toolbar', { name: 'Editor toolbar' });
 	}

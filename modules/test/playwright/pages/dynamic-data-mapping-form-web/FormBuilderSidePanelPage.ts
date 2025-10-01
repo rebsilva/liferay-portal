@@ -49,7 +49,7 @@ export class FormBuilderSidePanelPage {
 			name: 'Advanced',
 		});
 		this.allowGuestUsers = page.getByLabel('Allow Guest Users to Send');
-		this.backButton = page.getByRole('button', {name: 'Back'});
+		this.backButton = page.getByLabel('Back', { exact: true });
 		this.collapsibleToggleSwitch = page.getByRole('switch', {
 			name: 'Collapsible',
 		});
@@ -60,9 +60,7 @@ export class FormBuilderSidePanelPage {
 		this.label = page.getByLabel('Label', {exact: true}).first();
 		this.objectFieldSelect = page.getByLabel('Object Field');
 		this.page = page;
-		this.paragraphFieldTextarea = page
-			.frameLocator('iframe')
-			.locator('.cke_editable');
+		this.paragraphFieldTextarea = page.getByRole('textbox', { name: 'Rich Text Editor. Editing'});
 		this.paragraphFieldTitle = page.getByPlaceholder('Enter a title.');
 		this.predefinedValueField = page.getByLabel('Predefined Value');
 		this.repeatableFieldToggleSwitch = page.getByRole('switch', {
