@@ -135,7 +135,7 @@ const RichText = ({
 		setCurrentAvailableLocales(availableLocales);
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentEditingLocale]);
+	}, [currentEditingLocale.localeId]);
 
 	useEffect(() => {
 		changeLanguage(editingLanguageId ?? defaultLocale?.localeId ?? locale);
@@ -279,15 +279,18 @@ const RichText = ({
 		const data = currentValue[defaultLocale.localeId];
 
 		if (Liferay.FeatureFlags['LPD-11235']) {
-			setCKEditor5Config({
-				...ckEditor5Config,
-				initialData: data ?? '',
-			});
+
+			// setCKEditor5Config({
+			// 	...ckEditor5Config,
+			// 	initialData: data ?? '',
+			// });
+
+			setCurrentInternalValue(data ?? '');
 		}
 		else {
 			editorRef.current.editor.setData(data);
 		}
-	}, [ckEditor5Config, currentValue, defaultLocale, editorRef]);
+	}, [currentValue, defaultLocale, editorRef]);
 
 	useEffect(() => {
 		const handleRestoreState = () => {
@@ -339,6 +342,7 @@ const RichText = ({
 						<CKEditor5ClassicEditor
 							className="w-100"
 							config={ckEditor5Config}
+							data={currentInternalValue}
 							disabled={readOnly}
 							key={JSON.stringify(ckEditor5Config)}
 							onChange={(event, editor) =>
