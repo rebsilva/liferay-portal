@@ -54,6 +54,25 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 			parentFieldName
 		);
 
+		if (Liferay.FeatureFlags['LPD-11235']) {
+			return {
+				...nestedField,
+				...(nestedField.config && {
+					config: updateEditorConfigFilebrowsersURL(
+						nestedField.config,
+						newNestedFieldName,
+						nestedField.fieldName
+					),
+				}),
+				name: newNestedFieldName,
+				nestedFields: updateNestedFieldNames(
+					newNestedFieldName,
+					nestedField.nestedFields
+				),
+				...parseNestedFieldName(newNestedFieldName),
+			};
+		}
+
 		return {
 			...nestedField,
 			...(nestedField.editorConfig && {
@@ -270,6 +289,25 @@ export default function fieldReducer(state, action) {
 												currentRepeatedIndex++,
 										}
 									);
+
+									if (Liferay.FeatureFlags['LPD-11235']) {
+										return {
+											...currentField,
+											...(currentField.config && {
+												config: updateEditorConfigFilebrowsersURL(
+													currentField.config,
+													name,
+													currentField.fieldName
+												),
+											}),
+											name,
+											nestedFields:
+												updateNestedFieldNames(
+													name,
+													currentField.nestedFields
+												),
+										};
+									}
 
 									return {
 										...currentField,
