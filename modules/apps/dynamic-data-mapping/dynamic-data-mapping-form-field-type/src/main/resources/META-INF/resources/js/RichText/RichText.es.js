@@ -102,7 +102,6 @@ const RichText = ({
 	const {portletNamespace} = useConfig();
 
 	useEffect(() => {
-		if (Liferay.FeatureFlags['LPD-11235']) {
 			setCKEditor5Config({
 				...ckEditor5Config,
 				initialData: currentInternalValue,
@@ -122,35 +121,35 @@ const RichText = ({
 			};
 
 			setCurrentAvailableLocales(availableLocales);
-		}
+		
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentEditingLocale.localeId]);
 
-	useEffect(() => {
-		if (!Liferay.FeatureFlags['LPD-11235']) {
-			const editor = editorRef.current?.editor;
+	// useEffect(() => {
+	// 	if (!Liferay.FeatureFlags['LPD-11235']) {
+	// 		const editor = editorRef.current?.editor;
 
-			if (editor) {
-				editor.config.contentsLangDirection =
-					Liferay.Language.direction[currentEditingLocale.localeId];
-				editor.config.contentsLanguage = currentEditingLocale.localeId;
-				editor.setData(currentInternalValue);
-			}
+	// 		if (editor) {
+	// 			editor.config.contentsLangDirection =
+	// 				Liferay.Language.direction[currentEditingLocale.localeId];
+	// 			editor.config.contentsLanguage = currentEditingLocale.localeId;
+	// 			editor.setData(currentInternalValue);
+	// 		}
 
-			const {availableLocales} = {
-				...transformAvailableLocalesAndValue({
-					availableLocales: currentAvailableLocales,
-					defaultLocale,
-					value: currentValue,
-				}),
-			};
+	// 		const {availableLocales} = {
+	// 			...transformAvailableLocalesAndValue({
+	// 				availableLocales: currentAvailableLocales,
+	// 				defaultLocale,
+	// 				value: currentValue,
+	// 			}),
+	// 		};
 
-			setCurrentAvailableLocales(availableLocales);
-		}
+	// 		setCurrentAvailableLocales(availableLocales);
+	// 	}
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentEditingLocale]);
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [currentEditingLocale]);
 
 	useEffect(() => {
 		changeLanguage(editingLanguageId ?? defaultLocale?.localeId ?? locale);
@@ -293,31 +292,30 @@ const RichText = ({
 	const resetTranslation = useCallback(() => {
 		const data = currentValue[defaultLocale.localeId];
 
-		if (Liferay.FeatureFlags['LPD-11235']) {
-
 			// setCKEditor5Config({
 			// 	...ckEditor5Config,
 			// 	initialData: data ?? '',
 			// });
 
 			setCurrentInternalValue(data ?? '');
-		}
-		else {
-			editorRef.current.editor.setData(data);
-		}
+		
+		// else {
+		// 	editorRef.current.editor.setData(data);
+		// }
 	}, [currentValue, defaultLocale, editorRef]);
 
 	useEffect(() => {
 		const handleRestoreState = () => {
-			if (Liferay.FeatureFlags['LPD-11235']) {
-				setCKEditor5Config({
-					...ckEditor5Config,
-					initialData: value,
-				});
-			}
-			else {
-				editorRef.current.editor.setData(value);
-			}
+				// setCKEditor5Config({
+				// 	...ckEditor5Config,
+				// 	initialData: value,
+				// });
+
+				setCurrentInternalValue(value);
+			
+			// else {
+			// 	editorRef.current.editor.setData(value);
+			// }
 		};
 
 		Liferay.after('ddm:restoreState', handleRestoreState);
@@ -325,7 +323,7 @@ const RichText = ({
 		return () => {
 			Liferay.detach('ddm:restoreState', handleRestoreState);
 		};
-	}, [ckEditor5Config, currentValue, value]);
+	}, [currentValue, value]);
 
 	useEffect(() => {
 		Liferay.after('inputLocalized:resetTranslations', resetTranslation);
@@ -353,7 +351,6 @@ const RichText = ({
 		>
 			<ClayInput.Group>
 				<ClayInput.GroupItem>
-					{Liferay.FeatureFlags['LPD-11235'] ? (
 						<CKEditor5ClassicEditor
 							className="w-100"
 							config={ckEditor5Config}
@@ -365,62 +362,6 @@ const RichText = ({
 							}
 							onReady={onReady}
 						/>
-					) : (
-						<ClassicEditor
-							ariaInvalid={displayErrors && !valid}
-							ariaLabel={label}
-							ariaRequired={otherProps.required}
-							className="w-100"
-							contents={
-								currentValue
-									? currentValue[
-											currentEditingLocale?.localeId
-										]
-									: ''
-							}
-							editorConfig={
-								readOnly
-									? {
-											...editorConfig,
-											applicationTitle:
-												(label || tip) &&
-												`${label}, ${tip}`,
-											removePlugins:
-												'codemirror, autogrow',
-											resize_enabled: true,
-										}
-									: {
-											...editorConfig,
-											applicationTitle:
-												(label || tip) &&
-												`${label}, ${tip}`,
-											removePlugins: 'autogrow',
-											resize_enabled: true,
-										}
-							}
-							name={name}
-							onBlur={onBlur}
-							onChange={(content) => handleContentChange(content)}
-							onDrop={(event) => handleFileDrop(event)}
-							onFocus={onFocus}
-							onPaste={(event) => handleFilePaste(event)}
-							onSetData={(event) => {
-								const editor = event.editor;
-
-								if (editor.mode === 'source') {
-									const value = event.data.dataValue;
-
-									const sanitizedValue = sanitizeHTML(value);
-
-									handleContentChange(sanitizedValue);
-
-									event.data.dataValue = sanitizedValue;
-								}
-							}}
-							readOnly={readOnly}
-							ref={editorRef}
-						/>
-					)}
 				</ClayInput.GroupItem>
 
 				<input

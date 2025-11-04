@@ -295,16 +295,6 @@ export default function UndoRedo({
 			step.selectedLanguageId
 		);
 
-		if (!Liferay.FeatureFlags['LPD-11235']) {
-			setTimeout(
-				() =>
-					descriptionInputComponent.updateInput(
-						step.descriptionInputValue
-					),
-				200
-			);
-		}
-
 		friendlyURLInputComponent.updateInput(step.friendlyURLInputValue);
 
 		titleInputComponent.updateInput(step.titleInputValue);

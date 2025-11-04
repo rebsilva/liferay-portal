@@ -421,8 +421,7 @@ public class DDMFormAdminDisplayContext {
 					EditorConfiguration editorConfiguration =
 						EditorConfigurationFactoryUtil.getEditorConfiguration(
 							StringPool.BLANK, ddmFormFieldType.getName(),
-							FeatureFlagManagerUtil.isEnabled("LPD-11235") ?
-								"ckeditor5_classic" : "ckeditor_classic",
+								"ckeditor5_classic",
 							new HashMap<String, Object>(), themeDisplay,
 							RequestBackedPortletURLFactoryUtil.create(
 								httpServletRequest));

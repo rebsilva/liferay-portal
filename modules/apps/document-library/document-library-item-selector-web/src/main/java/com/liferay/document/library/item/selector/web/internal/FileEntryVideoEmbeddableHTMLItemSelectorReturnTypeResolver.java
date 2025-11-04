@@ -64,10 +64,6 @@ public class FileEntryVideoEmbeddableHTMLItemSelectorReturnTypeResolver
 		).put(
 			"url",
 			() -> {
-				if (!FeatureFlagManagerUtil.isEnabled("LPD-11235")) {
-					return null;
-				}
-
 				DLVideoExternalShortcut dlVideoExternalShortcut =
 					_dlVideoExternalShortcutResolver.resolve(
 						fileEntry.getFileVersion());

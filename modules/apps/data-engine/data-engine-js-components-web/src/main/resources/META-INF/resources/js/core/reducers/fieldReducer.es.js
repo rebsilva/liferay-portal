@@ -53,8 +53,6 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 			nestedField.name,
 			parentFieldName
 		);
-
-		if (Liferay.FeatureFlags['LPD-11235']) {
 			return {
 				...nestedField,
 				...(nestedField.config && {
@@ -71,24 +69,24 @@ export function updateNestedFieldNames(parentFieldName, nestedFields) {
 				),
 				...parseNestedFieldName(newNestedFieldName),
 			};
-		}
+		
 
-		return {
-			...nestedField,
-			...(nestedField.editorConfig && {
-				editorConfig: updateEditorConfigFilebrowsersURL(
-					nestedField.editorConfig,
-					newNestedFieldName,
-					nestedField.fieldName
-				),
-			}),
-			name: newNestedFieldName,
-			nestedFields: updateNestedFieldNames(
-				newNestedFieldName,
-				nestedField.nestedFields
-			),
-			...parseNestedFieldName(newNestedFieldName),
-		};
+		// return {
+		// 	...nestedField,
+		// 	...(nestedField.editorConfig && {
+		// 		editorConfig: updateEditorConfigFilebrowsersURL(
+		// 			nestedField.editorConfig,
+		// 			newNestedFieldName,
+		// 			nestedField.fieldName
+		// 		),
+		// 	}),
+		// 	name: newNestedFieldName,
+		// 	nestedFields: updateNestedFieldNames(
+		// 		newNestedFieldName,
+		// 		nestedField.nestedFields
+		// 	),
+		// 	...parseNestedFieldName(newNestedFieldName),
+		// };
 	});
 }
 
@@ -290,7 +288,6 @@ export default function fieldReducer(state, action) {
 										}
 									);
 
-									if (Liferay.FeatureFlags['LPD-11235']) {
 										return {
 											...currentField,
 											...(currentField.config && {
@@ -307,24 +304,24 @@ export default function fieldReducer(state, action) {
 													currentField.nestedFields
 												),
 										};
-									}
+								
 
-									return {
-										...currentField,
-										...(currentField.editorConfig && {
-											editorConfig:
-												updateEditorConfigFilebrowsersURL(
-													currentField.editorConfig,
-													name,
-													currentField.fieldName
-												),
-										}),
-										name,
-										nestedFields: updateNestedFieldNames(
-											name,
-											currentField.nestedFields
-										),
-									};
+									// return {
+									// 	...currentField,
+									// 	...(currentField.editorConfig && {
+									// 		editorConfig:
+									// 			updateEditorConfigFilebrowsersURL(
+									// 				currentField.editorConfig,
+									// 				name,
+									// 				currentField.fieldName
+									// 			),
+									// 	}),
+									// 	name,
+									// 	nestedFields: updateNestedFieldNames(
+									// 		name,
+									// 		currentField.nestedFields
+									// 	),
+									// };
 								}
 
 								return currentField;
