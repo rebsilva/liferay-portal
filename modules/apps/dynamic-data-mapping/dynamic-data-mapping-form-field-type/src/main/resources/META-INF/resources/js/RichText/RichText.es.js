@@ -112,8 +112,23 @@ const RichText = ({
 					),
 				},
 			});
+
+			const {availableLocales} = {
+				...transformAvailableLocalesAndValue({
+					availableLocales: currentAvailableLocales,
+					defaultLocale,
+					value: currentValue,
+				}),
+			};
+
+			setCurrentAvailableLocales(availableLocales);
 		}
-		else {
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentEditingLocale.localeId]);
+
+	useEffect(() => {
+		if (!Liferay.FeatureFlags['LPD-11235']) {
 			const editor = editorRef.current?.editor;
 
 			if (editor) {
@@ -122,20 +137,20 @@ const RichText = ({
 				editor.config.contentsLanguage = currentEditingLocale.localeId;
 				editor.setData(currentInternalValue);
 			}
+
+			const {availableLocales} = {
+				...transformAvailableLocalesAndValue({
+					availableLocales: currentAvailableLocales,
+					defaultLocale,
+					value: currentValue,
+				}),
+			};
+
+			setCurrentAvailableLocales(availableLocales);
 		}
 
-		const {availableLocales} = {
-			...transformAvailableLocalesAndValue({
-				availableLocales: currentAvailableLocales,
-				defaultLocale,
-				value: currentValue,
-			}),
-		};
-
-		setCurrentAvailableLocales(availableLocales);
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentEditingLocale.localeId]);
+	}, [currentEditingLocale]);
 
 	useEffect(() => {
 		changeLanguage(editingLanguageId ?? defaultLocale?.localeId ?? locale);
