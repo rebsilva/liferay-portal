@@ -237,7 +237,7 @@ function AutoSaveProvider({children, interval, url}) {
 	);
 }
 
-export default withRouter(AutoSaveProvider);
+export default AutoSaveProvider;
 
 export function useAutoSave() {
 	return useContext(AutoSaveContext);
