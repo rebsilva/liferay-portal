@@ -362,6 +362,9 @@ const RichText = ({
 							className="w-100"
 							config={ckEditor5Config}
 							data={currentInternalValue}
+							{...(!localizedObjectField && {
+								data: currentInternalValue,
+							})}
 							disabled={readOnly}
 							key={JSON.stringify(ckEditor5Config)}
 							onBlur={onBlur}
