@@ -4,7 +4,7 @@
  */
 
 import ClayIcon from '@clayui/icon';
-import pathToRegexp from 'path-to-regexp';
+import {compile} from '../../util/path-to-regexp.es';
 import React from 'react';
 import {Link, withRouter} from 'react-router-dom';
 
@@ -25,7 +25,7 @@ const ListHeadItem = ({
 	const nextSort = `${name}:${sorted && order === 'desc' ? 'asc' : 'desc'}`;
 	const sortIcon = order === 'asc' ? 'order-arrow-up' : 'order-arrow-down';
 
-	const pathname = pathToRegexp.compile(path)({
+	const pathname = compile(path)({
 		...params,
 		sort: nextSort,
 	});

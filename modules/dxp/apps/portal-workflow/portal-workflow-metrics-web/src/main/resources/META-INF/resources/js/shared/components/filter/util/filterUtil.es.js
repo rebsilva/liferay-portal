@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import pathToRegexp from 'path-to-regexp';
+import {compile} from '../../../util/path-to-regexp.es';
 
 import {capitalize} from '../../../util/util.es';
 import {parse, stringify} from '../../router/queryString.es';
@@ -162,7 +162,7 @@ const replaceHistory = (filterQuery, routerProps) => {
 		match: {params, path},
 	} = routerProps;
 
-	const pathname = pathToRegexp.compile(path)({...params, page: 1});
+	const pathname = compile(path)({...params, page: 1});
 
 	if (filterQuery !== search) {
 		history.replace({
