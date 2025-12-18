@@ -8,9 +8,9 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayList from '@clayui/list';
 import React, {useCallback} from 'react';
+import {useLocation} from 'react-router';
 
 import {useFilter} from '../../hooks/useFilter.es';
-import {useRouter} from '../../hooks/useRouter.es';
 import {sub} from '../../util/lang.es';
 import {
 	removeFilters,
@@ -32,7 +32,7 @@ const ResultsBar = ({children}) => {
 
 const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 	const {dispatch, filterState} = useFilter({withoutRouteParams});
-	const routerProps = useRouter();
+	const location = useLocation();
 
 	const handleClearAll = useCallback(() => {
 		filters.map((filter) => {
@@ -48,13 +48,13 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 		dispatch(filterState);
 
 		if (!withoutRouteParams) {
-			const query = removeFilters(routerProps.location.search);
+			const query = removeFilters(location.search);
 
-			replaceHistory(query, routerProps);
+			replaceHistory(query);
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filterState, routerProps, withoutRouteParams]);
+	}, [filterState, location, withoutRouteParams]);
 
 	return (
 		<ClayList.ItemText className="tbar-item tbar-item-expand">
@@ -74,7 +74,7 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 
 const FilterItem = ({filter, item, withoutRouteParams}) => {
 	const {dispatch, filterState} = useFilter({withoutRouteParams});
-	const routerProps = useRouter();
+	const location = useLocation();
 
 	const removeFilter = useCallback(() => {
 		item.active = false;
@@ -86,17 +86,13 @@ const FilterItem = ({filter, item, withoutRouteParams}) => {
 		dispatch(filterState);
 
 		if (!withoutRouteParams) {
-			const query = removeItem(
-				filter.key,
-				item,
-				routerProps.location.search
-			);
+			const query = removeItem(filter.key, item, location.search);
 
-			replaceHistory(query, routerProps);
+			replaceHistory(query);
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filterState, routerProps, withoutRouteParams]);
+	}, [filterState, location, withoutRouteParams]);
 
 	return (
 		<ClayList.ItemText className="tbar-item">

@@ -4,6 +4,7 @@
  */
 
 import React, {useCallback, useContext, useMemo, useState} from 'react';
+import {useLocation} from 'react-router';
 
 import Filter from '../../shared/components/filter/Filter.es';
 import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.es';
@@ -16,7 +17,6 @@ import {
 } from '../../shared/components/filter/util/filterUtil.es';
 import {parse, stringify} from '../../shared/components/router/queryString.es';
 import {useFilter} from '../../shared/hooks/useFilter.es';
-import {useRouter} from '../../shared/hooks/useRouter.es';
 import {useRouterParams} from '../../shared/hooks/useRouterParams.es';
 import {useSessionStorage} from '../../shared/hooks/useStorage.es';
 import {AppContext} from '../AppContext.es';
@@ -37,6 +37,8 @@ export default function TimeRangeFilter({
 		withoutRouteParams: false,
 		...options,
 	};
+
+	const {search} = useLocation();
 
 	const {isAmPm} = useContext(AppContext);
 	const {filters} = useRouterParams();
@@ -65,7 +67,6 @@ export default function TimeRangeFilter({
 	);
 
 	const prefixedFilterKey = getCapitalizedFilterKey(prefixKey, filterKey);
-	const routerProps = useRouter();
 
 	const dateEnd = filters[dateEndKey];
 	const dateStart = filters[dateStartKey];
@@ -109,7 +110,7 @@ export default function TimeRangeFilter({
 
 	const handleSelectFilter = (filter) => {
 		const filterValue = {[prefixedFilterKey]: [filter.key]};
-		const query = parse(routerProps.location.search);
+		const query = parse(search);
 
 		if (!options.withoutRouteParams) {
 			query.filters = {
@@ -118,8 +119,7 @@ export default function TimeRangeFilter({
 				[dateStartKey]: filter.dateStart,
 				...filterValue,
 			};
-
-			replaceHistory(stringify(query), routerProps);
+			replaceHistory(stringify(query));
 		}
 		else {
 			dispatch(filterValue);

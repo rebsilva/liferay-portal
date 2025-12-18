@@ -7,9 +7,9 @@ import ClayButton from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import React, {useCallback, useEffect, useState} from 'react';
+import {useLocation} from 'react-router';
 
 import {useFilter} from '../../hooks/useFilter.es';
-import {useRouter} from '../../hooks/useRouter.es';
 import {FilterItem} from './FilterItem.es';
 import {FilterSearch} from './FilterSearch.es';
 import {
@@ -42,7 +42,7 @@ const Filter = ({
 	const [changed, setChanged] = useState(false);
 
 	const prefixedFilterKey = getCapitalizedFilterKey(prefixKey, filterKey);
-	const routerProps = useRouter();
+	const location = useLocation();
 
 	const getSelectedItems = (items) => items.filter((item) => item.active);
 
@@ -51,17 +51,17 @@ const Filter = ({
 			const query = getSelectedItemsQuery(
 				items,
 				prefixedFilterKey,
-				routerProps.location.search
+				location.search
 			);
 
-			replaceHistory(query, routerProps);
+			replaceHistory(query);
 		}
 		else {
 			dispatchFilter(prefixedFilterKey, getSelectedItems(items));
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [items, routerProps]);
+	}, [items, location]);
 
 	const closeDropdown = () => {
 		setExpanded(false);

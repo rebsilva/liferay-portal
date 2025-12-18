@@ -7,8 +7,8 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useEffect, useState} from 'react';
+import {useLocation} from 'react-router';
 
-import {useRouter} from '../../hooks/useRouter.es';
 import {replaceHistory} from '../filter/util/filterUtil.es';
 import {parse, stringify} from '../router/queryString.es';
 
@@ -16,9 +16,9 @@ const SearchField = ({
 	disabled,
 	placeholder = Liferay.Language.get('search-for'),
 }) => {
-	const routerProps = useRouter();
+	const location = useLocation();
 
-	const query = parse(routerProps.location.search);
+	const query = parse(location.search);
 	const {search = ''} = query;
 
 	const [searchValue, setSearchValue] = useState('');
@@ -36,7 +36,7 @@ const SearchField = ({
 
 		query.search = searchValue;
 
-		replaceHistory(stringify(query), routerProps);
+		replaceHistory(stringify(query));
 	};
 
 	return (

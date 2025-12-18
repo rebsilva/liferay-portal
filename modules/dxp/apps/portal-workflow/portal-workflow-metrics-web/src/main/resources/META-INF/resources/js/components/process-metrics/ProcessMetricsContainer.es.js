@@ -7,7 +7,7 @@ import ClayLayout from '@clayui/layout';
 import {usePrevious} from '@liferay/frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useMemo} from 'react';
-import {Route, Switch} from 'react-router-dom';
+import {Route, Routes, useLocation, useNavigate, useParams} from 'react-router';
 
 import {replaceHistory} from '../../shared/components/filter/util/filterUtil.es';
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';
@@ -15,13 +15,9 @@ import MetricsCalculatedInfo from '../../shared/components/last-updated-info/Met
 import NavbarTabs from '../../shared/components/navbar-tabs/NavbarTabs.es';
 import PromisesResolver from '../../shared/components/promises-resolver/PromisesResolver.es';
 import {parse, stringify} from '../../shared/components/router/queryString.es';
-import {
-	getPathname,
-	withParams,
-} from '../../shared/components/router/routerUtil.es';
+import {getPathname} from '../../shared/components/router/routerUtil.es';
 import {useDateModified} from '../../shared/hooks/useDateModified.es';
 import {useProcessTitle} from '../../shared/hooks/useProcessTitle.es';
-import {useRouter} from '../../shared/hooks/useRouter.es';
 import {headers, metricsBaseURL} from '../../shared/rest/fetch.es';
 import {AppContext} from '../AppContext.es';
 import {useTimeRangeFetch} from '../filter/hooks/useTimeRangeFetch.es';
@@ -83,7 +79,7 @@ const DashboardTab = ({processId, routeParams}) => {
 
 function PerformanceTab({processId, routeParams}) {
 	const {fetchDateModified} = useContext(AppContext);
-	const routerProps = useRouter();
+	const {search} = useLocation();
 
 	const {dateModified, fetchData} = useDateModified({
 		processId,
@@ -139,7 +135,7 @@ function PerformanceTab({processId, routeParams}) {
 		const replaceHistoryWithDefaultFilters = async () => {
 			const fetchedTimeRanges = await fetchTimeRanges();
 
-			const query = parse(routerProps.location.search);
+			const query = parse(search);
 
 			if (
 				fetchedTimeRanges?.items?.length &&
@@ -156,7 +152,7 @@ function PerformanceTab({processId, routeParams}) {
 					query
 				);
 
-				replaceHistory(queryWithDefaultFilters, routerProps);
+				replaceHistory(queryWithDefaultFilters);
 			}
 		};
 
@@ -182,8 +178,11 @@ function PerformanceTab({processId, routeParams}) {
 	);
 }
 
-export default function ProcessMetricsContainer({history, processId, query}) {
+export default function ProcessMetricsContainer() {
 	const {defaultDelta} = useContext(AppContext);
+	const location = useLocation();
+	const navigate = useNavigate();
+	const {processId} = useParams();
 
 	useProcessTitle(processId);
 
@@ -207,18 +206,18 @@ export default function ProcessMetricsContainer({history, processId, query}) {
 		},
 	};
 
-	if (history.location.pathname === `/metrics/${processId}`) {
+	if (location.pathname === `/metrics/${processId}`) {
 		const pathname = getPathname(
 			tabs.dashboard.params,
 			tabs.dashboard.path
 		);
 
 		const search = stringify({
-			...parse(query),
+			...parse(location.search),
 			filters: {taskNames: ['allSteps']},
 		});
 
-		history.replace({pathname, search});
+		navigate({pathname, search}, {replace: true});
 	}
 
 	return (
@@ -236,19 +235,17 @@ export default function ProcessMetricsContainer({history, processId, query}) {
 
 			<SLAInfo processId={processId} />
 
-			<Switch>
+			<Routes>
 				<Route
-					exact
+					element={<DashboardTab />}
 					path={tabs.dashboard.path}
-					render={withParams(DashboardTab)}
-				/>
+				></Route>
 
 				<Route
-					exact
+					element={<PerformanceTab />}
 					path={tabs.performance.path}
-					render={withParams(PerformanceTab)}
-				/>
-			</Switch>
+				></Route>
+			</Routes>
 		</div>
 	);
 }
