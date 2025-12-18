@@ -8,7 +8,7 @@ import {compile} from '../../util/path-to-regexp.es';
 import React, {useCallback, useContext} from 'react';
 
 import {AppContext} from '../../../components/AppContext.es';
-import {useRouter} from '../../hooks/useRouter.es';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 const PaginationBar = ({
 	page,
@@ -20,11 +20,13 @@ const PaginationBar = ({
 	withoutRouting,
 }) => {
 	const {deltaValues} = useContext(AppContext);
-	const {
-		history,
-		location: {search},
-		match: {params, path},
-	} = useRouter();
+	
+	const {search} = useLocation();
+    const {params} = useParams();
+	const navigate = useNavigate();
+	// const path = ?
+	// not working because it still need the path property
+	// useMatches does not work because it needs 'createBrowserRouter'
 
 	const deltas = deltaValues.map((label) => ({label}));
 	const labels = {
@@ -42,7 +44,7 @@ const PaginationBar = ({
 					pageSize: newPageSize,
 				});
 
-				history.push({pathname, search});
+				navigate({pathname, search});
 			}
 			else {
 				setPage(1);
@@ -62,7 +64,7 @@ const PaginationBar = ({
 					page: newPage,
 				});
 
-				history.push({pathname, search});
+				navigate({pathname, search});
 			}
 			else {
 				setPage(newPage);
