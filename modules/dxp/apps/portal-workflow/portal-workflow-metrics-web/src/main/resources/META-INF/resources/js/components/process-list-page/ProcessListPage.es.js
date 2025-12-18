@@ -5,6 +5,7 @@
 
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useMemo} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';
 import PromisesResolver from '../../shared/components/promises-resolver/PromisesResolver.es';
@@ -40,15 +41,19 @@ const Header = ({page, pageSize, search, sort, totalCount}) => {
 	);
 };
 
-function ProcessListPage({history, query, routeParams}) {
-	if (history.location.pathname === '/') {
-		history.replace(`/processes/20/1/overdueInstanceCount:desc`);
+function ProcessListPage() {
+	const location = useLocation();
+	const navigate = useNavigate();
+	const routeParams = useParams();
+
+	if (location.pathname === '/') {
+		navigate(`/processes/20/1/overdueInstanceCount:desc`, {replace: true});
 	}
 
 	usePageTitle(Liferay.Language.get('metrics'));
 
 	const {page, pageSize, sort} = routeParams;
-	const {search = ''} = parse(query);
+	const {search = ''} = parse(location.search);
 
 	const {data, fetchData} = useFetch({
 		params: {

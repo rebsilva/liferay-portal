@@ -5,6 +5,7 @@
 
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React from 'react';
+import {useLocation} from 'react-router';
 
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
 import ResultsBar from '../../shared/components/results-bar/ResultsBar.es';
@@ -25,8 +26,9 @@ export default function Header({
 	selectedFilters,
 	totalCount,
 }) {
+	const {search} = useLocation();
 	const showFiltersResult =
-		routeParams.search || hasFilterToShow(selectedFilters, hideFilters);
+		search || hasFilterToShow(selectedFilters, hideFilters);
 
 	return (
 		<>
@@ -62,7 +64,7 @@ export default function Header({
 			{showFiltersResult && (
 				<ResultsBar>
 					<ResultsBar.TotalCount
-						search={routeParams.search}
+						search={search}
 						totalCount={totalCount}
 					/>
 

@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import {useParams} from 'react-router';
 
 import {useFetch} from '../../shared/hooks/useFetch.es';
 import {useFilter} from '../../shared/hooks/useFilter.es';
@@ -16,8 +17,10 @@ import Header from './InstanceListPageHeader.es';
 import InstanceListPageProvider from './InstanceListPageProvider.es';
 import ModalProvider from './modal/ModalProvider.es';
 
-function InstanceListPage({routeParams}) {
+function InstanceListPage() {
 	useTimeRangeFetch();
+
+	const routeParams = useParams();
 
 	const {page, pageSize, processId, sort} = routeParams;
 

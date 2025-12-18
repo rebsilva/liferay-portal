@@ -4,6 +4,7 @@
  */
 
 import React, {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router';
 
 import PromisesResolver from '../../shared/components/promises-resolver/PromisesResolver.es';
 import {parse} from '../../shared/components/router/queryString.es';
@@ -13,10 +14,12 @@ import {useProcessTitle} from '../../shared/hooks/useProcessTitle.es';
 import Body from './WorkloadByAssigneePageBody.es';
 import Header from './WorkloadByAssigneePageHeader.es';
 
-function WorkloadByAssigneePage({query, routeParams}) {
-	const {processId, ...paginationParams} = routeParams;
+function WorkloadByAssigneePage() {
+	const location = useLocation();
+	const routeParams = useParams();
 
-	const {search = null} = parse(query);
+	const {processId, ...paginationParams} = routeParams;
+	const {search = null} = parse(location.search);
 	const filterKeys = ['processStep', 'roles'];
 
 	useProcessTitle(processId, Liferay.Language.get('workload-by-assignee'));

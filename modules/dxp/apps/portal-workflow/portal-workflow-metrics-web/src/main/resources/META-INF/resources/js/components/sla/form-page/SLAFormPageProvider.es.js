@@ -4,6 +4,7 @@
  */
 
 import React, {createContext, useMemo, useState} from 'react';
+import {useParams} from 'react-router';
 
 import PromisesResolver from '../../../shared/components/promises-resolver/PromisesResolver.es';
 import {useCalendars} from './hooks/useCalendars.es';
@@ -12,8 +13,9 @@ import {useSLANodes} from './hooks/useSLANodes.es';
 
 const SLAFormContext = createContext({});
 
-function SLAFormPageProvider({children, id, processId}) {
+function SLAFormPageProvider({children}) {
 	const [errors, setErrors] = useState({});
+	const {id, processId} = useParams();
 
 	const {fetchCalendars, ...calendarsData} = useCalendars();
 	const {fetchNodes, ...SLANodes} = useSLANodes(processId);

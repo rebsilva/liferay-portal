@@ -6,6 +6,7 @@
 import ClayAlert from '@clayui/alert';
 import ClayLayout from '@clayui/layout';
 import React, {createContext, useContext, useMemo, useState} from 'react';
+import {useParams} from 'react-router';
 
 import PromisesResolver from '../../../shared/components/promises-resolver/PromisesResolver.es';
 import {useFetch} from '../../../shared/hooks/useFetch.es';
@@ -16,8 +17,9 @@ import Body from './SLAListPageBody.es';
 import Header from './SLAListPageHeader.es';
 import DeleteSLAModal from './modal/DeleteSLAModal.es';
 
-function SLAListPage({page, pageSize, processId}) {
+function SLAListPage() {
 	const {SLAUpdated, setSLAUpdated} = useContext(SLAContext);
+	const {page, pageSize, processId} = useParams();
 
 	const [itemToRemove, setItemToRemove] = useState(null);
 	const [visible, setVisible] = useState(false);

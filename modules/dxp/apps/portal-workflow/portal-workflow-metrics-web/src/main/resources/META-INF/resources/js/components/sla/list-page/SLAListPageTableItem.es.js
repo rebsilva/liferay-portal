@@ -7,10 +7,10 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayTable from '@clayui/table';
 import React, {useCallback, useContext} from 'react';
+import {useLocation, useNavigate} from 'react-router';
 
 import QuickActionKebab from '../../../shared/components/quick-action-kebab/QuickActionKebab.es';
 import ChildLink from '../../../shared/components/router/ChildLink.es';
-import {useRouter} from '../../../shared/hooks/useRouter.es';
 import {formatDuration} from '../../../shared/util/duration.es';
 import moment from '../../../shared/util/moment.es';
 import {SLAListPageContext} from './SLAListPage.es';
@@ -26,10 +26,9 @@ export default function Item({
 	processId,
 	status,
 }) {
-	const {
-		history,
-		location: {search},
-	} = useRouter();
+	const {search} = useLocation();
+	const navigate = useNavigate();
+
 	const {showDeleteModal} = useContext(SLAListPageContext);
 
 	const handleDelete = useCallback(() => {
@@ -49,7 +48,7 @@ export default function Item({
 		{
 			label: Liferay.Language.get('edit'),
 			onClick: () => {
-				history.push({
+				navigate({
 					pathname: `/sla/${processId}/edit/${id}`,
 					search,
 				});

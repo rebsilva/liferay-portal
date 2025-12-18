@@ -7,6 +7,7 @@ import ClayButton from '@clayui/button';
 import ClayForm, {ClayInput} from '@clayui/form';
 import ClayLayout from '@clayui/layout';
 import React, {useCallback, useContext} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 import ContentView from '../../../shared/components/content-view/ContentView.es';
 import FormGroupWithStatus from '../../../shared/components/form/FormGroupWithStatus.es';
@@ -37,9 +38,14 @@ import {
 	validateNodeKeys,
 } from './util/slaFormUtil.es';
 
-function Body({history, id, processId, query}) {
+function Body() {
 	const {defaultDelta} = useContext(AppContext);
 	const {setSLAUpdated} = useContext(SLAContext);
+
+	const {search} = useLocation();
+	const navigate = useNavigate();
+	const {id, processId} = useParams();
+
 	const {
 		changeValue,
 		errors,
@@ -51,7 +57,7 @@ function Body({history, id, processId, query}) {
 	} = useContext(SLAFormContext);
 	const toaster = useToaster();
 
-	const {slaInfoLink} = parse(query);
+	const {slaInfoLink} = parse(search);
 
 	usePageTitle(id ? sla.name : Liferay.Language.get('new-sla'));
 
@@ -112,7 +118,7 @@ function Body({history, id, processId, query}) {
 					if (id) {
 						setSLAUpdated(true);
 
-						history.goBack();
+						navigate(-1);
 
 						toaster.success(
 							Liferay.Language.get('sla-was-updated')
@@ -120,13 +126,13 @@ function Body({history, id, processId, query}) {
 					}
 					else {
 						if (slaInfoLink) {
-							history.push({
+							navigate({
 								pathname: `/sla/${processId}/list/${defaultDelta}/1`,
-								search: query,
+								search,
 							});
 						}
 						else {
-							history.goBack();
+							navigate(-1);
 						}
 
 						toaster.success(Liferay.Language.get('sla-was-saved'));
@@ -245,7 +251,7 @@ function Body({history, id, processId, query}) {
 
 							<ClayButton
 								displayType="secondary"
-								onClick={() => history.goBack()}
+								onClick={() => navigate(-1)}
 							>
 								{Liferay.Language.get('cancel')}
 							</ClayButton>

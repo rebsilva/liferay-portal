@@ -4,6 +4,7 @@
  */
 
 import React, {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router';
 
 import PromisesResolver from '../../shared/components/promises-resolver/PromisesResolver.es';
 import {parse} from '../../shared/components/router/queryString.es';
@@ -15,11 +16,13 @@ import {getTimeRangeParams} from '../filter/util/timeRangeUtil.es';
 import Body from './PerformanceByAssigneePageBody.es';
 import Header from './PerformanceByAssigneePageHeader.es';
 
-function PerformanceByAssigneePage({query, routeParams}) {
+function PerformanceByAssigneePage() {
 	useTimeRangeFetch();
+	const location = useLocation();
+	const routeParams = useParams();
 
 	const {processId, ...paginationParams} = routeParams;
-	const {search = null} = parse(query);
+	const {search = null} = parse(location.search);
 	const filterKeys = ['processStep', 'roles'];
 
 	useProcessTitle(processId, Liferay.Language.get('performance-by-assignee'));
