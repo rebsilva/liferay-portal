@@ -4,15 +4,13 @@
  */
 
 import {useMemo} from 'react';
+import {useLocation, useParams} from 'react-router';
 
 import {getFiltersParam} from '../components/filter/util/filterUtil.es';
-import {useRouter} from './useRouter.es';
 
 const useRouterParams = () => {
-	const {
-		location: {search},
-		match: {params},
-	} = useRouter();
+	const {search} = useLocation();
+	const {params} = useParams();
 
 	const filters = useMemo(() => getFiltersParam(search), [search]);
 
