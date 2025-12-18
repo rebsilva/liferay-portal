@@ -162,10 +162,6 @@ const replaceHistory = (filterQuery, routerProps) => {
 		match: {params, path},
 	} = routerProps;
 
-	// not working because it still need the path property
-	// useMatches does not work because it needs 'createBrowserRouter'
-	// also needs to replace history, location and params for the hooks
-
 	const pathname = compile(path)({...params, page: 1});
 
 	if (filterQuery !== search) {
