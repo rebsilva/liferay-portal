@@ -4,11 +4,12 @@
  */
 
 import {ClayPaginationBarWithBasicItems} from '@clayui/pagination-bar';
-import {compile} from '../../util/path-to-regexp.es';
 import React, {useCallback, useContext} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 import {AppContext} from '../../../components/AppContext.es';
-import {useRouter} from '../../hooks/useRouter.es';
+import {useRoutePath} from '../../hooks/useRoutePath.es';
+import {compile} from '../../util/path-to-regexp.es';
 
 const PaginationBar = ({
 	page,
@@ -20,11 +21,10 @@ const PaginationBar = ({
 	withoutRouting,
 }) => {
 	const {deltaValues} = useContext(AppContext);
-	const {
-		history,
-		location: {search},
-		match: {params, path},
-	} = useRouter();
+	const {search} = useLocation();
+	const {params} = useParams();
+	const path = useRoutePath();
+	const navigate = useNavigate();
 
 	const deltas = deltaValues.map((label) => ({label}));
 	const labels = {
@@ -42,7 +42,7 @@ const PaginationBar = ({
 					pageSize: newPageSize,
 				});
 
-				history.push({pathname, search});
+				navigate({pathname, search});
 			}
 			else {
 				setPage(1);
@@ -62,7 +62,7 @@ const PaginationBar = ({
 					page: newPage,
 				});
 
-				history.push({pathname, search});
+				navigate({pathname, search});
 			}
 			else {
 				setPage(newPage);

@@ -4,7 +4,7 @@
  */
 
 import {ManagementToolbar} from 'frontend-js-components-web';
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router';
 
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';

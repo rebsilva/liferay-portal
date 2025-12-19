@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import {HashRouter as Router, Route, Routes} from 'react-router';
+import {Outlet, RouterProvider, createHashRouter} from 'react-router';
 
 import {FilterContextProvider} from '../shared/components/filter/FilterContext.es';
 import HeaderController from '../shared/components/header/HeaderController.es';
@@ -18,61 +18,77 @@ import SettingsContainer from './settings/SettingsContainer.es';
 import SLAContainer from './sla/SLAContainer.es';
 import WorkloadByAssigneePage from './workload-by-assignee-page/WorkloadByAssigneePage.es';
 
+const Layout = () => (
+	<>
+		<HeaderController basePath="/processes" />
+
+		<div className="portal-workflow-metrics-app">
+			<Outlet />
+		</div>
+	</>
+);
+
+const router = createHashRouter([
+	{
+		children: [
+			{
+				element: <ProcessListPage />,
+				handle: {
+					path: '/',
+				},
+				index: true,
+			},
+			{
+				element: <ProcessListPage />,
+				handle: {
+					path: '/processes/:pageSize/:page/:sort',
+				},
+				path: '/processes/:pageSize/:page/:sort',
+			},
+
+			/*
+			{
+				element: <ProcessMetricsContainer />,
+				path: '/metrics/:processId',
+			},
+			{
+				element: <InstanceListPage />,
+				path: '/instance/:processId/:pageSize/:page/:sort',
+			},
+			{
+				element: <SLAContainer />,
+				path: '/sla/:processId',
+			},
+			{
+				element: <PerformanceByStepPage />,
+				path: '/performance/step/:processId/:pageSize/:page/:sort',
+			},
+			{
+				element: <WorkloadByAssigneePage />,
+				path: '/workload/assignee/:processId/:pageSize/:page/:sort',
+			},
+			{
+				element: <PerformanceByAssigneePage />,
+				path: '/performance/assignee/:processId/:pageSize/:page/:sort',
+			},
+			{
+				element: <SettingsContainer />,
+				path: '/settings',
+			},
+			*/
+		],
+		element: <Layout />,
+		path: '/',
+	},
+]);
+
 const App = (props) => {
 	return (
-		<Router>
-			<AppContextProvider {...props}>
-				<FilterContextProvider>
-					<HeaderController basePath="/processes" />
-
-					<div className="portal-workflow-metrics-app">
-						<Routes>
-							<Route element={<ProcessListPage />} path="/" />
-
-							<Route
-								element={<ProcessListPage />}
-								path="/processes/:pageSize/:page/:sort"
-							/>
-
-							<Route
-								element={<ProcessMetricsContainer />}
-								path="/metrics/:processId"
-							/>
-
-							<Route
-								element={<InstanceListPage />}
-								path="/instance/:processId/:pageSize/:page/:sort"
-							/>
-
-							<Route
-								element={<SLAContainer />}
-								path="/sla/:processId"
-							/>
-
-							<Route
-								element={<PerformanceByStepPage />}
-								path="/performance/step/:processId/:pageSize/:page/:sort"
-							/>
-
-							<Route
-								element={<WorkloadByAssigneePage />}
-								path="/workload/assignee/:processId/:pageSize/:page/:sort"
-							/>
-
-							<Route
-								element={<PerformanceByAssigneePage />}
-								path="/performance/assignee/:processId/:pageSize/:page/:sort"
-							/>
-
-							<Route
-								element={<SettingsContainer />}
-								path="/settings"
-							/>
-						</Routes>
-					</div>
-				</FilterContextProvider>
-			</AppContextProvider>
-		</Router>
+		<AppContextProvider {...props}>
+			<FilterContextProvider>
+				<RouterProvider router={router} />
+			</FilterContextProvider>
+		</AppContextProvider>
 	);
 };
 
