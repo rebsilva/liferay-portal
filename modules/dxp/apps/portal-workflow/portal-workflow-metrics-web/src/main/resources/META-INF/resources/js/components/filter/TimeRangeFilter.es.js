@@ -4,7 +4,7 @@
  */
 
 import React, {useCallback, useContext, useMemo, useState} from 'react';
-import {useLocation} from 'react-router';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 import Filter from '../../shared/components/filter/Filter.es';
 import {useFilterName} from '../../shared/components/filter/hooks/useFilterName.es';
@@ -13,12 +13,13 @@ import filterConstants from '../../shared/components/filter/util/filterConstants
 import {
 	getCapitalizedFilterKey,
 	mergeItemsArray,
-	replaceHistory,
 } from '../../shared/components/filter/util/filterUtil.es';
 import {parse, stringify} from '../../shared/components/router/queryString.es';
 import {useFilter} from '../../shared/hooks/useFilter.es';
+import {useRoutePath} from '../../shared/hooks/useRoutePath.es';
 import {useRouterParams} from '../../shared/hooks/useRouterParams.es';
 import {useSessionStorage} from '../../shared/hooks/useStorage.es';
+import {compile} from '../../shared/util/path-to-regexp.es';
 import {AppContext} from '../AppContext.es';
 import CustomTimeRangeForm from './CustomTimeRangeForm.es';
 import {getCustomTimeRange, parseDateItems} from './util/timeRangeUtil.es';
@@ -39,6 +40,9 @@ export default function TimeRangeFilter({
 	};
 
 	const {search} = useLocation();
+	const navigate = useNavigate();
+	const {params} = useParams();
+	const path = useRoutePath();
 
 	const {isAmPm} = useContext(AppContext);
 	const {filters} = useRouterParams();
@@ -119,7 +123,12 @@ export default function TimeRangeFilter({
 				[dateStartKey]: filter.dateStart,
 				...filterValue,
 			};
-			replaceHistory(stringify(query));
+
+			const pathname = path
+				? compile(path)({...params, page: 1})
+				: location.pathname;
+
+			navigate({pathname, search: stringify(query)}, {replace: true});
 		}
 		else {
 			dispatch(filterValue);

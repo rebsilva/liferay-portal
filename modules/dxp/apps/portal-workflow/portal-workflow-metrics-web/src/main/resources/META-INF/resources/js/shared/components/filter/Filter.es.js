@@ -7,7 +7,7 @@ import ClayButton from '@clayui/button';
 import ClayDropDown, {Align} from '@clayui/drop-down';
 import ClayIcon from '@clayui/icon';
 import React, {useCallback, useEffect, useState} from 'react';
-import {useLocation} from 'react-router';
+import {useLocation, useNavigate} from 'react-router';
 
 import {useFilter} from '../../hooks/useFilter.es';
 import {FilterItem} from './FilterItem.es';
@@ -15,7 +15,6 @@ import {FilterSearch} from './FilterSearch.es';
 import {
 	getCapitalizedFilterKey,
 	getSelectedItemsQuery,
-	replaceHistory,
 } from './util/filterUtil.es';
 
 const Filter = ({
@@ -43,6 +42,7 @@ const Filter = ({
 
 	const prefixedFilterKey = getCapitalizedFilterKey(prefixKey, filterKey);
 	const location = useLocation();
+	const navigate = useNavigate();
 
 	const getSelectedItems = (items) => items.filter((item) => item.active);
 
@@ -54,7 +54,7 @@ const Filter = ({
 				location.search
 			);
 
-			replaceHistory(query);
+			navigate({search: query}, {replace: true});
 		}
 		else {
 			dispatchFilter(prefixedFilterKey, getSelectedItems(items));

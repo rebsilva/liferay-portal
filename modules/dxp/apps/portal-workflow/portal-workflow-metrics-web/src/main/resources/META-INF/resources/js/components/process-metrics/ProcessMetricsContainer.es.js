@@ -9,7 +9,6 @@ import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useMemo} from 'react';
 import {Outlet, useLocation, useNavigate, useParams} from 'react-router';
 
-import {replaceHistory} from '../../shared/components/filter/util/filterUtil.es';
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';
 import MetricsCalculatedInfo from '../../shared/components/last-updated-info/MetricsCalculatedInfo.es';
 import NavbarTabs from '../../shared/components/navbar-tabs/NavbarTabs.es';
@@ -83,6 +82,7 @@ export function PerformanceTab() {
 	const routeParams = useParams();
 	const {processId} = routeParams;
 	const {fetchDateModified} = useContext(AppContext);
+	const navigate = useNavigate();
 	const {search} = useLocation();
 
 	const {dateModified, fetchData} = useDateModified({
@@ -156,7 +156,7 @@ export function PerformanceTab() {
 					query
 				);
 
-				replaceHistory(queryWithDefaultFilters);
+				navigate({search: queryWithDefaultFilters}, {replace: true});
 			}
 		};
 
