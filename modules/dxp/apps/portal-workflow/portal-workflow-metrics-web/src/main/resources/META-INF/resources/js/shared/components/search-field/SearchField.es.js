@@ -7,9 +7,10 @@ import {ClayButtonWithIcon} from '@clayui/button';
 import {ClayInput} from '@clayui/form';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useEffect, useState} from 'react';
-import {useLocation} from 'react-router';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
-import {replaceHistory} from '../filter/util/filterUtil.es';
+import {useRoutePath} from '../../hooks/useRoutePath.es';
+import {compile} from '../../util/path-to-regexp.es';
 import {parse, stringify} from '../router/queryString.es';
 
 const SearchField = ({
@@ -17,6 +18,9 @@ const SearchField = ({
 	placeholder = Liferay.Language.get('search-for'),
 }) => {
 	const location = useLocation();
+	const navigate = useNavigate();
+	const params = useParams();
+	const path = useRoutePath();
 
 	const query = parse(location.search);
 	const {search = ''} = query;
@@ -36,7 +40,11 @@ const SearchField = ({
 
 		query.search = searchValue;
 
-		replaceHistory(stringify(query));
+		const pathname = path
+			? compile(path)({...params, page: 1})
+			: location.pathname;
+
+		navigate({pathname, search: stringify(query)}, {replace: true});
 	};
 
 	return (
