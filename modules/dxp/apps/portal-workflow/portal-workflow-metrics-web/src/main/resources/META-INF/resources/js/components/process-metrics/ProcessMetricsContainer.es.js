@@ -7,7 +7,7 @@ import ClayLayout from '@clayui/layout';
 import {usePrevious} from '@liferay/frontend-js-react-web';
 import {fetch} from 'frontend-js-web';
 import React, {useContext, useEffect, useMemo} from 'react';
-import {Route, Routes, useLocation, useNavigate, useParams} from 'react-router';
+import {Outlet, useLocation, useNavigate, useParams} from 'react-router';
 
 import {replaceHistory} from '../../shared/components/filter/util/filterUtil.es';
 import HeaderKebab from '../../shared/components/header/HeaderKebab.es';
@@ -30,7 +30,9 @@ import PendingItemsCard from './process-items/PendingItemsCard.es';
 import WorkloadByAssigneeCard from './workload-by-assignee-card/WorkloadByAssigneeCard.es';
 import WorkloadByStepCard from './workload-by-step-card/WorkloadByStepCard.es';
 
-const DashboardTab = ({processId, routeParams}) => {
+export function DashboardTab() {
+	const routeParams = useParams();
+	const {processId} = routeParams;
 	const {fetchDateModified} = useContext(AppContext);
 
 	const {dateModified, fetchData} = useDateModified({
@@ -75,9 +77,11 @@ const DashboardTab = ({processId, routeParams}) => {
 			</ClayLayout.ContainerFluid>
 		</PromisesResolver>
 	);
-};
+}
 
-function PerformanceTab({processId, routeParams}) {
+export function PerformanceTab() {
+	const routeParams = useParams();
+	const {processId} = routeParams;
 	const {fetchDateModified} = useContext(AppContext);
 	const {search} = useLocation();
 
@@ -235,17 +239,7 @@ export default function ProcessMetricsContainer() {
 
 			<SLAInfo processId={processId} />
 
-			<Routes>
-				<Route
-					element={<DashboardTab />}
-					path={tabs.dashboard.path}
-				></Route>
-
-				<Route
-					element={<PerformanceTab />}
-					path={tabs.performance.path}
-				></Route>
-			</Routes>
+			<Outlet />
 		</div>
 	);
 }

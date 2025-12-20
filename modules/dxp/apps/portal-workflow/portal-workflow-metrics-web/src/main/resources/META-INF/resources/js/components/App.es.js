@@ -13,7 +13,10 @@ import InstanceListPage from './instance-list-page/InstanceListPage.es';
 import PerformanceByAssigneePage from './performance-by-assignee-page/PerformanceByAssigneePage.es';
 import PerformanceByStepPage from './performance-by-step-page/PerformanceByStepPage.es';
 import ProcessListPage from './process-list-page/ProcessListPage.es';
-import ProcessMetricsContainer from './process-metrics/ProcessMetricsContainer.es';
+import ProcessMetricsContainer, {
+	DashboardTab,
+	PerformanceTab,
+} from './process-metrics/ProcessMetricsContainer.es';
 import SettingsContainer from './settings/SettingsContainer.es';
 import SLAContainer from './sla/SLAContainer.es';
 import WorkloadByAssigneePage from './workload-by-assignee-page/WorkloadByAssigneePage.es';
@@ -45,37 +48,62 @@ const router = createHashRouter([
 				},
 				path: '/processes/:pageSize/:page/:sort',
 			},
-
-			/*
 			{
+				children: [
+					{
+						element: <DashboardTab />,
+						handle: {
+							path: '/metrics/:processId/dashboard/:pageSize/:page/:sort',
+						},
+						path: 'dashboard/:pageSize/:page/:sort',
+					},
+					{
+						element: <PerformanceTab />,
+						handle: {
+							path: '/metrics/:processId/performance',
+						},
+						path: 'performance',
+					},
+				],
 				element: <ProcessMetricsContainer />,
 				path: '/metrics/:processId',
 			},
 			{
 				element: <InstanceListPage />,
+				handle: {
+					path: '/instance/:processId/:pageSize/:page/:sort',
+				},
 				path: '/instance/:processId/:pageSize/:page/:sort',
 			},
 			{
 				element: <SLAContainer />,
-				path: '/sla/:processId',
+				path: '/sla/:processId/*',
 			},
 			{
 				element: <PerformanceByStepPage />,
+				handle: {
+					path: '/performance/step/:processId/:pageSize/:page/:sort',
+				},
 				path: '/performance/step/:processId/:pageSize/:page/:sort',
 			},
 			{
 				element: <WorkloadByAssigneePage />,
+				handle: {
+					path: '/workload/assignee/:processId/:pageSize/:page/:sort',
+				},
 				path: '/workload/assignee/:processId/:pageSize/:page/:sort',
 			},
 			{
 				element: <PerformanceByAssigneePage />,
+				handle: {
+					path: '/performance/assignee/:processId/:pageSize/:page/:sort',
+				},
 				path: '/performance/assignee/:processId/:pageSize/:page/:sort',
 			},
 			{
 				element: <SettingsContainer />,
-				path: '/settings',
+				path: '/settings/*',
 			},
-			*/
 		],
 		element: <Layout />,
 		path: '/',
