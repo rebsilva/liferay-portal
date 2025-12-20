@@ -41,7 +41,7 @@ export default function TimeRangeFilter({
 
 	const {search} = useLocation();
 	const navigate = useNavigate();
-	const {params} = useParams();
+	const params = useParams();
 	const path = useRoutePath();
 
 	const {isAmPm} = useContext(AppContext);

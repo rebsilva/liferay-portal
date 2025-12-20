@@ -10,7 +10,7 @@ import {getFiltersParam} from '../components/filter/util/filterUtil.es';
 
 const useRouterParams = () => {
 	const {search} = useLocation();
-	const {params} = useParams();
+	const params = useParams();
 
 	const filters = useMemo(() => getFiltersParam(search), [search]);
 

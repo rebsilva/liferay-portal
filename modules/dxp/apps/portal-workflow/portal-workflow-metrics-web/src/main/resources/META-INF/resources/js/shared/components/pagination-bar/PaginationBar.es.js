@@ -22,7 +22,7 @@ const PaginationBar = ({
 }) => {
 	const {deltaValues} = useContext(AppContext);
 	const {search} = useLocation();
-	const {params} = useParams();
+	const params = useParams();
 	const path = useRoutePath();
 	const navigate = useNavigate();
 
