@@ -46,10 +46,6 @@ function ProcessListPage() {
 	const navigate = useNavigate();
 	const routeParams = useParams();
 
-	if (location.pathname === '/') {
-		navigate(`/processes/20/1/overdueInstanceCount:desc`, {replace: true});
-	}
-
 	usePageTitle(Liferay.Language.get('metrics'));
 
 	const {page, pageSize, sort} = routeParams;
@@ -72,6 +68,14 @@ function ProcessListPage() {
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [page, pageSize, search, sort]);
+
+	useEffect(() => {
+		if (location.pathname === '/') {
+			navigate(`/processes/20/1/overdueInstanceCount:desc`, {
+				replace: true,
+			});
+		}
+	}, [location.pathname, navigate]);
 
 	return (
 		<PromisesResolver promises={promises}>
