@@ -8,15 +8,13 @@ import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import ClayList from '@clayui/list';
 import React, {useCallback} from 'react';
-import {useLocation} from 'react-router';
+import {useLocation, useNavigate, useParams} from 'react-router';
 
 import {useFilter} from '../../hooks/useFilter.es';
+import {useRoutePath} from '../../hooks/useRoutePath.es';
 import {sub} from '../../util/lang.es';
-import {
-	removeFilters,
-	removeItem,
-	replaceHistory,
-} from '../filter/util/filterUtil.es';
+import {compile} from '../../util/path-to-regexp.es';
+import {removeFilters, removeItem} from '../filter/util/filterUtil.es';
 
 const ResultsBar = ({children}) => {
 	return (
@@ -33,6 +31,9 @@ const ResultsBar = ({children}) => {
 const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 	const {dispatch, filterState} = useFilter({withoutRouteParams});
 	const location = useLocation();
+	const navigate = useNavigate();
+	const params = useParams();
+	const path = useRoutePath();
 
 	const handleClearAll = useCallback(() => {
 		filters.map((filter) => {
@@ -50,11 +51,15 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 		if (!withoutRouteParams) {
 			const query = removeFilters(location.search);
 
-			replaceHistory(query);
+			const pathname = path
+				? compile(path)({...params, page: 1})
+				: location.pathname;
+
+			navigate({pathname, search: query}, {replace: true});
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filterState, location, withoutRouteParams]);
+	}, [filterState, location, navigate, params, path, withoutRouteParams]);
 
 	return (
 		<ClayList.ItemText className="tbar-item tbar-item-expand">
@@ -75,6 +80,9 @@ const Clear = ({filters = [], filterKeys = [], withoutRouteParams}) => {
 const FilterItem = ({filter, item, withoutRouteParams}) => {
 	const {dispatch, filterState} = useFilter({withoutRouteParams});
 	const location = useLocation();
+	const navigate = useNavigate();
+	const params = useParams();
+	const path = useRoutePath();
 
 	const removeFilter = useCallback(() => {
 		item.active = false;
@@ -88,11 +96,15 @@ const FilterItem = ({filter, item, withoutRouteParams}) => {
 		if (!withoutRouteParams) {
 			const query = removeItem(filter.key, item, location.search);
 
-			replaceHistory(query);
+			const pathname = path
+				? compile(path)({...params, page: 1})
+				: location.pathname;
+
+			navigate({pathname, search: query}, {replace: true});
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [filterState, location, withoutRouteParams]);
+	}, [filterState, location, navigate, params, path, withoutRouteParams]);
 
 	return (
 		<ClayList.ItemText className="tbar-item">
