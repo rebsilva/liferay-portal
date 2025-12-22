@@ -19,6 +19,8 @@ import ProcessMetricsContainer, {
 } from './process-metrics/ProcessMetricsContainer.es';
 import SettingsContainer from './settings/SettingsContainer.es';
 import SLAContainer from './sla/SLAContainer.es';
+import SLAFormPage from './sla/form-page/SLAFormPage.es';
+import SLAListPage from './sla/list-page/SLAListPage.es';
 import WorkloadByAssigneePage from './workload-by-assignee-page/WorkloadByAssigneePage.es';
 
 const Layout = () => (
@@ -76,8 +78,31 @@ const router = createHashRouter([
 				path: '/instance/:processId/:pageSize/:page/:sort',
 			},
 			{
+				children: [
+					{
+						element: <SLAListPage />,
+						handle: {
+							path: '/sla/:processId/list/:pageSize/:page',
+						},
+						path: 'list/:pageSize/:page',
+					},
+					{
+						element: <SLAFormPage />,
+						handle: {
+							path: '/sla/:processId/new',
+						},
+						path: 'new',
+					},
+					{
+						element: <SLAFormPage />,
+						handle: {
+							path: '/sla/:processId/edit/:id',
+						},
+						path: 'edit/:id',
+					},
+				],
 				element: <SLAContainer />,
-				path: '/sla/:processId/*',
+				path: '/sla/:processId',
 			},
 			{
 				element: <PerformanceByStepPage />,

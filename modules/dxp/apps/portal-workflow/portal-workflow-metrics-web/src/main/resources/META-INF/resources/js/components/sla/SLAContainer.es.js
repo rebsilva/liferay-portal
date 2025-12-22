@@ -4,11 +4,9 @@
  */
 
 import React, {createContext, useState} from 'react';
-import {Route, Routes} from 'react-router';
+import {Outlet} from 'react-router';
 
 import {FilterContextProvider} from '../../shared/components/filter/FilterContext.es';
-import SLAFormPage from './form-page/SLAFormPage.es';
-import SLAListPage from './list-page/SLAListPage.es';
 
 const SLAContext = createContext();
 
@@ -18,22 +16,7 @@ export default function SLAContainer() {
 	return (
 		<SLAContext.Provider value={{SLAUpdated, setSLAUpdated}}>
 			<FilterContextProvider>
-				<Routes>
-					<Route
-						element={<SLAListPage />}
-						path="/sla/:processId/list/:pageSize/:page"
-					/>
-
-					<Route
-						element={<SLAFormPage />}
-						path="/sla/:processId/new"
-					/>
-
-					<Route
-						element={<SLAFormPage />}
-						path="/sla/:processId/edit/:id"
-					/>
-				</Routes>
+				<Outlet />
 			</FilterContextProvider>
 		</SLAContext.Provider>
 	);
