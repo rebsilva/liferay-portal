@@ -6,8 +6,6 @@
 import React, {createContext, useState} from 'react';
 import {Outlet} from 'react-router';
 
-import {FilterContextProvider} from '../../shared/components/filter/FilterContext.es';
-
 const SLAContext = createContext();
 
 export default function SLAContainer() {
@@ -15,9 +13,7 @@ export default function SLAContainer() {
 
 	return (
 		<SLAContext.Provider value={{SLAUpdated, setSLAUpdated}}>
-			<FilterContextProvider>
-				<Outlet />
-			</FilterContextProvider>
+			<Outlet />
 		</SLAContext.Provider>
 	);
 }
