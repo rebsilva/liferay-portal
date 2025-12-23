@@ -67,6 +67,7 @@ const SearchField = ({
 
 					<ClayInput.GroupInsetItem after tag="span">
 						<ClayButtonWithIcon
+							aria-label={Liferay.Language.get('search')}
 							displayType="unstyled"
 							symbol="search"
 							type="submit"
