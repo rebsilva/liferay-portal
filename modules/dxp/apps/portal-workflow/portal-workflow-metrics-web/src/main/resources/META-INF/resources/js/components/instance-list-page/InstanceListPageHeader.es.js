@@ -40,8 +40,6 @@ export default function Header({
 		processId,
 	});
 
-	const {search} = useLocation();
-
 	const {userId} = useContext(AppContext);
 	const {selectAll, selectedItems, setSelectAll, setSelectedItems} =
 		useContext(InstanceListContext);
@@ -233,10 +231,7 @@ export default function Header({
 
 			{!!selectedFilterItems.length && (
 				<ResultsBar>
-					<ResultsBar.TotalCount
-						search={search}
-						totalCount={totalCount}
-					/>
+					<ResultsBar.TotalCount totalCount={totalCount} />
 
 					<ResultsBar.FilterItems
 						filters={selectedFilterItems}
