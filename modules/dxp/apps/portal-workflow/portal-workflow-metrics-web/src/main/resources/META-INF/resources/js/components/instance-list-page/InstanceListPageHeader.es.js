@@ -7,7 +7,6 @@ import ClayLayout from '@clayui/layout';
 import {usePrevious} from '@liferay/frontend-js-react-web';
 import {ManagementToolbar} from 'frontend-js-components-web';
 import React, {useCallback, useContext, useEffect, useMemo} from 'react';
-import {useLocation} from 'react-router';
 
 import filterConstants from '../../shared/components/filter/util/filterConstants.es';
 import MetricsCalculatedInfo from '../../shared/components/last-updated-info/MetricsCalculatedInfo.es';
