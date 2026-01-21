@@ -3,31 +3,23 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import {createMemoryHistory} from 'history';
-import React, {cloneElement, useMemo, useState} from 'react';
-import {Route, Router} from 'react-router-dom';
+import React, {useMemo, useState, isValidElement} from 'react';
+/**
+ * React Router v7 Data Router utilities.
+ * createMemoryRouter is required for hooks like 'useMatches'.
+ */
+import {
+	createMemoryRouter,
+	RouterProvider,
+} from 'react-router';
 
 import {AppContext} from '../../src/main/resources/META-INF/resources/js/components/AppContext.es';
 import {FilterContextProvider} from '../../src/main/resources/META-INF/resources/js/shared/components/filter/FilterContext.es';
 
-const withParamsMock =
-	(...components) =>
-	({history, location: {search: query}, match: {params: routeParams}}) => {
-		return components.map((component, key) => {
-			if (routeParams.sort) {
-				routeParams.sort = decodeURIComponent(routeParams.sort);
-			}
-
-			return cloneElement(component, {
-				...routeParams,
-				history,
-				key,
-				query,
-				routeParams,
-			});
-		});
-	};
-
+/**
+ * MockRouter updated for React Router v7 Data Router.
+ * This implementation allows tests to use 'useMatches', 'useParams', and 'useLocation'.
+ */
 const MockRouter = ({
 	children,
 	initialPath = '/1/20/title%3Aasc',
@@ -37,7 +29,6 @@ const MockRouter = ({
 	query = '?backPath=%2F',
 	userId = '1',
 	userName = 'Test Test',
-	withoutRouterProps,
 }) => {
 	const [title, setTitle] = useState(null);
 	const [reindexStatuses, setReindexStatuses] = useState(
@@ -61,33 +52,55 @@ const MockRouter = ({
 			userId,
 			userName,
 		}),
-
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[reindexStatuses, title]
+		[reindexStatuses, title, fetchDateModified, isAmPm, userId, userName]
 	);
 
-	const initialEntries = useMemo(
-		() => [{pathname: initialPath, search: query}],
-		[initialPath, query]
-	);
+	/**
+	 * Normalizes 'children' into a valid React element for the route configuration.
+	 */
+	const content = useMemo(() => {
+		if (!children) return null;
 
-	const history = useMemo(
-		() => createMemoryHistory({initialEntries, keyLength: 0}),
-		[initialEntries]
-	);
+		if (isValidElement(children)) {
+			return children;
+		}
 
-	const component = withoutRouterProps
-		? () => cloneElement(children)
-		: withParamsMock(children);
+		if (typeof children === 'function') {
+			const Component = children;
+			return <Component />;
+		}
+
+		return children;
+	}, [children]);
+
+	/**
+	 * Configures the Data Router instance.
+	 * Data Routers decouple routing logic from the component tree, enabling Data APIs.
+	 */
+	const router = useMemo(() => {
+		const routes = [
+			{
+				element: content,
+				path: path,
+			},
+			{
+				element: content,
+				path: '*',
+			},
+		];
+
+		return createMemoryRouter(routes, {
+			initialEntries: [`${initialPath}${query}`],
+		});
+	}, [content, path, initialPath, query]);
 
 	return (
-		<Router history={history}>
-			<AppContext.Provider value={contextState}>
-				<FilterContextProvider>
-					<Route path={path} render={component} />
-				</FilterContextProvider>
-			</AppContext.Provider>
-		</Router>
+		<AppContext.Provider value={contextState}>
+			<FilterContextProvider>
+				{/* RouterProvider must be used when creating routers with createMemoryRouter */}
+				<RouterProvider router={router} />
+			</FilterContextProvider>
+		</AppContext.Provider>
 	);
 };
 
